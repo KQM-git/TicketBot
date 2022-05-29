@@ -1,0 +1,42 @@
+{
+    "name": "ticketbot",
+    "version": "1.0.0",
+    "description": "A Discord Ticket Bot",
+    "main": "dist/main.js",
+    "scripts": {
+        "start": "node dist/main.js",
+        "dev": "nodemon src/main.ts",
+        "build": "tsc -p ."
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Tibowl/TiBot.git"
+    },
+    "author": "Tibi",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Tibowl/TiBot/issues"
+    },
+    "homepage": "https://github.com/Tibowl/TiBot#readme",
+    "dependencies": {
+        "@prisma/client": "^3.14.0",
+        "discord-api-types": "^0.25.2",
+        "discord.js": "^13.4.0",
+        "enmap": "^5.8.7",
+        "fs-extra": "^10.0.0",
+        "log4js": "^6.3.0",
+        "node-fetch": "^2.6.6"
+    },
+    "devDependencies": {
+        "@types/fs-extra": "^9.0.13",
+        "@types/node": "^16.11.17",
+        "@types/ws": "^8.2.2",
+        "@typescript-eslint/eslint-plugin": "^5.8.1",
+        "@typescript-eslint/parser": "^5.8.1",
+        "eslint": "^8.5.0",
+        "nodemon": "^2.0.15",
+        "prisma": "^3.14.0",
+        "ts-node": "^10.4.0",
+        "typescript": "^4.5.4"
+    }
+}

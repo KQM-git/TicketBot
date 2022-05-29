@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Transcript {
+  id            Int            @id @default(autoincrement())
+  slug          String         @unique
+  channelId     String
+  channelName   String
+  messages      Message[]
+  users         User[]
+  verifications Verification[]
+  server        Server         @relation(fields: [serverId], references: [id])
+  serverId      String
+}
+
+model QueuedTranscript {
+  id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  channelId     String
+  channelName   String
+  botReplyId    String
+  upTo          String?
+  latest        String
+  transcriber   User     @relation(fields: [transcriberId], references: [id])
+  transcriberId String
+}
+
+model Verification {
+  id           Int         @id @default(autoincrement())
+  createdAt    DateTime    @default(now())
+  channelId    String
+  channelName  String
+  verifier     User        @relation(fields: [userId], references: [id])
+  userId       String
+  Transcript   Transcript? @relation(fields: [transcriptId], references: [id])
+  transcriptId Int?
+}
+
+model User {
+  id        String   @id
+  roleColor String?
+  nickname  String?
+  username  String?
+  tag       String?
+  avatar    String?
+  bot       Boolean?
+  verified  Boolean?
+
+  QueuedTranscript QueuedTranscript[]
+  Verification     Verification[]
+  Transcript       Transcript[]
+  Message          Message[]
+}
+
+model Server {
+  id     String @id
+  name   String
+  avatar String
+
+  Transcript Transcript[]
+}
+
+model Message {
+  id        Int       @id @default(autoincrement())
+  discordId String
+  createdAt DateTime
+  editedAt  DateTime?
+
+  attachements Json[]
+  reactions    Json[]
+  embeds       Json[]
+  content      String
+  components   Json[]
+  mentions     Json[]
+  stickers     Json[]
+  reply        String?
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  Transcript   Transcript @relation(fields: [transcriptId], references: [id])
+  transcriptId Int
+}
