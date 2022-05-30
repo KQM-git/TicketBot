@@ -17,13 +17,18 @@ export default class Status extends Command {
             usage: "transcript",
             aliases: ["transcribe"],
             options: [{
-                name: "message",
-                description: "Link to message or message ID up to which to fetch messages (leave empty for entire channel)",
+                name: "oldest",
+                description: "Link to message or message ID up to which to fetch messages (oldest message, defaults to entire channel)",
                 type: "STRING",
                 required: false
             }, {
-                name: "start",
-                description: "Link to message or message ID to start from (leave empty to start from current message)",
+                name: "newest",
+                description: "Link to message or message ID to start from (newest message, defaults to start from current)",
+                type: "STRING",
+                required: false
+            }, {
+                name: "slug",
+                description: "Slug to use (defaults to channel name, appends ID or timestamp if already used)",
                 type: "STRING",
                 required: false
             }]
@@ -31,14 +36,14 @@ export default class Status extends Command {
     }
 
     async runInteraction(source: CommandInteraction): Promise<SendMessage | undefined> {
-        return this.run(source, source.user.id, source.channel, source.options.getString("message", false), source.options.getString("start", false))
+        return this.run(source, source.user.id, source.channel, source.options.getString("oldest", false), source.options.getString("newest", false), source.options.getString("slug", false))
     }
 
     async runMessage(source: Message, args: string[]): Promise<SendMessage | undefined> {
         return this.run(source, source.author.id, source.channel, args[0], args[1])
     }
 
-    async run(source: CommandSource, senderId: Snowflake, channel: TextBasedChannel | null, upTo?: string | null, latest?: string | null): Promise<SendMessage | undefined> {
+    async run(source: CommandSource, senderId: Snowflake, channel: TextBasedChannel | null, upTo?: string | null, latest?: string | null, slug?: string | null): Promise<SendMessage | undefined> {
         if (!channel) return await sendMessage(source, "Couldn't fetch channel", undefined, true)
         if (!(channel instanceof BaseGuildTextChannel) || !source.guild) return await sendMessage(source, "Can't make transcripts here", undefined, true)
 
@@ -75,7 +80,7 @@ export default class Status extends Command {
 
         Logger.info(`${sender.id} (@${sender.user.tag}) requested a transcript for ${channel.id} (${channel.name}) - For messages ${upTo ?? "start of channel"} ~ ${latest}`)
 
-        await client.transcriptionManager.startTranscript(channel, response, upTo, latest, sender)
+        await client.transcriptionManager.startTranscript(channel, response, upTo, latest, sender, slug || channel.name)
 
         return response
     }

@@ -16,14 +16,15 @@ export default class TranscriptionManager {
         this.prisma = client.prisma
     }
 
-    public async startTranscript(channel: BaseGuildTextChannel, reply: SendMessage, upTo: string | undefined, latest: string, transcriber: GuildMember) {
-        let slug = channel.name
+    public async startTranscript(channel: BaseGuildTextChannel, reply: SendMessage, upTo: string | undefined, latest: string, transcriber: GuildMember, slug: string) {
+        const initialSlug = slug
+
         let trans = await this.prisma.transcript.findUnique({ where: { slug } })
         if (trans) {
-            slug = `${channel.name}-${channel.id}`
+            slug = `${initialSlug}-${channel.id}`
             trans = await this.prisma.transcript.findUnique({ where: { slug } })
             if (trans) {
-                slug = `${channel.name}-${channel.id}-${Date.now()}`
+                slug = `${initialSlug}-${channel.id}-${Date.now()}`
                 trans = await this.prisma.transcript.findUnique({ where: { slug } })
                 if (trans) {
                     slug = randomUUID()
