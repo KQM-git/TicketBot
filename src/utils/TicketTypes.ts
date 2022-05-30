@@ -89,7 +89,7 @@ export const tickets: Record<string, TicketType> = {
         manageRoles: ["980899219235807302"],
         defaultCategory: "980926469737963530",
         opening: {
-            content: "This is a staff ticket"
+            content: " - This is a staff ticket"
         },
         style: "DANGER"
     }
@@ -157,6 +157,7 @@ export async function createTicket(ticketType: TicketType, name: string, member:
 
     return channel.id
 }
+
 export async function convertTicket(ticketType: TicketType, channel: TextChannel, member: GuildMember | User, status: string, guild: Guild) {
     await client.transcriptionManager.updateServer(guild)
 
@@ -168,13 +169,16 @@ export async function convertTicket(ticketType: TicketType, channel: TextChannel
             member = (await guild.members.fetch(mentioned.id)) ?? mentioned
     }
 
-
     try {
-        const existing = await client.prisma.ticket.findUnique({ where: { channelId: channel.id } })
-        if (existing)
-            return `<#${channel.id}> already existed as ${existing.id} (${existing.type} / ${existing.status})`
-        const ticket = await client.prisma.ticket.create({
-            data: {
+        const ticket = await client.prisma.ticket.upsert({
+            where: {
+                channelId: channel.id
+            },
+            update: {
+                type: ticketType.id,
+                status
+            },
+            create: {
                 channelId: channel.id,
                 createdAt: channel.createdAt,
                 initialName: channel.name,

@@ -11,19 +11,19 @@ export default class ConvertTicket extends Command {
         super({
             name,
             category: "Tickets",
-            help: "Convert a channel into a ticket.",
+            help: "Convert a channel or category into a ticket or change type.",
             usage: "convertticket",
             aliases: [],
             options: [{
+                name: "channel",
+                description: "Channel / category to convert",
+                type: "CHANNEL",
+                required: true
+            }, {
                 name: "type",
                 description: "Ticket type to use",
                 type: "STRING",
                 choices: Object.values(tickets).map(a => ({ name: a.name, value: a.id })),
-                required: true
-            }, {
-                name: "channel",
-                description: "Channel to convert",
-                type: "CHANNEL",
                 required: true
             }, {
                 name: "status",
