@@ -1,7 +1,8 @@
-import { BaseGuildTextChannel, CommandInteraction, Message, MessageEmbed, Snowflake, TextBasedChannel } from "discord.js"
+import { BaseGuildTextChannel, ButtonInteraction, CommandInteraction, Message, MessageEmbed, Snowflake, TextBasedChannel } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
+import { tickets } from "../../utils/TicketTypes"
 import { CommandSource, SendMessage } from "../../utils/Types"
 import { Colors, sendMessage } from "../../utils/Utils"
 
@@ -42,12 +43,28 @@ export default class Transcript extends Command {
         return this.run(source, source.author.id, source.channel, args[0], args[1])
     }
 
+    async runButton(source: ButtonInteraction): Promise<void> {
+        await this.run(source, source.user.id, source.channel)
+    }
+
     async run(source: CommandSource, senderId: Snowflake, channel: TextBasedChannel | null, upTo?: string | null, latest?: string | null, slug?: string | null): Promise<SendMessage | undefined> {
         if (!channel) return await sendMessage(source, "Couldn't fetch channel", undefined, true)
         if (!(channel instanceof BaseGuildTextChannel) || !source.guild) return await sendMessage(source, "Can't make transcripts here", undefined, true)
 
         const sender = await source.guild.members.fetch(senderId)
+        if (!sender) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
+
+        const ticket = await client.prisma.ticket.findUnique({ where: { channelId: channel.id } })
+        if (!ticket) return await sendMessage(source, "This channel isn't a known ticket", undefined, true)
+
+        const ticketType = tickets[ticket.type]
+
+        if (!ticketType)
+            return await sendMessage(source, "Couldn't find ticket type", undefined, true)
+
         // TODO check perms
+        if (!sender.roles.cache.hasAny(...ticketType.manageRoles))
+            return await sendMessage(source, `You can't make transcripts of ${ticketType.name}`, undefined, true)
 
         if (!upTo) upTo = undefined
         else {
@@ -79,7 +96,7 @@ export default class Transcript extends Command {
 
         Logger.info(`${sender.id} (@${sender.user.tag}) requested a transcript for ${channel.id} (${channel.name}) - For messages ${upTo ?? "start of channel"} ~ ${latest}`)
 
-        await client.transcriptionManager.startTranscript(channel, response, upTo, latest, sender, slug || channel.name)
+        await client.transcriptionManager.startTranscript(channel, response, upTo, latest, sender, slug || channel.name, ticketType.dumpChannel)
 
         return response
     }

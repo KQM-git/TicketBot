@@ -1,7 +1,7 @@
 import { BaseGuildTextChannel, ColorResolvable, Message, MessageActionRow, MessageEmbed } from "discord.js"
 import log4js from "log4js"
 import client from "../main"
-import { CommandSource, SendMessage } from "./Types"
+import { CommandSource, SendMessage, TicketStatus } from "./Types"
 
 const Logger = log4js.getLogger("Utils")
 
@@ -129,7 +129,10 @@ export function findFuzzyBestCandidates(target: string[], search: string, amount
 }
 
 
-export const Colors: Record<string, ColorResolvable> = {
+type Color = "GREEN" | "DARK_GREEN" | "ORANGE" | "RED" | "DARK_RED" | "AQUA" | "PURPLE" |
+"Anemo" | "Cryo" | "Electro" | "Geo" | "Hydro" | "Pyro" | "Dendro" | "None" | TicketStatus
+
+export const Colors: Record<Color, ColorResolvable> = {
     GREEN: "#00EA69",
     DARK_GREEN: "#2EF41F",
 
@@ -150,4 +153,10 @@ export const Colors: Record<string, ColorResolvable> = {
     "Dendro": "#B2EB28",
 
     "None": "#545353",
+
+    OPEN: "#F49C1F",
+    CLOSED: "#F4231F",
+    VERIFIED: "#00EA69",
+    TRANSCRIBED: "#2EF41F",
+    DELETED: "#F4231F"
 }

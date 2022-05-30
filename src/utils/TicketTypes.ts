@@ -26,11 +26,24 @@ export const tickets: Record<string, TicketType> = {
 **Significance:** Conclusion`,
                 color: "#A758BF"
             }],
+            components: [
+                new MessageActionRow().addComponents(
+                    new MessageButton()
+                        .setLabel("Close")
+                        .setCustomId("close")
+                        .setEmoji("🔒")
+                        .setStyle("DANGER")
+                )
+            ]
         },
+        creationRoles: ["980899762054254593"],
+        manageRoles: ["980899103049383936"],
+        verifyRoles: ["980898982316351578"],
         defaultCategory: "980837799076958310",
         closeCategory: "980837820929294367",
         verifications: 2,
-        verifiedCategory: "980838078300164096"
+        verifiedCategory: "980838078300164096",
+        dumpChannel: "980924167648079892"
     },
     guide: {
         id: "guide",
@@ -49,21 +62,47 @@ export const tickets: Record<string, TicketType> = {
                 color: "#A758BF"
             }],
             components: [
-                new MessageActionRow()
-                    .addComponents(new MessageButton()
+                new MessageActionRow().addComponents(
+                    new MessageButton()
                         .setLabel("Guide Guidelines")
                         .setURL("https://docs.google.com/document/d/1hZ0bNmMy1t5R8TOF1v8mcuzQpR0BgJD5pKY2T_t6uh0/edit?usp=sharing")
-                        .setStyle("LINK")
-                    )
+                        .setStyle("LINK"),
+                    new MessageButton()
+                        .setLabel("Close")
+                        .setCustomId("close")
+                        .setEmoji("🔒")
+                        .setStyle("DANGER")
+                )
             ]
         },
+        creationRoles: ["980899740029956106"],
+        manageRoles: ["980899103049383936"],
+        verifyRoles: ["980898982316351578"],
         defaultCategory: "980838140099039272",
         verifications: 2
+    },
+    staff: {
+        id: "staff",
+        name: "Staff Ticket",
+        emoji: "🐒",
+        creationRoles: ["980899219235807302"],
+        manageRoles: ["980899219235807302"],
+        defaultCategory: "980926469737963530",
+        opening: {
+            content: "This is a staff ticket"
+        },
+        style: "DANGER"
     }
 }
 
-export const presets = [{
-    name: "Theorycrafting tickets",
+export const presets: {
+    name: string
+    value: string
+    title: string
+    desc: string
+    buttons: TicketType[]
+}[] = [{
+    name: "Theorycrafting Tickets",
     value: "TC",
     title: "Theorycrafting Ticket",
     desc: `Welcome, Theorycrafter. Click on one of the buttons below to open a ticket.
@@ -73,6 +112,12 @@ export const presets = [{
 
 Please read the ticket guidelines above before opening a ticket.`,
     buttons: [tickets.libsubs, tickets.guide]
+}, {
+    name: "Staff Tickets",
+    value: "ST",
+    title: "Staff Tasks",
+    desc: "Click below to create a task",
+    buttons: [tickets.staff]
 }]
 
 

@@ -25,11 +25,15 @@ export type TicketType = {
         embeds?: [MessageEmbedOptions]
         components?: [MessageActionRow]
     }
+    creationRoles: string[]
+    verifyRoles?: string[]
+    manageRoles: string[]
     defaultCategory: string
     closeCategory?: string
     verifications?: number
     verifiedCategory?: string
     publishingCategory?: string
+    dumpChannel?: string
 }
 
 // Database stuff

@@ -58,7 +58,10 @@ export default class ConvertTicket extends Command {
 
         const member = await source.guild.members.fetch(user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
+
         // TODO check perms
+        if (!member.permissionsIn(channel.id).has("ADMINISTRATOR"))
+            return await sendMessage(source, "Only Administrators can convert tickets", undefined, true)
 
         const ticketType = tickets[type]
 

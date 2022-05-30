@@ -39,6 +39,16 @@ export default class CreateTicket extends Command {
             await source.reply({ content: "Couldn't find ticket type", ephemeral: true })
             return
         }
+        const member = await source.guild?.members.fetch(source.user.id)
+        if (!member) {
+            await sendMessage(source, "Couldn't fetch your roles", undefined, true)
+            return
+        }
+
+        if (!member.roles.cache.hasAny(...ticketType.creationRoles)) {
+            await sendMessage(source, "You can't create roles of this type", undefined, true)
+            return
+        }
 
         const input = new TextInputComponent().setCustomId("name").setLabel("Name").setStyle("SHORT")
 
@@ -66,12 +76,14 @@ export default class CreateTicket extends Command {
 
         const member = await source.guild.members.fetch(user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
-        // TODO check perms
 
         const ticketType = tickets[type]
 
         if (!ticketType)
             return await sendMessage(source, "Couldn't find ticket type", undefined, true)
+
+        if (!member.roles.cache.hasAny(...ticketType.creationRoles))
+            return await sendMessage(source, "You can't create roles of this type", undefined, true)
 
         try {
             const id = await createTicket(ticketType, name, member, source.guild)

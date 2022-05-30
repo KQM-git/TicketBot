@@ -45,6 +45,7 @@ model QueuedTranscript {
   channelName   String
   botReplyId    String
   botChannelId  String
+  dumpChannelId String?
   upTo          String?
   latest        String
   fetched       Int        @default(0)

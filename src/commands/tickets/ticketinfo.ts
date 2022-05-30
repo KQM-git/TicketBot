@@ -2,7 +2,7 @@ import { ButtonInteraction, CommandInteraction, Message, MessageEmbed } from "di
 import client from "../../main"
 import Command from "../../utils/Command"
 import { tickets } from "../../utils/TicketTypes"
-import { CommandSource, SendMessage } from "../../utils/Types"
+import { CommandSource, SendMessage, TicketStatus } from "../../utils/Types"
 import { Colors, displayTimestamp, sendMessage } from "../../utils/Utils"
 
 
@@ -56,8 +56,9 @@ export default class TicketInfo extends Command {
         return await sendMessage(source, new MessageEmbed()
             .setTitle(`${ticketType?.name ?? ticketInfo.type} (Ticket #${ticketInfo.id})`)
             .setDescription(`Created by <@${ticketInfo.creator.discordId}> (${ticketInfo.creator.username}#${ticketInfo.creator.tag}) ${displayTimestamp(ticketInfo.createdAt)}`)
+            .addField("Status", ticketInfo.status)
             .addField("Verifications", `${ticketInfo.verifications.map(v => `- <@${v.verifier.discordId}> at ${displayTimestamp(v.createdAt)}`).join("\n") || "Not yet verified"}`)
-            .setColor(Colors.GREEN)
+            .setColor(Colors[ticketInfo.status as TicketStatus])
         , undefined, true)
     }
 }

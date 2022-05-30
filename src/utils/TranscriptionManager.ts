@@ -3,7 +3,7 @@ import { randomUUID } from "crypto"
 import { BaseGuildTextChannel, Guild, GuildMember, MessageEmbed, User } from "discord.js"
 import { getLogger } from "log4js"
 import TiBotClient from "../TiBotClient"
-import { Enumerable, InputJsonValue, MessageInput, SendMessage, UserInput } from "./Types"
+import { Enumerable, InputJsonValue, MessageInput, SendMessage, TicketStatus, UserInput } from "./Types"
 import { Colors, updateMessage } from "./Utils"
 
 const Logger = getLogger("transcriber")
@@ -16,7 +16,7 @@ export default class TranscriptionManager {
         this.prisma = client.prisma
     }
 
-    public async startTranscript(channel: BaseGuildTextChannel, reply: SendMessage, upTo: string | undefined, latest: string, transcriber: GuildMember, slug: string) {
+    public async startTranscript(channel: BaseGuildTextChannel, reply: SendMessage, upTo: string | undefined, latest: string, transcriber: GuildMember, slug: string, dumpChannel?: string) {
         const initialSlug = slug
 
         let trans = await this.prisma.transcript.findUnique({ where: { slug } })
@@ -53,6 +53,7 @@ export default class TranscriptionManager {
                 transcript: { connect: { id: transcript.id } },
                 botReplyId: reply.id,
                 botChannelId: channel.id,
+                dumpChannelId: dumpChannel,
                 server
             }
         })
@@ -146,15 +147,30 @@ export default class TranscriptionManager {
 
         if (messages.length == 0) {
             Logger.info(`Finishing up queue #${queued.id} - transcript #${queued.transcriptId} (${queued.channelId} - ${queued.channelName}): ${fetched} msgs total`)
-            await this.prisma.queuedTranscript.delete({
-                where: { id: queued.id },
+            await this.prisma.ticket.update({
+                where: { channelId: queued.channelId },
+                data: { status: TicketStatus.TRANSCRIBED }
             })
-            const transcript = await this.prisma.transcript.findUnique({ where: { id: queued.transcriptId }, select: { slug: true } })
+            const transcript = await this.prisma.transcript.findUnique({ where: { id: queued.transcriptId } })
 
             await updateMessage(queued.botChannelId, queued.botReplyId, new MessageEmbed()
                 .setTitle("Created transcript!")
                 .setDescription(`:wicked: ${transcript?.slug} - Fetched ${fetched} messages!`)
                 .setColor(Colors.GREEN))
+
+            if (queued.dumpChannelId)
+                try {
+                    const channel = await this.client.channels.fetch(queued.dumpChannelId)
+                    if (channel && channel instanceof BaseGuildTextChannel) {
+                        await channel.send(`Transcript for ${queued.channelName}`)
+                    }
+                } catch (error) {
+                    Logger.error("Error while sending log", error)
+                }
+
+            await this.prisma.queuedTranscript.delete({
+                where: { id: queued.id },
+            })
             return
         }
 
