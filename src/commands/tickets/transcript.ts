@@ -1,5 +1,4 @@
-import { Snowflake } from "discord-api-types"
-import { BaseGuildTextChannel, CommandInteraction, Message, MessageEmbed, TextBasedChannel } from "discord.js"
+import { BaseGuildTextChannel, CommandInteraction, Message, MessageEmbed, Snowflake, TextBasedChannel } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
@@ -8,7 +7,7 @@ import { Colors, sendMessage } from "../../utils/Utils"
 
 const Logger = getLogger("transcript")
 const discordMessageLink = /^https:\/\/discord.com\/channels\/\d+\/\d+\/(\d+)$/
-export default class Status extends Command {
+export default class Transcript extends Command {
     constructor(name: string) {
         super({
             name,

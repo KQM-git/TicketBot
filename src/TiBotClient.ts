@@ -24,7 +24,7 @@ export default class TiBotClient extends Discord.Client {
     commands: Enmap<string, Command> = new Enmap()
     prisma: PrismaClient = new PrismaClient()
 
-    transcriptionManager: TranscriptionManager= new TranscriptionManager(this)
+    transcriptionManager: TranscriptionManager = new TranscriptionManager(this)
 
     constructor() {
         super({

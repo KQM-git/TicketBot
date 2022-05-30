@@ -1,4 +1,16 @@
 -- CreateTable
+CREATE TABLE "Ticket" (
+    "id" SERIAL NOT NULL,
+    "type" TEXT NOT NULL,
+    "channelId" TEXT NOT NULL,
+    "initialName" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "serverId" TEXT NOT NULL,
+
+    CONSTRAINT "Ticket_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Transcript" (
     "id" SERIAL NOT NULL,
     "slug" TEXT NOT NULL,
@@ -36,6 +48,7 @@ CREATE TABLE "Verification" (
     "userId" TEXT NOT NULL,
     "serverId" TEXT NOT NULL,
     "transcriptId" INTEGER,
+    "ticketsId" INTEGER NOT NULL,
 
     CONSTRAINT "Verification_pkey" PRIMARY KEY ("id")
 );
@@ -76,7 +89,6 @@ CREATE TABLE "Message" (
     "embeds" JSONB[],
     "content" TEXT NOT NULL,
     "components" JSONB[],
-    "mentions" JSONB[],
     "stickers" JSONB[],
     "reply" TEXT,
     "userId" TEXT NOT NULL,
@@ -108,6 +120,12 @@ CREATE UNIQUE INDEX "_TranscriptToUser_AB_unique" ON "_TranscriptToUser"("A", "B
 CREATE INDEX "_TranscriptToUser_B_index" ON "_TranscriptToUser"("B");
 
 -- AddForeignKey
+ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_userId_serverId_fkey" FOREIGN KEY ("userId", "serverId") REFERENCES "User"("discordId", "serverId") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_serverId_fkey" FOREIGN KEY ("serverId") REFERENCES "Server"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Transcript" ADD CONSTRAINT "Transcript_serverId_fkey" FOREIGN KEY ("serverId") REFERENCES "Server"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -118,6 +136,9 @@ ALTER TABLE "QueuedTranscript" ADD CONSTRAINT "QueuedTranscript_transcriberId_se
 
 -- AddForeignKey
 ALTER TABLE "QueuedTranscript" ADD CONSTRAINT "QueuedTranscript_serverId_fkey" FOREIGN KEY ("serverId") REFERENCES "Server"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Verification" ADD CONSTRAINT "Verification_ticketsId_fkey" FOREIGN KEY ("ticketsId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Verification" ADD CONSTRAINT "Verification_transcriptId_fkey" FOREIGN KEY ("transcriptId") REFERENCES "Transcript"("id") ON DELETE SET NULL ON UPDATE CASCADE;

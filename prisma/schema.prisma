@@ -10,6 +10,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Ticket {
+  id            Int            @id @default(autoincrement())
+  type          String
+  channelId     String
+  initialName   String
+  creator       User           @relation(fields: [userId, serverId], references: [discordId, serverId])
+  userId        String
+  server        Server         @relation(fields: [serverId], references: [id])
+  serverId      String
+  verifications Verification[]
+}
+
 model Transcript {
   id               Int               @id @default(autoincrement())
   slug             String            @unique
@@ -52,6 +64,8 @@ model Verification {
   serverId     String
   transcript   Transcript? @relation(fields: [transcriptId], references: [id])
   transcriptId Int?
+  ticket       Ticket      @relation(fields: [ticketsId], references: [id])
+  ticketsId    Int
 }
 
 model User {
@@ -72,6 +86,7 @@ model User {
   Transcript       Transcript[]
   Message          Message[]
 
+  Tickets Ticket[]
   @@unique([discordId, serverId])
 }
 
@@ -85,6 +100,7 @@ model Server {
   Verification     Verification[]
   User             User[]
   Message          Message[]
+  Tickets          Ticket[]
 }
 
 model Message {
@@ -98,7 +114,6 @@ model Message {
   embeds      Json[]
   content     String
   components  Json[]
-  mentions    Json[]
   stickers    Json[]
   reply       String?
 

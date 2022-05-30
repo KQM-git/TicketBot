@@ -1,6 +1,6 @@
 import { PrismaClient, QueuedTranscript } from "@prisma/client"
 import { randomUUID } from "crypto"
-import { BaseGuildTextChannel, GuildMember, MessageEmbed } from "discord.js"
+import { BaseGuildTextChannel, Guild, GuildMember, MessageEmbed } from "discord.js"
 import { getLogger } from "log4js"
 import TiBotClient from "../TiBotClient"
 import { Enumerable, InputJsonValue, MessageInput, SendMessage, UserInput } from "./Types"
@@ -32,18 +32,7 @@ export default class TranscriptionManager {
             }
         }
 
-        const server = {
-            connectOrCreate: {
-                create: {
-                    id: channel.guild.id,
-                    icon: channel.guild.icon,
-                    name: channel.guild.name
-                },
-                where: {
-                    id: channel.guild.id
-                }
-            }
-        }
+        const server = this.getServer(channel.guild)
 
         const transcript = await this.prisma.transcript.create({
             data: {
@@ -58,7 +47,7 @@ export default class TranscriptionManager {
             data: {
                 channelId: channel.id,
                 channelName: channel.name,
-                latest,
+                latest: (BigInt(latest) + BigInt(1)).toString(),
                 upTo,
                 transcriber: await this.connectUser(transcriber),
                 transcript: { connect: { id: transcript.id } },
@@ -71,6 +60,21 @@ export default class TranscriptionManager {
         this.transcribe(response)
             .then(() => void 0)
             .catch((err) => Logger.error(err))
+    }
+
+    public getServer(guild: Guild) {
+        return {
+            connectOrCreate: {
+                create: {
+                    id: guild.id,
+                    icon: guild.icon,
+                    name: guild.name
+                },
+                where: {
+                    id: guild.id
+                }
+            }
+        }
     }
 
     public async ready() {
@@ -112,7 +116,6 @@ export default class TranscriptionManager {
                 embeds: msg.embeds.map(e => e.toJSON() as unknown as Enumerable<InputJsonValue>),
                 content: msg.content,
                 components: msg.components.map(c => c.toJSON() as unknown as Enumerable<InputJsonValue>),
-                mentions: msg.mentions.toJSON() as unknown as Enumerable<InputJsonValue>,
                 stickers: msg.stickers.toJSON() as unknown as Enumerable<InputJsonValue>,
                 reply: msg.reference?.messageId,
                 userId: msg.author.id,
@@ -206,7 +209,7 @@ export default class TranscriptionManager {
         await this.prisma.queuedTranscript.delete({ where: { id: queued.id } })
     }
 
-    private async connectUser(member: GuildMember): Promise<{
+    public async connectUser(member: GuildMember): Promise<{
         connectOrCreate: {
             where: { discordId_serverId: { discordId: string, serverId: string } }
             create: UserInput
@@ -237,5 +240,23 @@ export default class TranscriptionManager {
             verified: (await member.user.fetchFlags()).has("VERIFIED_BOT"),
             serverId: member.guild.id
         }
+    }
+
+    public async updateServer(guild: Guild) {
+        await this.client.prisma.server.upsert({
+            create: {
+                id: guild.id,
+                icon: guild.icon,
+                name: guild.name
+            },
+            where: {
+                id: guild.id
+            },
+            update: {
+                id: guild.id,
+                icon: guild.icon,
+                name: guild.name
+            }
+        })
     }
 }

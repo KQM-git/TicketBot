@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionData, AutocompleteInteraction, CommandInteraction, Message } from "discord.js"
+import { ApplicationCommandOptionData, AutocompleteInteraction, ButtonInteraction, CommandInteraction, Message, ModalSubmitInteraction } from "discord.js"
 
 import config from "../data/config.json"
 import { CommandResponse, CommandSource, SendMessage } from "./Types"
@@ -36,6 +36,18 @@ export default abstract class Command {
 
     abstract runInteraction(source: CommandInteraction, command: string): CommandResponse
     abstract runMessage(source: Message, args: string[], command: string): CommandResponse
+    async runButton(source: ButtonInteraction, _command: string): Promise<void> {
+        await source.reply({
+            content: "An error occurred",
+            ephemeral: true
+        })
+    }
+    async runModalSubmit(source: ModalSubmitInteraction, _command: string): Promise<void> {
+        await source.reply({
+            content: "An error occurred",
+            ephemeral: true
+        })
+    }
     async autocomplete(source: AutocompleteInteraction, _command: string): Promise<void> {
         await source.respond([{
             name: source.options.getFocused().toString() || "Empty",

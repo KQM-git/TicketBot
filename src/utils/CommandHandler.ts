@@ -1,4 +1,4 @@
-import { AutocompleteInteraction, CommandInteraction, Message } from "discord.js"
+import { AutocompleteInteraction, ButtonInteraction, CommandInteraction, Message, ModalSubmitInteraction } from "discord.js"
 import log4js from "log4js"
 import client from "../main"
 import Command from "../utils/Command"
@@ -64,6 +64,36 @@ export async function handleAutoComplete(cmdInfo: ParsedCommand, interaction: Au
             await response
         const endTime = Date.now()
         Logger.debug(`Autocomplete ${cmdInfo.command} took ${midTime - startTime}ms, sending took ${endTime - midTime}ms, message->start took ${startTime - interaction.createdTimestamp}ms`)
+    } catch (error) {
+        Logger.error(error)
+    }
+}
+
+export async function handleButton(cmdInfo: ParsedCommand, interaction: ButtonInteraction): Promise<void> {
+    const { command, cmd } = cmdInfo
+    try {
+        const startTime = Date.now()
+        const msg = cmd.runButton(interaction, command)
+        const midTime = Date.now()
+        if (msg && interaction.channel?.type !== "DM")
+            await msg
+        const endTime = Date.now()
+        Logger.debug(`${cmdInfo.command} took ${midTime - startTime}ms, sending took ${endTime - midTime}ms, message->start took ${startTime - interaction.createdTimestamp}ms`)
+    } catch (error) {
+        Logger.error(error)
+    }
+}
+
+export async function handleModalSubmit(cmdInfo: ParsedCommand, interaction: ModalSubmitInteraction): Promise<void> {
+    const { command, cmd } = cmdInfo
+    try {
+        const startTime = Date.now()
+        const msg = cmd.runModalSubmit(interaction, command)
+        const midTime = Date.now()
+        if (msg && interaction.channel?.type !== "DM")
+            await msg
+        const endTime = Date.now()
+        Logger.debug(`${cmdInfo.command} took ${midTime - startTime}ms, sending took ${endTime - midTime}ms, message->start took ${startTime - interaction.createdTimestamp}ms`)
     } catch (error) {
         Logger.error(error)
     }

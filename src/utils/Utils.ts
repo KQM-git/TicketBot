@@ -12,7 +12,7 @@ export function displayTimestamp(time: Date, display = "R"): string {
 export function isMessage(msg: SendMessage | CommandSource | undefined): msg is Message {
     return msg instanceof Message
 }
-export async function updateMessage(channelId: string, replyId: string, response: string | MessageEmbed, components?: (MessageActionRow)[]) {
+export async function updateMessage(channelId: string, replyId: string, response: string | MessageEmbed, components?: (MessageActionRow)[]): Promise<SendMessage | undefined> {
     let embeds: (MessageEmbed)[] | undefined
     let content: string | undefined
 
@@ -26,6 +26,7 @@ export async function updateMessage(channelId: string, replyId: string, response
         if (channel && channel instanceof BaseGuildTextChannel) {
             const msg = await channel.messages.fetch(replyId)
             await msg.edit({ content, embeds, components })
+            return msg
         }
     } catch (error) {
         Logger.error(`Couldn't update message ${replyId}`, error)
@@ -44,6 +45,8 @@ export async function sendMessage(source: CommandSource, response: string | Mess
     try {
         if (source instanceof Message)
             return await source.reply({ content, embeds, components, allowedMentions: {} })
+        else if (source.deferred)
+            return await source.editReply({ content, embeds, components })
         else
             return await source.reply({ content, embeds, components, fetchReply: true, ephemeral })
     } catch (error) {
@@ -57,6 +60,11 @@ function searchClean(str: string): string {
 function caps(str: string): string {
     return str.split("").filter(k => k != k.toLowerCase()).join("")
 }
+
+export function trim(input: string): string {
+    return input.toLowerCase().replace(/[():"'-]/g, "").trim().replace(/ +/g, "-")
+}
+
 
 export function fuzzySearchScore(a: string, b: string): number {
     if (a.length == 0) return 0
