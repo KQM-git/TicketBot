@@ -165,7 +165,8 @@ export default class TranscriptionManager {
         await this.prisma.$transaction([
             this.prisma.queuedTranscript.update({
                 where: { id: queued.id },
-                data: queued
+                data: queued,
+                select: { id: true }
             }),
             ...users.map(u => this.prisma.user.upsert({
                 create: u,
@@ -175,7 +176,8 @@ export default class TranscriptionManager {
                         discordId: u.discordId,
                         serverId: u.serverId
                     }
-                }
+                },
+                select: { id: true }
             })),
             this.prisma.message.createMany({ data: messages }),
             this.prisma.transcript.update({
@@ -186,7 +188,8 @@ export default class TranscriptionManager {
                 },
                 where: {
                     id: queued.transcriptId
-                }
+                },
+                select: { id: true }
             })
         ])
 

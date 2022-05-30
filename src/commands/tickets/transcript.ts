@@ -18,12 +18,12 @@ export default class Status extends Command {
             aliases: ["transcribe"],
             options: [{
                 name: "oldest",
-                description: "Link to message or message ID up to which to fetch messages (oldest message, defaults to entire channel)",
+                description: "Link to message or message ID up to which to fetch messages (defaults to entire channel)",
                 type: "STRING",
                 required: false
             }, {
                 name: "newest",
-                description: "Link to message or message ID to start from (newest message, defaults to start from current)",
+                description: "Link to message or message ID to start from (defaults to start from current)",
                 type: "STRING",
                 required: false
             }, {
