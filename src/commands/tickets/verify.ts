@@ -57,9 +57,6 @@ export default class CloseTicket extends Command {
         if (ticket == null)
             return await sendMessage(source, "No ticket data associated with this channel!", undefined, true)
 
-        if (ticket.status != TicketStatus.CLOSED)
-            return await sendMessage(source, "This ticket isn't ready for verification", undefined, true)
-
         if (ticket.verifications.find(v => v.userId == user.id))
             return await sendMessage(source, "You already verified this ticket!", undefined, true)
 
