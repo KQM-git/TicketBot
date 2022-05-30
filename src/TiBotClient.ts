@@ -6,6 +6,7 @@ import log4js from "log4js"
 import { join } from "path"
 import config from "./data/config.json"
 import Command from "./utils/Command"
+import TranscriptionManager from "./utils/TranscriptionManager"
 
 
 const Logger = log4js.getLogger("main")
@@ -22,6 +23,8 @@ intents.add(
 export default class TiBotClient extends Discord.Client {
     commands: Enmap<string, Command> = new Enmap()
     prisma: PrismaClient = new PrismaClient()
+
+    transcriptionManager: TranscriptionManager= new TranscriptionManager(this)
 
     constructor() {
         super({

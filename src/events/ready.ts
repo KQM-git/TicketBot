@@ -12,6 +12,8 @@ export async function handle(): Promise<void> {
     if (alreadyLoaded) return
     alreadyLoaded = true
 
+    await client.transcriptionManager.ready()
+
     await client.user?.setStatus("online")
 
     if (!client.application?.owner) await client.application?.fetch()

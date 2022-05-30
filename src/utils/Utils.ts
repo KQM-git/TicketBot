@@ -1,5 +1,6 @@
-import { ColorResolvable, Message, MessageActionRow, MessageEmbed } from "discord.js"
+import { BaseGuildTextChannel, ColorResolvable, Message, MessageActionRow, MessageEmbed } from "discord.js"
 import log4js from "log4js"
+import client from "../main"
 import { CommandSource, SendMessage } from "./Types"
 
 const Logger = log4js.getLogger("Utils")
@@ -10,6 +11,25 @@ export function displayTimestamp(time: Date, display = "R"): string {
 
 export function isMessage(msg: SendMessage | CommandSource | undefined): msg is Message {
     return msg instanceof Message
+}
+export async function updateMessage(channelId: string, replyId: string, response: string | MessageEmbed, components?: (MessageActionRow)[]) {
+    let embeds: (MessageEmbed)[] | undefined
+    let content: string | undefined
+
+    if (typeof response == "string")
+        content = response
+    else
+        embeds = [response]
+
+    try {
+        const channel = await client.channels.fetch(channelId)
+        if (channel && channel instanceof BaseGuildTextChannel) {
+            const msg = await channel.messages.fetch(replyId)
+            await msg.edit({ content, embeds, components })
+        }
+    } catch (error) {
+        Logger.error(`Couldn't update message ${replyId}`, error)
+    }
 }
 
 export async function sendMessage(source: CommandSource, response: string | MessageEmbed, components?: (MessageActionRow)[], ephemeral?: boolean): Promise<SendMessage | undefined> {

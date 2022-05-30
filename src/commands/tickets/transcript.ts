@@ -1,5 +1,7 @@
-import { BaseGuildTextChannel, CommandInteraction, Message, MessageEmbed, TextBasedChannel, User } from "discord.js"
+import { Snowflake } from "discord-api-types"
+import { BaseGuildTextChannel, CommandInteraction, Message, MessageEmbed, TextBasedChannel } from "discord.js"
 import { getLogger } from "log4js"
+import client from "../../main"
 import Command from "../../utils/Command"
 import { CommandSource, SendMessage } from "../../utils/Types"
 import { Colors, sendMessage } from "../../utils/Utils"
@@ -29,16 +31,18 @@ export default class Status extends Command {
     }
 
     async runInteraction(source: CommandInteraction): Promise<SendMessage | undefined> {
-        return this.run(source, source.user, source.channel, source.options.getString("message", false), source.options.getString("start", false))
-
+        return this.run(source, source.user.id, source.channel, source.options.getString("message", false), source.options.getString("start", false))
     }
+
     async runMessage(source: Message, args: string[]): Promise<SendMessage | undefined> {
-        return this.run(source, source.author, source.channel, args[0], args[1])
+        return this.run(source, source.author.id, source.channel, args[0], args[1])
     }
 
-    async run(source: CommandSource, sender: User, channel: TextBasedChannel | null, upTo?: string | null, latest?: string | null): Promise<SendMessage | undefined> {
+    async run(source: CommandSource, senderId: Snowflake, channel: TextBasedChannel | null, upTo?: string | null, latest?: string | null): Promise<SendMessage | undefined> {
         if (!channel) return await sendMessage(source, "Couldn't fetch channel", undefined, true)
-        if (!(channel instanceof BaseGuildTextChannel)) return await sendMessage(source, "Can't make transcripts here", undefined, true)
+        if (!(channel instanceof BaseGuildTextChannel) || !source.guild) return await sendMessage(source, "Can't make transcripts here", undefined, true)
+
+        const sender = await source.guild.members.fetch(senderId)
         // TODO check perms
 
         if (!upTo) upTo = undefined
@@ -66,10 +70,12 @@ export default class Status extends Command {
         if (!response) return response
         if (!latest) latest = response.id
 
-        Logger.info(`${sender.id} (@${sender.tag}) requested a transcript for ${channel.id} (${channel.name}) - For messages ${upTo ?? "start of channel"} ~ ${latest}`)
+        if (upTo && BigInt(latest) < BigInt(upTo))
+            [latest, upTo] = [upTo, latest]
 
-        // const msgs = await channel.messages.fetch({ before: latest, limit: 100 })
-        // console.log(msgs)
+        Logger.info(`${sender.id} (@${sender.user.tag}) requested a transcript for ${channel.id} (${channel.name}) - For messages ${upTo ?? "start of channel"} ~ ${latest}`)
+
+        await client.transcriptionManager.startTranscript(channel, response, upTo, latest, sender)
 
         return response
     }
