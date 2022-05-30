@@ -7,6 +7,14 @@ export type SendMessage = Message | APIMessage
 export type CommandResponse = Promise<SendMessage | undefined> | undefined
 
 // Ticket data
+export enum TicketStatus {
+    OPEN = "OPEN",
+    CLOSED = "CLOSED",
+    VERIFIED = "VERIFIED",
+    TRANSCRIBED = "TRANSCRIBED",
+    DELETED = "DELETED"
+}
+
 export type TicketType = {
     id: string
     name: string

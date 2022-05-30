@@ -12,8 +12,10 @@ datasource db {
 
 model Ticket {
   id            Int            @id @default(autoincrement())
+  createdAt     DateTime       @default(now())
   type          String
-  channelId     String
+  status        String         @default("OPEN")
+  channelId     String         @unique
   initialName   String
   creator       User           @relation(fields: [userId, serverId], references: [discordId, serverId])
   userId        String
@@ -25,6 +27,7 @@ model Ticket {
 model Transcript {
   id               Int               @id @default(autoincrement())
   slug             String            @unique
+  createdAt        DateTime          @default(now())
   channelId        String
   channelName      String
   messages         Message[]
@@ -91,9 +94,10 @@ model User {
 }
 
 model Server {
-  id   String  @id
-  name String
-  icon String?
+  id        String   @id
+  createdAt DateTime @default(now())
+  name      String
+  icon      String?
 
   Transcript       Transcript[]
   QueuedTranscript QueuedTranscript[]

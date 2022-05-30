@@ -1,6 +1,6 @@
 import { PrismaClient, QueuedTranscript } from "@prisma/client"
 import { randomUUID } from "crypto"
-import { BaseGuildTextChannel, Guild, GuildMember, MessageEmbed } from "discord.js"
+import { BaseGuildTextChannel, Guild, GuildMember, MessageEmbed, User } from "discord.js"
 import { getLogger } from "log4js"
 import TiBotClient from "../TiBotClient"
 import { Enumerable, InputJsonValue, MessageInput, SendMessage, UserInput } from "./Types"
@@ -49,7 +49,7 @@ export default class TranscriptionManager {
                 channelName: channel.name,
                 latest: (BigInt(latest) + BigInt(1)).toString(),
                 upTo,
-                transcriber: await this.connectUser(transcriber),
+                transcriber: await this.connectUser(transcriber, transcriber.guild.id),
                 transcript: { connect: { id: transcript.id } },
                 botReplyId: reply.id,
                 botChannelId: channel.id,
@@ -126,7 +126,7 @@ export default class TranscriptionManager {
             if (!users.find(u => u.discordId == msg.author.id)) {
                 try {
                     const member = await guild.members.fetch(msg.author.id)
-                    users.push(await this.getUser(member))
+                    users.push(await this.getMember(member))
                 } catch (error) {
                     users.push({
                         discordId: msg.author.id,
@@ -209,7 +209,7 @@ export default class TranscriptionManager {
         await this.prisma.queuedTranscript.delete({ where: { id: queued.id } })
     }
 
-    public async connectUser(member: GuildMember): Promise<{
+    public async connectUser(member: GuildMember | User, guildId: string): Promise<{
         connectOrCreate: {
             where: { discordId_serverId: { discordId: string, serverId: string } }
             create: UserInput
@@ -220,15 +220,15 @@ export default class TranscriptionManager {
                 where: {
                     discordId_serverId: {
                         discordId: member.id,
-                        serverId: member.guild.id
+                        serverId: guildId
                     }
                 },
-                create: await this.getUser(member)
+                create: member instanceof GuildMember ? await this.getMember(member) : await this.getUser(member, guildId)
             }
         }
     }
 
-    private async getUser(member: GuildMember) {
+    private async getMember(member: GuildMember): Promise<UserInput> {
         return {
             discordId: member.user.id,
             roleColor: member.displayHexColor,
@@ -239,6 +239,20 @@ export default class TranscriptionManager {
             bot: member.user.bot,
             verified: (await member.user.fetchFlags()).has("VERIFIED_BOT"),
             serverId: member.guild.id
+        }
+    }
+
+    private async getUser(user: User, guildId: string): Promise<UserInput> {
+        return {
+            discordId: user.id,
+            roleColor: null,
+            nickname: null,
+            username: user.username,
+            tag: user.discriminator,
+            avatar: user.avatar,
+            bot: user.bot,
+            verified: (await user.fetchFlags()).has("VERIFIED_BOT"),
+            serverId: guildId
         }
     }
 

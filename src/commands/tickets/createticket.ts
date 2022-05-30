@@ -71,7 +71,7 @@ export default class CreateTicket extends Command {
         const ticketType = tickets[type]
 
         if (!ticketType)
-            return await sendMessage(source, "Couldn't find type", undefined, true)
+            return await sendMessage(source, "Couldn't find ticket type", undefined, true)
 
         try {
             const id = await createTicket(ticketType, name, member, source.guild)

@@ -1,7 +1,9 @@
 -- CreateTable
 CREATE TABLE "Ticket" (
     "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "type" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT E'OPEN',
     "channelId" TEXT NOT NULL,
     "initialName" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
@@ -14,6 +16,7 @@ CREATE TABLE "Ticket" (
 CREATE TABLE "Transcript" (
     "id" SERIAL NOT NULL,
     "slug" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "channelId" TEXT NOT NULL,
     "channelName" TEXT NOT NULL,
     "serverId" TEXT NOT NULL,
@@ -72,6 +75,7 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Server" (
     "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "name" TEXT NOT NULL,
     "icon" TEXT,
 
@@ -103,6 +107,9 @@ CREATE TABLE "_TranscriptToUser" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Ticket_channelId_key" ON "Ticket"("channelId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Transcript_slug_key" ON "Transcript"("slug");

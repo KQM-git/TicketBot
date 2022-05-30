@@ -48,7 +48,7 @@ export async function sendMessage(source: CommandSource, response: string | Mess
         else if (source.deferred)
             return await source.editReply({ content, embeds, components })
         else
-            return await source.reply({ content, embeds, components, fetchReply: true, ephemeral })
+            return await source.reply({ content, embeds, components, fetchReply: true, ephemeral, allowedMentions: {} })
     } catch (error) {
         Logger.error("sendMessage", error)
     }
