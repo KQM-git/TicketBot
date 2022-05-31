@@ -60,8 +60,8 @@ export default class RemoveUserTicket extends Command {
 
         const ticketType = tickets[ticket.type]
 
-        if (!(ticket.creator.discordId == user.id || (ticketType && member.roles.cache.hasAny(...ticketType.manageRoles))))
-            return await sendMessage(source, "Only the ticket creator and people with management roles can close tickets", undefined, true)
+        if (!(ticketType && member.roles.cache.hasAny(...ticketType.manageRoles)))
+            return await sendMessage(source, "Only people with management roles can remove groups from tickets", undefined, true)
 
         Logger.info(`Removing group ${targetId} ticket ${ticket.id} (${ticket.name}) by ${member.id} (${member.user.tag})`)
 

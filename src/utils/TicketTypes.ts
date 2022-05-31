@@ -167,7 +167,10 @@ export async function createTicket(ticketType: TicketType, name: string, member:
 
 
     try {
-        await channel.permissionOverwrites.create(member, { MANAGE_MESSAGES: true })
+        await channel.permissionOverwrites.create(member, {
+            VIEW_CHANNEL: true,
+            MANAGE_MESSAGES: true
+        })
     } catch (error) {
         Logger.error("Couldn't give creator permission for MANAGE_MESSAGES")
     }
