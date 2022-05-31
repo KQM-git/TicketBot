@@ -77,8 +77,13 @@ export default class DeleteTicket extends Command {
             return await sendMessage(source, "No ticket data associated with this channel!", undefined, true)
 
         const ticketType = tickets[ticket.type]
-        if (!(ticketType && member.roles.cache.hasAny(...ticketType.manageRoles)))
-            return await sendMessage(source, "Only the people with management roles can delete tickets", undefined, true)
+        if (!(ticketType && member.roles.cache.hasAny(...ticketType.manageRoles))) {
+            if (member.id == ticket.creator.discordId) {
+                if (ticket.createdAt.getTime() + 5 * 60 * 1000 < Date.now())
+                    return await sendMessage(source, "Only the people with management roles can delete tickets (owner can also delete in first 5 minutes).", undefined, true)
+            } else
+                return await sendMessage(source, "Only the people with management roles can delete tickets (owner can also delete in first 5 minutes).", undefined, true)
+        }
 
         if (!run)
             return true
