@@ -38,8 +38,10 @@ export async function handle(): Promise<void> {
     try {
         if (config.production)
             await client.application?.commands.set(cmds)
-        else
+        else {
+            await client.guilds.cache.get("247122362942619649")?.commands.set(cmds)
             await client.guilds.cache.get("980837690285109349")?.commands.set(cmds)
+        }
         Logger.info(`Commands registered for ${config.production}`)
     } catch (error) {
         Logger.error("Unable to register commands")

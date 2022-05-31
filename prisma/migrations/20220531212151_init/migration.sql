@@ -2,11 +2,12 @@
 CREATE TABLE "Ticket" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "lastRename" TIMESTAMP(3),
     "type" TEXT NOT NULL,
     "status" TEXT NOT NULL DEFAULT E'OPEN',
     "channelId" TEXT NOT NULL,
-    "initialName" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "creatorId" TEXT NOT NULL,
     "serverId" TEXT NOT NULL,
 
     CONSTRAINT "Ticket_pkey" PRIMARY KEY ("id")
@@ -20,6 +21,7 @@ CREATE TABLE "Transcript" (
     "channelId" TEXT NOT NULL,
     "channelName" TEXT NOT NULL,
     "serverId" TEXT NOT NULL,
+    "ticketId" INTEGER NOT NULL,
 
     CONSTRAINT "Transcript_pkey" PRIMARY KEY ("id")
 );
@@ -32,8 +34,10 @@ CREATE TABLE "QueuedTranscript" (
     "channelName" TEXT NOT NULL,
     "botReplyId" TEXT NOT NULL,
     "botChannelId" TEXT NOT NULL,
+    "dumpChannelId" TEXT,
     "upTo" TEXT,
     "latest" TEXT NOT NULL,
+    "endAction" TEXT NOT NULL,
     "fetched" INTEGER NOT NULL DEFAULT 0,
     "transcriberId" TEXT NOT NULL,
     "serverId" TEXT NOT NULL,
@@ -103,6 +107,12 @@ CREATE TABLE "Message" (
 );
 
 -- CreateTable
+CREATE TABLE "_contributes" (
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL
+);
+
+-- CreateTable
 CREATE TABLE "_TranscriptToUser" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL
@@ -121,16 +131,25 @@ CREATE UNIQUE INDEX "QueuedTranscript_transcriptId_key" ON "QueuedTranscript"("t
 CREATE UNIQUE INDEX "User_discordId_serverId_key" ON "User"("discordId", "serverId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "_contributes_AB_unique" ON "_contributes"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_contributes_B_index" ON "_contributes"("B");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "_TranscriptToUser_AB_unique" ON "_TranscriptToUser"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_TranscriptToUser_B_index" ON "_TranscriptToUser"("B");
 
 -- AddForeignKey
-ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_userId_serverId_fkey" FOREIGN KEY ("userId", "serverId") REFERENCES "User"("discordId", "serverId") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_creatorId_serverId_fkey" FOREIGN KEY ("creatorId", "serverId") REFERENCES "User"("discordId", "serverId") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_serverId_fkey" FOREIGN KEY ("serverId") REFERENCES "Server"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Transcript" ADD CONSTRAINT "Transcript_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Transcript" ADD CONSTRAINT "Transcript_serverId_fkey" FOREIGN KEY ("serverId") REFERENCES "Server"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -167,6 +186,12 @@ ALTER TABLE "Message" ADD CONSTRAINT "Message_userId_serverId_fkey" FOREIGN KEY 
 
 -- AddForeignKey
 ALTER TABLE "Message" ADD CONSTRAINT "Message_serverId_fkey" FOREIGN KEY ("serverId") REFERENCES "Server"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_contributes" ADD CONSTRAINT "_contributes_A_fkey" FOREIGN KEY ("A") REFERENCES "Ticket"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_contributes" ADD CONSTRAINT "_contributes_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_TranscriptToUser" ADD CONSTRAINT "_TranscriptToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "Transcript"("id") ON DELETE CASCADE ON UPDATE CASCADE;

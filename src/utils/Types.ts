@@ -4,15 +4,19 @@ import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, Messa
 // Discord shortcuts
 export type CommandSource = Message | CommandInteraction | ModalSubmitInteraction | ButtonInteraction
 export type SendMessage = Message | APIMessage
-export type CommandResponse = Promise<SendMessage | undefined> | undefined
+export type CommandResponse = Promise<unknown> | unknown
 
 // Ticket data
 export enum TicketStatus {
     OPEN = "OPEN",
     CLOSED = "CLOSED",
     VERIFIED = "VERIFIED",
-    TRANSCRIBED = "TRANSCRIBED",
     DELETED = "DELETED"
+}
+
+export enum EndingAction {
+    DELETE = "DELETE",
+    NOTHING = "NOTHING"
 }
 
 export type TicketType = {
@@ -32,7 +36,7 @@ export type TicketType = {
     closeCategory?: string
     verifications?: number
     verifiedCategory?: string
-    publishingCategory?: string
+    verifiedRole?: string
     dumpChannel?: string
 }
 

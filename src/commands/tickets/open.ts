@@ -1,4 +1,5 @@
 import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButton, MessageEmbed, User } from "discord.js"
+import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
 import { tickets } from "../../utils/TicketTypes"
@@ -6,6 +7,7 @@ import { CommandSource, SendMessage, TicketStatus } from "../../utils/Types"
 import { displayTimestamp, sendMessage } from "../../utils/Utils"
 
 
+const Logger = getLogger("open")
 export default class OpenTicket extends Command {
     constructor(name: string) {
         super({
@@ -65,6 +67,7 @@ export default class OpenTicket extends Command {
         if (!(ticket.creator.discordId == user.id || (ticketType && member.roles.cache.hasAny(...ticketType.manageRoles))))
             return await sendMessage(source, "Only the ticket creator and people with management roles can open tickets", undefined, true)
 
+        Logger.info(`Opening ticket ${source.channel.id} / ${source.channel.id} -> ${ticket.id} by ${user.id} (${user.tag})`)
         await source.channel.permissionOverwrites.create(ticket.creator.discordId, { SEND_MESSAGES: null })
         if (ticketType?.defaultCategory) {
             await source.channel.setParent(ticketType?.defaultCategory)
@@ -96,6 +99,7 @@ export default class OpenTicket extends Command {
                 }
             }
         })
+        Logger.info(`Opened ticket ${source.channel.id} / ${source.channel.id} -> ${ticket.id} by ${user.id} (${user.tag})`)
 
         return await sendMessage(source, "Opened ticket!")
     }

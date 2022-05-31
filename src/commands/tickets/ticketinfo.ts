@@ -41,6 +41,7 @@ export default class TicketInfo extends Command {
             },
             include: {
                 creator: true,
+                contributors: true,
                 verifications: {
                     include: {
                         verifier: true
@@ -58,6 +59,7 @@ export default class TicketInfo extends Command {
             .setDescription(`Created by <@${ticketInfo.creator.discordId}> (${ticketInfo.creator.username}#${ticketInfo.creator.tag}) ${displayTimestamp(ticketInfo.createdAt)}`)
             .addField("Status", ticketInfo.status)
             .addField("Verifications", `${ticketInfo.verifications.map(v => `- <@${v.verifier.discordId}> at ${displayTimestamp(v.createdAt)}`).join("\n") || "Not yet verified"}`)
+            .addField("Contributors", `${ticketInfo.contributors.map(c => `<@${c.discordId}>`).join(", ") || "No contributors added"}`)
             .setColor(Colors[ticketInfo.status as TicketStatus])
         , undefined, true)
     }

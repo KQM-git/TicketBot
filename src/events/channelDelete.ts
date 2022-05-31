@@ -20,7 +20,7 @@ export async function handle(channel: DMChannel | GuildChannel): Promise<void> {
             }
         })
 
-        if (ticket && ticket.status != TicketStatus.TRANSCRIBED) {
+        if (ticket && ticket.status != TicketStatus.DELETED) {
             await client.prisma.ticket.update({
                 where: {
                     id: ticket.id
@@ -29,7 +29,7 @@ export async function handle(channel: DMChannel | GuildChannel): Promise<void> {
                     status: TicketStatus.DELETED
                 }
             })
-            Logger.info(`Updated ticket ${ticket.id} from open to deleted.`)
+            Logger.info(`Updated ticket ${ticket.id} from ${ticket.status} to deleted.`)
         }
     } catch (error) {
         Logger.error(error)

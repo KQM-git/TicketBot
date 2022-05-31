@@ -13,15 +13,18 @@ datasource db {
 model Ticket {
   id            Int            @id @default(autoincrement())
   createdAt     DateTime       @default(now())
+  lastRename    DateTime?
   type          String
   status        String         @default("OPEN")
   channelId     String         @unique
-  initialName   String
-  creator       User           @relation(fields: [userId, serverId], references: [discordId, serverId])
-  userId        String
+  name          String
+  creator       User           @relation("created", fields: [creatorId, serverId], references: [discordId, serverId])
+  creatorId     String
   server        Server         @relation(fields: [serverId], references: [id])
   serverId      String
   verifications Verification[]
+  transcript    Transcript[]
+  contributors  User[]         @relation("contributes")
 }
 
 model Transcript {
@@ -35,6 +38,8 @@ model Transcript {
   verifications    Verification[]
   server           Server            @relation(fields: [serverId], references: [id])
   serverId         String
+  ticket           Ticket            @relation(fields: [ticketId], references: [id])
+  ticketId         Int
   QueuedTranscript QueuedTranscript?
 }
 
@@ -48,6 +53,7 @@ model QueuedTranscript {
   dumpChannelId String?
   upTo          String?
   latest        String
+  endAction     String
   fetched       Int        @default(0)
   transcriber   User       @relation(fields: [transcriberId, serverId], references: [discordId, serverId])
   transcriberId String
@@ -89,8 +95,9 @@ model User {
   Verification     Verification[]
   Transcript       Transcript[]
   Message          Message[]
+  Tickets          Ticket[]           @relation("created")
+  Contributed      Ticket[]           @relation("contributes")
 
-  Tickets Ticket[]
   @@unique([discordId, serverId])
 }
 

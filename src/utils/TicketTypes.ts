@@ -32,8 +32,13 @@ export const tickets: Record<string, TicketType> = {
                         .setLabel("Close")
                         .setCustomId("close")
                         .setEmoji("🔒")
-                        .setStyle("DANGER")
-                )
+                        .setStyle("DANGER"),
+                    new MessageButton()
+                        .setLabel("Rename")
+                        .setCustomId("rename")
+                        .setEmoji("✏️")
+                        .setStyle("SECONDARY")
+                ),
             ]
         },
         creationRoles: ["980899762054254593"],
@@ -41,8 +46,9 @@ export const tickets: Record<string, TicketType> = {
         verifyRoles: ["980898982316351578"],
         defaultCategory: "980837799076958310",
         closeCategory: "980837820929294367",
-        verifications: 2,
+        verifications: 1,
         verifiedCategory: "980838078300164096",
+        verifiedRole: "980899054177374268",
         dumpChannel: "980924167648079892"
     },
     guide: {
@@ -127,6 +133,8 @@ export async function createTicket(ticketType: TicketType, name: string, member:
     if (!parent || parent.type != "GUILD_CATEGORY")
         throw Error("Invalid parent channel")
 
+    Logger.info(`Creating a ticket for ${member.id} (@${member.user.tag}) in ${guild.id}: ${name}`)
+
     await client.transcriptionManager.updateServer(guild)
 
     const channel = await guild.channels.create(trim(name), {
@@ -143,15 +151,16 @@ export async function createTicket(ticketType: TicketType, name: string, member:
     await client.prisma.ticket.create({
         data: {
             channelId: channel.id,
-            initialName: name,
+            name,
             type: ticketType.id,
             server: client.transcriptionManager.getServer(guild),
-            creator: await client.transcriptionManager.connectUser(member, guild.id)
+            creator: await client.transcriptionManager.connectUser(member, guild.id),
+            contributors: await client.transcriptionManager.connectUser(member, guild.id),
         },
         select: { id: true }
     })
 
-    await mgs.pin()
+    await mgs.pin("Initial create ticket message")
 
     Logger.info(`Created ticket for ${channel.id} / ${channel.name}`)
 
@@ -181,7 +190,7 @@ export async function convertTicket(ticketType: TicketType, channel: TextChannel
             create: {
                 channelId: channel.id,
                 createdAt: channel.createdAt,
-                initialName: channel.name,
+                name: channel.name,
                 type: ticketType.id,
                 server: client.transcriptionManager.getServer(guild),
                 creator: await client.transcriptionManager.connectUser(member, guild.id),

@@ -1,12 +1,13 @@
-import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButton, MessageEmbed, User } from "discord.js"
+import { ButtonInteraction, CommandInteraction, GuildMember, Message, MessageEmbed, User } from "discord.js"
+import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
 import { tickets } from "../../utils/TicketTypes"
-import { CommandSource, SendMessage, TicketStatus } from "../../utils/Types"
-import { sendMessage } from "../../utils/Utils"
+import { CommandSource, EndingAction, SendMessage, TicketStatus } from "../../utils/Types"
+import { Colors, sendMessage } from "../../utils/Utils"
 
-
-export default class CloseTicket extends Command {
+const Logger = getLogger("verify")
+export default class VerifyTicket extends Command {
     constructor(name: string) {
         super({
             name,
@@ -46,6 +47,7 @@ export default class CloseTicket extends Command {
             },
             include: {
                 creator: true,
+                contributors: true,
                 verifications: {
                     include: {
                         verifier: true
@@ -65,23 +67,57 @@ export default class CloseTicket extends Command {
             return await sendMessage(source, "Only people with verify or management roles can verify tickets", undefined, true)
 
         const enough = ticketType.verifications && ticket.verifications.length + 1 >= ticketType.verifications
-        const components: MessageActionRow[] = []
+
+        Logger.info(`Verifying ticket ${ticket.id}: ${ticket.name} by ${user.id} (${user.tag})`)
+        await source.channel.send({
+            embeds: [new MessageEmbed().setDescription(`Ticket verified by <@${member.id}>`)]
+        })
+
         if (enough) {
+            Logger.info(`Enough verifications for ticket ${ticket.id}: ${ticket.name} by ${user.id} (${user.tag}), doing some extra actions...`)
             if (ticketType?.verifiedCategory)
                 await source.channel.setParent(ticketType?.verifiedCategory)
 
-            components.push(new MessageActionRow().addComponents(new MessageButton()
-                .setCustomId("transcript")
-                .setLabel("Transcript")
-                .setEmoji("📑")
-                .setStyle("SECONDARY")
-            ))
+
+            if (ticketType.verifiedRole) {
+                const givenUser: GuildMember[] = []
+
+                for (const contributor of ticket.contributors) {
+                    try {
+                        const member = await source.guild.members.fetch(contributor.discordId)
+                        if (member && !member.roles.cache.has(ticketType.verifiedRole)) {
+                            Logger.info(`Giving contribution role for ${member.id} (${member.user.tag}) from ticket ${ticket.id}: ${ticket.name}`)
+                            await member.roles.add(ticketType.verifiedRole)
+                            givenUser.push(member)
+
+                            if (givenUser.length > 5)
+                                await source.channel.send({ embeds: [
+                                    new MessageEmbed()
+                                        .setTitle("Contribution roles")
+                                        .setDescription(givenUser.map(u => `Given <@${u.id}> the role <@${ticketType.verifiedRole}>`).join("\n"))
+                                        .setColor(Colors.AQUA)
+                                ] })
+                        }
+                    } catch (error) {
+                        Logger.error(`Couldn't give role to ${contributor.discordId}`)
+                    }
+                }
+
+                if (givenUser.length > 0)
+                    await source.channel.send({ embeds: [
+                        new MessageEmbed()
+                            .setTitle("Contribution roles")
+                            .setDescription(givenUser.map(u => `Given <@${u.id}> the role <@&${ticketType.verifiedRole}>`).join("\n"))
+                            .setColor(Colors.AQUA)
+                    ] })
+            }
+
+            Logger.info(`Giving contribution role for ${member.id} (${member.user.tag}) from ticket ${ticket.id}: ${ticket.name}`)
+            const response = await source.channel.send({ embeds: [ new MessageEmbed().setTitle("Creating transcript...").setColor(Colors.ORANGE) ] })
+            if (response)
+                await client.transcriptionManager.startTranscript(source.channel, response, undefined, response.id, member, source.channel.name, ticketType.dumpChannel, EndingAction.NOTHING)
         }
 
-        await source.channel.send({
-            embeds: [new MessageEmbed().setDescription(`Ticket verified by <@${member.id}>`)],
-            components
-        })
 
         await client.prisma.ticket.update({
             where: { id: ticket.id },
@@ -98,6 +134,7 @@ export default class CloseTicket extends Command {
             }
         })
 
+        Logger.info(`Verified ticket ${ticket.id}: ${ticket.name} by ${user.id} (${user.tag})`)
         return await sendMessage(source, "Verified ticket!")
     }
 }

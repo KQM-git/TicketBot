@@ -129,8 +129,7 @@ export function findFuzzyBestCandidates(target: string[], search: string, amount
 }
 
 
-type Color = "GREEN" | "DARK_GREEN" | "ORANGE" | "RED" | "DARK_RED" | "AQUA" | "PURPLE" |
-"Anemo" | "Cryo" | "Electro" | "Geo" | "Hydro" | "Pyro" | "Dendro" | "None" | TicketStatus
+type Color = "GREEN" | "DARK_GREEN" | "ORANGE" | "RED" | "DARK_RED" | "AQUA" | "PURPLE" | TicketStatus
 
 export const Colors: Record<Color, ColorResolvable> = {
     GREEN: "#00EA69",
@@ -144,19 +143,8 @@ export const Colors: Record<Color, ColorResolvable> = {
     AQUA: "#07EADB",
     PURPLE: "#6B68B1",
 
-    "Anemo": "#32D39F",
-    "Cryo": "#79E8EB",
-    "Electro": "#CA7FFF",
-    "Geo": "#FEE263",
-    "Hydro": "#06E5FE",
-    "Pyro": "#FFAA6E",
-    "Dendro": "#B2EB28",
-
-    "None": "#545353",
-
     OPEN: "#F49C1F",
     CLOSED: "#F4231F",
     VERIFIED: "#00EA69",
-    TRANSCRIBED: "#2EF41F",
     DELETED: "#F4231F"
 }

@@ -1,11 +1,12 @@
 import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButton, MessageEmbed, User } from "discord.js"
+import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
 import { tickets } from "../../utils/TicketTypes"
 import { CommandSource, SendMessage, TicketStatus } from "../../utils/Types"
 import { sendMessage } from "../../utils/Utils"
 
-
+const Logger = getLogger("close")
 export default class CloseTicket extends Command {
     constructor(name: string) {
         super({
@@ -60,6 +61,7 @@ export default class CloseTicket extends Command {
         if (!(ticket.creator.discordId == user.id || (ticketType && member.roles.cache.hasAny(...ticketType.manageRoles))))
             return await sendMessage(source, "Only the ticket creator and people with management roles can close tickets", undefined, true)
 
+        Logger.info(`Closing ticket ${ticket.id} (${ticket.name}) by ${member.id} (${member.user.tag})`)
 
         await source.channel.permissionOverwrites.create(ticket.creator.discordId, { SEND_MESSAGES: false })
         if (ticketType?.closeCategory) {

@@ -50,7 +50,11 @@ export default class CreateTicket extends Command {
             return
         }
 
-        const input = new TextInputComponent().setCustomId("name").setLabel("Name").setStyle("SHORT")
+        const input = new TextInputComponent()
+            .setCustomId("name")
+            .setLabel("Name")
+            .setStyle("SHORT")
+            .setPlaceholder("Enter a name for your ticket")
 
         const modal = new Modal()
             .setTitle(`Creating a ${ticketType.name}`)

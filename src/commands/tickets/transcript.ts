@@ -3,7 +3,7 @@ import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
 import { tickets } from "../../utils/TicketTypes"
-import { CommandSource, SendMessage } from "../../utils/Types"
+import { CommandSource, EndingAction, SendMessage } from "../../utils/Types"
 import { Colors, sendMessage } from "../../utils/Utils"
 
 const Logger = getLogger("transcript")
@@ -96,7 +96,7 @@ export default class Transcript extends Command {
 
         Logger.info(`${sender.id} (@${sender.user.tag}) requested a transcript for ${channel.id} (${channel.name}) - For messages ${upTo ?? "start of channel"} ~ ${latest}`)
 
-        await client.transcriptionManager.startTranscript(channel, response, upTo, latest, sender, slug || channel.name, ticketType.dumpChannel)
+        await client.transcriptionManager.startTranscript(channel, response, upTo, latest, sender, slug || channel.name, ticketType.dumpChannel, EndingAction.NOTHING)
 
         return response
     }
