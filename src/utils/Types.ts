@@ -38,6 +38,7 @@ export type TicketType = {
     verifiedCategory?: string
     verifiedRole?: string
     dumpChannel?: string
+    creationChannel?: string
 }
 
 // Database stuff

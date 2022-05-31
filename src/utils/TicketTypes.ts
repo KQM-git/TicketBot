@@ -14,8 +14,9 @@ export const tickets: Record<string, TicketType> = {
             content: ` - As an author, it is your responsibility to complete the ticket
 
 **Guidelines**
-- Name your ticket with /rename <ticket name>
-- When you are ready to submit the ticket, compile everything into one message following the format below. Then type /close or click the button; the ticket will automatically be moved to be reviewed.
+- You can rename your ticket with \`/rename <ticket name>\` or with the button below
+- If a ticket needs to be deleted, you can use \`/delete\` within the first 5 minutes
+- When you are ready to submit the ticket, compile everything into one message following the format below and pin it. Then type \`/close\` or click the button; the ticket will automatically be moved to be reviewed.
 - The ticket will be scrapped if: No activity >1 week or open for >1 month.`,
             embeds: [{
                 title: "Write-up Format",
@@ -49,7 +50,8 @@ export const tickets: Record<string, TicketType> = {
         verifications: 1,
         verifiedCategory: "980838078300164096",
         verifiedRole: "980899054177374268",
-        dumpChannel: "980924167648079892"
+        dumpChannel: "980924167648079892",
+        creationChannel: "981316199185014806"
     },
     guide: {
         id: "guide",
@@ -60,7 +62,7 @@ export const tickets: Record<string, TicketType> = {
             content: ` - As an author, it is your responsibility to complete the ticket
 
 **Guidelines**
-- Name it appropriately with /rename <ticket name>
+- Name it appropriately with \`/rename <ticket name>\`
 - When done ping <@235719068726853632> to begin the review process.`,
             embeds: [{
                 title: "Guide Guidelines",
@@ -85,7 +87,8 @@ export const tickets: Record<string, TicketType> = {
         manageRoles: ["980899103049383936"],
         verifyRoles: ["980898982316351578"],
         defaultCategory: "980838140099039272",
-        verifications: 2
+        verifications: 2,
+        creationChannel: "981316199185014806"
     },
     staff: {
         id: "staff",
@@ -161,6 +164,24 @@ export async function createTicket(ticketType: TicketType, name: string, member:
     })
 
     await mgs.pin("Initial create ticket message")
+
+
+    try {
+        await channel.permissionOverwrites.create(member, { MANAGE_MESSAGES: true })
+    } catch (error) {
+        Logger.error("Couldn't give creator permission for MANAGE_MESSAGES")
+    }
+    if (ticketType.creationChannel) {
+        const creationChannel = await guild.channels.fetch(ticketType.creationChannel)
+
+        if (creationChannel?.isText())
+            await creationChannel.send({
+                content: `<@${member.id}> created a ${ticketType.name}: ${name} over at <#${channel.id}>!`,
+                allowedMentions: {
+                    users: []
+                }
+            })
+    }
 
     Logger.info(`Created ticket for ${channel.id} / ${channel.name}`)
 

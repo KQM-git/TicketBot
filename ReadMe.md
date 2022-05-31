@@ -5,7 +5,6 @@ https://discord.com/oauth2/authorize?client_id=980553106704187402&scope=bot+appl
 
 
 # Todo
-- Add?
 - Backup option (dump into json #transcripts)
 - A directory channel the bot posts links to all active tickets in
 - Last message tracker (weekly dinkdonk)

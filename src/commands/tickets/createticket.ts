@@ -46,7 +46,7 @@ export default class CreateTicket extends Command {
         }
 
         if (!member.roles.cache.hasAny(...ticketType.creationRoles)) {
-            await sendMessage(source, "You can't create roles of this type", undefined, true)
+            await sendMessage(source, "You don't have one of the roles required to create this type of ticket", undefined, true)
             return
         }
 
@@ -87,7 +87,7 @@ export default class CreateTicket extends Command {
             return await sendMessage(source, "Couldn't find ticket type", undefined, true)
 
         if (!member.roles.cache.hasAny(...ticketType.creationRoles))
-            return await sendMessage(source, "You can't create roles of this type", undefined, true)
+            return await sendMessage(source, "You don't have one of the roles required to create this type of ticket", undefined, true)
 
         try {
             const id = await createTicket(ticketType, name, member, source.guild)
