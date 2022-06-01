@@ -1,6 +1,6 @@
 import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, Modal, ModalSubmitInteraction, TextInputComponent, User } from "discord.js"
 import Command from "../../utils/Command"
-import {  tickets } from "../../utils/TicketTypes"
+import {  ticketTypes } from "../../utils/TicketTypes"
 import { createTicket } from "../../utils/TicketUtils"
 import { CommandSource, SendMessage } from "../../utils/Types"
 import { sendMessage } from "../../utils/Utils"
@@ -18,7 +18,7 @@ export default class CreateTicket extends Command {
                 name: "type",
                 description: "Ticket type to create",
                 type: "STRING",
-                choices: Object.values(tickets).map(a => ({ name: a.name, value: a.id })),
+                choices: Object.values(ticketTypes).map(a => ({ name: a.name, value: a.id })),
                 required: true
             }, {
                 name: "name",
@@ -35,7 +35,7 @@ export default class CreateTicket extends Command {
     }
 
     async runButton(source: ButtonInteraction): Promise<void> {
-        const ticketType = tickets[source.customId.split("-")[1]]
+        const ticketType = ticketTypes[source.customId.split("-")[1]]
         if (!ticketType) {
             await source.reply({ content: "Couldn't find ticket type", ephemeral: true })
             return
@@ -82,7 +82,7 @@ export default class CreateTicket extends Command {
         const member = await source.guild.members.fetch(user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
 
-        const ticketType = tickets[type]
+        const ticketType = ticketTypes[type]
 
         if (!ticketType)
             return await sendMessage(source, "Couldn't find ticket type", undefined, true)

@@ -1,7 +1,7 @@
 import { APIInteractionDataResolvedChannel } from "discord-api-types/v9"
 import { CommandInteraction, GuildBasedChannel, Message, User } from "discord.js"
 import Command from "../../utils/Command"
-import {  tickets } from "../../utils/TicketTypes"
+import {  ticketTypes } from "../../utils/TicketTypes"
 import { convertTicket } from "../../utils/TicketUtils"
 import { CommandSource, SendMessage, TicketStatus } from "../../utils/Types"
 import { sendMessage } from "../../utils/Utils"
@@ -24,7 +24,7 @@ export default class ConvertTicket extends Command {
                 name: "type",
                 description: "Ticket type to use",
                 type: "STRING",
-                choices: Object.values(tickets).map(a => ({ name: a.name, value: a.id })),
+                choices: Object.values(ticketTypes).map(a => ({ name: a.name, value: a.id })),
                 required: true
             }, {
                 name: "status",
@@ -61,10 +61,10 @@ export default class ConvertTicket extends Command {
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
 
         // TODO check perms
-        if (!member.permissionsIn(channel.id).has("ADMINISTRATOR"))
-            return await sendMessage(source, "Only Administrators can convert tickets", undefined, true)
+        if (!member.permissionsIn(channel.id).has("MANAGE_CHANNELS"))
+            return await sendMessage(source, "You can only convert tickets where you have manage channel permission", undefined, true)
 
-        const ticketType = tickets[type]
+        const ticketType = ticketTypes[type]
 
         if (!ticketType)
             return await sendMessage(source, "Couldn't find type", undefined, true)

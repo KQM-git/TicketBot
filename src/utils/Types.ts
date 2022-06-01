@@ -39,6 +39,10 @@ export type TicketType = {
     verifiedRole?: string
     dumpChannel?: string
     creationChannel?: string
+    dinkDonk?: {
+        time: number
+        message: string
+    }
 }
 
 // Database stuff

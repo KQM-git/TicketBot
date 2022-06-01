@@ -2,7 +2,7 @@ import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, Messa
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
-import { tickets } from "../../utils/TicketTypes"
+import { ticketTypes } from "../../utils/TicketTypes"
 import { CommandSource, EndingAction, SendMessage } from "../../utils/Types"
 import { Colors, sendMessage, trim } from "../../utils/Utils"
 
@@ -76,7 +76,7 @@ export default class DeleteTicket extends Command {
         if (ticket == null)
             return await sendMessage(source, "No ticket data associated with this channel!", undefined, true)
 
-        const ticketType = tickets[ticket.type]
+        const ticketType = ticketTypes[ticket.type]
         if (!(ticketType && member.roles.cache.hasAny(...ticketType.manageRoles))) {
             if (member.id == ticket.creator.discordId) {
                 if (ticket.createdAt.getTime() + 5 * 60 * 1000 < Date.now())

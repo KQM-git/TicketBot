@@ -13,6 +13,7 @@ export async function handle(): Promise<void> {
     alreadyLoaded = true
 
     await client.transcriptionManager.ready()
+    await client.timerManager.ready()
 
     await client.user?.setStatus("online")
 

@@ -2,7 +2,7 @@ import { BaseGuildTextChannel, ButtonInteraction, CommandInteraction, Message, M
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
-import { tickets } from "../../utils/TicketTypes"
+import { ticketTypes } from "../../utils/TicketTypes"
 import { CommandSource, EndingAction, SendMessage } from "../../utils/Types"
 import { Colors, sendMessage } from "../../utils/Utils"
 
@@ -57,7 +57,7 @@ export default class Transcript extends Command {
         const ticket = await client.prisma.ticket.findUnique({ where: { channelId: channel.id } })
         if (!ticket) return await sendMessage(source, "This channel isn't a known ticket", undefined, true)
 
-        const ticketType = tickets[ticket.type]
+        const ticketType = ticketTypes[ticket.type]
 
         if (!ticketType)
             return await sendMessage(source, "Couldn't find ticket type", undefined, true)

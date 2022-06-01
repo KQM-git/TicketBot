@@ -49,7 +49,7 @@ const CATEGORY_STAFF_TICKETS = "980926469737963530"
 const CHANNEL_NEW_TICKETS = "981316199185014806"
 const CHANNEL_TRANSCRIPTS = "980924167648079892"
 
-export const tickets: Record<string, TicketType> = {
+export const ticketTypes: Record<string, TicketType> = {
     libsubs: {
         id: "libsubs",
         name: "Library Submission",
@@ -60,7 +60,7 @@ export const tickets: Record<string, TicketType> = {
 
 **Guidelines**
 - You can rename your ticket with \`/rename <ticket name>\` or with the button below
-- If a ticket needs to be deleted, you can use \`/delete\` within the first 5 minutes
+- If this ticket was created by accident or it can be deleted, you can use \`/delete\` within the first 5 minutes, otherwise ask a Scholar.
 - When you are ready to submit the ticket, compile everything into one message following the format below and pin it. Then type \`/close\` or click the button; the ticket will automatically be moved to be reviewed.
 - The ticket will be scrapped if: No activity >1 week or open for >1 month.`,
             embeds: [{
@@ -88,7 +88,11 @@ export const tickets: Record<string, TicketType> = {
         verifiedCategory: CATEGORY_PUBLISHING,
         verifiedRole: ROLE_CONTRIBUTOR,
         dumpChannel: CHANNEL_TRANSCRIPTS,
-        creationChannel: CHANNEL_NEW_TICKETS
+        creationChannel: CHANNEL_NEW_TICKETS,
+        dinkDonk: {
+            time: 7 * 24 * 60 * 1000,
+            message: "<a:dinkdonk:981687794000879696> This channel hasn't been active in the past week!"
+        }
     },
     guide: {
         id: "guide",
@@ -151,11 +155,11 @@ export const menus: {
 **Guide Ticket:** For guide submissions
 
 Please read the ticket guidelines above before opening a ticket.`,
-    ticketTypes: [tickets.libsubs, tickets.guide]
+    ticketTypes: [ticketTypes.libsubs, ticketTypes.guide]
 }, {
     name: "Staff Tickets",
     value: "ST",
     title: "Staff Tasks",
     desc: "Click below to create a task",
-    ticketTypes: [tickets.staff]
+    ticketTypes: [ticketTypes.staff]
 }]

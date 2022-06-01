@@ -2,7 +2,7 @@ import { ButtonInteraction, CommandInteraction, GuildMember, Message, MessageEmb
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
-import { tickets } from "../../utils/TicketTypes"
+import { ticketTypes } from "../../utils/TicketTypes"
 import { CommandSource, EndingAction, SendMessage, TicketStatus } from "../../utils/Types"
 import { Colors, sendMessage } from "../../utils/Utils"
 
@@ -62,7 +62,7 @@ export default class VerifyTicket extends Command {
         if (ticket.verifications.find(v => v.userId == user.id))
             return await sendMessage(source, "You already verified this ticket!", undefined, true)
 
-        const ticketType = tickets[ticket.type]
+        const ticketType = ticketTypes[ticket.type]
         if (!(ticketType && member.roles.cache.hasAny(...ticketType.manageRoles, ...(ticketType.verifyRoles ?? []))))
             return await sendMessage(source, "Only people with verify or management roles can verify tickets", undefined, true)
 

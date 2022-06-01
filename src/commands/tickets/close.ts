@@ -2,7 +2,7 @@ import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, Messa
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
-import { buttons, tickets } from "../../utils/TicketTypes"
+import { buttons, ticketTypes } from "../../utils/TicketTypes"
 import { CommandSource, SendMessage, TicketStatus } from "../../utils/Types"
 import { sendMessage } from "../../utils/Utils"
 
@@ -56,7 +56,7 @@ export default class CloseTicket extends Command {
         if (ticket.status != TicketStatus.OPEN)
             return await sendMessage(source, "This ticket is already closed", undefined, true)
 
-        const ticketType = tickets[ticket.type]
+        const ticketType = ticketTypes[ticket.type]
 
         if (!(ticket.creator.discordId == user.id || (ticketType && member.roles.cache.hasAny(...ticketType.manageRoles))))
             return await sendMessage(source, "Only the ticket creator and people with management roles can close tickets", undefined, true)

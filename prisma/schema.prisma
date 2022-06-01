@@ -14,6 +14,7 @@ model Ticket {
   id            Int            @id @default(autoincrement())
   createdAt     DateTime       @default(now())
   lastRename    DateTime?
+  lastMessage   DateTime       @default(now())
   type          String
   status        String         @default("OPEN")
   channelId     String         @unique

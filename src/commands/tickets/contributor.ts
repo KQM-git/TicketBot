@@ -2,7 +2,7 @@ import { CommandInteraction, Message, MessageEmbed, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
-import { tickets } from "../../utils/TicketTypes"
+import { ticketTypes } from "../../utils/TicketTypes"
 import { CommandSource, SendMessage } from "../../utils/Types"
 import { Colors, sendMessage } from "../../utils/Utils"
 
@@ -72,7 +72,7 @@ export default class ContributorTicket extends Command {
         if (ticket == null)
             return await sendMessage(source, "No ticket data associated with this channel!", undefined, true)
 
-        const ticketType = tickets[ticket.type]
+        const ticketType = ticketTypes[ticket.type]
         if (!(ticket.creator.discordId == user.id || (ticketType && member.roles.cache.hasAny(...ticketType.manageRoles))))
             return await sendMessage(source, "Only the ticket creator and people with management roles can edit the contributors", undefined, true)
 

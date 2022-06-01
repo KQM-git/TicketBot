@@ -2,7 +2,7 @@ import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, Modal
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
-import { tickets } from "../../utils/TicketTypes"
+import { ticketTypes } from "../../utils/TicketTypes"
 import { CommandSource, SendMessage } from "../../utils/Types"
 import { sendMessage } from "../../utils/Utils"
 
@@ -84,7 +84,7 @@ export default class RenameTicket extends Command {
         if (ticket.lastRename && ticket.lastRename?.getTime() + 5 * 60 * 1000> Date.now())
             return await sendMessage(source, "Please wait a couple minutes between renames!", undefined, true)
 
-        const ticketType = tickets[ticket.type]
+        const ticketType = ticketTypes[ticket.type]
         if (!(ticket.creator.discordId == user.id || (ticketType && member.roles.cache.hasAny(...ticketType.manageRoles))))
             return await sendMessage(source, "Only the ticket creator and people with management roles can rename tickets", undefined, true)
 

@@ -3,7 +3,7 @@ import { CommandInteraction, GuildMember, Message, MessageEmbed, Role, User } fr
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
-import { tickets } from "../../utils/TicketTypes"
+import { ticketTypes } from "../../utils/TicketTypes"
 import { CommandSource, SendMessage } from "../../utils/Types"
 import { Colors, sendMessage } from "../../utils/Utils"
 
@@ -58,7 +58,7 @@ export default class AddUserTicket extends Command {
         if (ticket == null)
             return await sendMessage(source, "No ticket data associated with this channel!", undefined, true)
 
-        const ticketType = tickets[ticket.type]
+        const ticketType = ticketTypes[ticket.type]
 
         if (!(ticketType && member.roles.cache.hasAny(...ticketType.manageRoles)))
             return await sendMessage(source, "Only people with management roles can add/remove groups from tickets", undefined, true)

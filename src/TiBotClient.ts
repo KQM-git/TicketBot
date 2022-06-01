@@ -6,6 +6,7 @@ import log4js from "log4js"
 import { join } from "path"
 import config from "./data/config.json"
 import Command from "./utils/Command"
+import TimerManager from "./utils/TimerManager"
 import TranscriptionManager from "./utils/TranscriptionManager"
 
 
@@ -25,6 +26,7 @@ export default class TiBotClient extends Discord.Client {
     prisma: PrismaClient = new PrismaClient()
 
     transcriptionManager: TranscriptionManager = new TranscriptionManager(this)
+    timerManager: TimerManager = new TimerManager(this)
 
     constructor() {
         super({
