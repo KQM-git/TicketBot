@@ -1,11 +1,11 @@
 import { APIInteractionDataResolvedGuildMember, APIRole } from "discord-api-types/v9"
-import { CommandInteraction, GuildMember, Message, Role, User } from "discord.js"
+import { CommandInteraction, GuildMember, Message, MessageEmbed, Role, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
 import { tickets } from "../../utils/TicketTypes"
 import { CommandSource, SendMessage } from "../../utils/Types"
-import { sendMessage } from "../../utils/Utils"
+import { Colors, sendMessage } from "../../utils/Utils"
 
 const Logger = getLogger("add")
 export default class AddUserTicket extends Command {
@@ -66,6 +66,13 @@ export default class AddUserTicket extends Command {
         Logger.info(`Adding group ${targetId} ticket ${ticket.id} (${ticket.name}) by ${member.id} (${member.user.tag})`)
 
         await source.channel.permissionOverwrites.create(targetId, { VIEW_CHANNEL: true })
+        await source.channel.send({
+            embeds: [
+                new MessageEmbed()
+                    .setDescription(`<@${member.id}> added ${target} to this ticket`)
+                    .setColor(Colors.GREEN)
+            ]
+        })
 
         return await sendMessage(source, `Added ${target} to ticket`)
     }

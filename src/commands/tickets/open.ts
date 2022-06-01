@@ -1,8 +1,8 @@
-import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButton, MessageEmbed, User } from "discord.js"
+import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageEmbed, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
-import { tickets } from "../../utils/TicketTypes"
+import { buttons, tickets } from "../../utils/TicketTypes"
 import { CommandSource, SendMessage, TicketStatus } from "../../utils/Types"
 import { displayTimestamp, sendMessage } from "../../utils/Utils"
 
@@ -80,11 +80,7 @@ export default class OpenTicket extends Command {
                     .addField("Previous verifications", `${ticket.verifications.map(v => `- <@${v.verifier.discordId}> at ${displayTimestamp(v.createdAt)}`).join("\n") || "Wasn't verified"}`)
             ],
             components: [new MessageActionRow().addComponents(
-                new MessageButton()
-                    .setCustomId("close")
-                    .setLabel("Close")
-                    .setEmoji("🔓")
-                    .setStyle("DANGER")
+                buttons.CLOSE
             )]
         })
 

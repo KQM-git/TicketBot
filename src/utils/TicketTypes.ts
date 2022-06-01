@@ -1,8 +1,53 @@
-import { Guild, GuildMember, MessageActionRow, MessageButton, TextChannel, User } from "discord.js"
-import { getLogger } from "log4js"
-import client from "../main"
+import { MessageActionRow, MessageButton } from "discord.js"
 import { TicketType } from "./Types"
-import { trim } from "./Utils"
+
+export const buttons = {
+    CLOSE: new MessageButton()
+        .setLabel("Close")
+        .setCustomId("close")
+        .setEmoji("🔒")
+        .setStyle("DANGER"),
+    OPEN: new MessageButton()
+        .setCustomId("open")
+        .setLabel("Open")
+        .setEmoji("🔓")
+        .setStyle("SECONDARY"),
+    VERIFY: new MessageButton()
+        .setCustomId("verify")
+        .setLabel("Verify")
+        .setEmoji("✅")
+        .setStyle("PRIMARY"),
+    TRANSCRIPT: new MessageButton()
+        .setCustomId("transcript")
+        .setLabel("Transcript")
+        .setEmoji("📑")
+        .setStyle("SECONDARY"),
+    RENAME: new MessageButton()
+        .setLabel("Rename")
+        .setCustomId("rename")
+        .setEmoji("✏️")
+        .setStyle("SECONDARY"),
+    GUIDE_LINK: new MessageButton()
+        .setLabel("Guide Guidelines")
+        .setURL("https://docs.google.com/document/d/1hZ0bNmMy1t5R8TOF1v8mcuzQpR0BgJD5pKY2T_t6uh0/edit?usp=sharing")
+        .setStyle("LINK")
+}
+
+const ROLE_LIBSUB = "980899762054254593"
+const ROLE_GUIDESUBS = "980899740029956106"
+const ROLE_CONTRIBUTOR = "980899054177374268"
+const ROLE_THEORYCRAFTER = "980898982316351578"
+const ROLE_SCHOLAR = "980899103049383936"
+const ROLE_STAFF = "980899219235807302"
+
+const CATEGORY_GUIDES = "980838140099039272"
+const CATEGORY_OPEN_SUBS = "980837799076958310"
+const CATEGORY_FOR_REVIEW = "980837820929294367"
+const CATEGORY_PUBLISHING = "980838078300164096"
+const CATEGORY_STAFF_TICKETS = "980926469737963530"
+
+const CHANNEL_NEW_TICKETS = "981316199185014806"
+const CHANNEL_TRANSCRIPTS = "980924167648079892"
 
 export const tickets: Record<string, TicketType> = {
     libsubs: {
@@ -29,29 +74,21 @@ export const tickets: Record<string, TicketType> = {
             }],
             components: [
                 new MessageActionRow().addComponents(
-                    new MessageButton()
-                        .setLabel("Close")
-                        .setCustomId("close")
-                        .setEmoji("🔒")
-                        .setStyle("DANGER"),
-                    new MessageButton()
-                        .setLabel("Rename")
-                        .setCustomId("rename")
-                        .setEmoji("✏️")
-                        .setStyle("SECONDARY")
+                    buttons.CLOSE,
+                    buttons.RENAME
                 ),
             ]
         },
-        creationRoles: ["980899762054254593"],
-        manageRoles: ["980899103049383936"],
-        verifyRoles: ["980898982316351578"],
-        defaultCategory: "980837799076958310",
-        closeCategory: "980837820929294367",
+        creationRoles: [ROLE_LIBSUB],
+        manageRoles: [ROLE_SCHOLAR],
+        verifyRoles: [ROLE_THEORYCRAFTER],
+        defaultCategory: CATEGORY_OPEN_SUBS,
+        closeCategory: CATEGORY_FOR_REVIEW,
         verifications: 1,
-        verifiedCategory: "980838078300164096",
-        verifiedRole: "980899054177374268",
-        dumpChannel: "980924167648079892",
-        creationChannel: "981316199185014806"
+        verifiedCategory: CATEGORY_PUBLISHING,
+        verifiedRole: ROLE_CONTRIBUTOR,
+        dumpChannel: CHANNEL_TRANSCRIPTS,
+        creationChannel: CHANNEL_NEW_TICKETS
     },
     guide: {
         id: "guide",
@@ -71,32 +108,26 @@ export const tickets: Record<string, TicketType> = {
             }],
             components: [
                 new MessageActionRow().addComponents(
-                    new MessageButton()
-                        .setLabel("Guide Guidelines")
-                        .setURL("https://docs.google.com/document/d/1hZ0bNmMy1t5R8TOF1v8mcuzQpR0BgJD5pKY2T_t6uh0/edit?usp=sharing")
-                        .setStyle("LINK"),
-                    new MessageButton()
-                        .setLabel("Close")
-                        .setCustomId("close")
-                        .setEmoji("🔒")
-                        .setStyle("DANGER")
+                    buttons.GUIDE_LINK,
+                    buttons.CLOSE
                 )
             ]
         },
-        creationRoles: ["980899740029956106"],
-        manageRoles: ["980899103049383936"],
-        verifyRoles: ["980898982316351578"],
-        defaultCategory: "980838140099039272",
+        creationRoles: [ROLE_GUIDESUBS],
+        manageRoles: [ROLE_SCHOLAR],
+        verifyRoles: [ROLE_THEORYCRAFTER],
+        defaultCategory: CATEGORY_GUIDES,
         verifications: 2,
-        creationChannel: "981316199185014806"
+        dumpChannel: CHANNEL_TRANSCRIPTS,
+        creationChannel: CHANNEL_NEW_TICKETS
     },
     staff: {
         id: "staff",
         name: "Staff Ticket",
         emoji: "🐒",
-        creationRoles: ["980899219235807302"],
-        manageRoles: ["980899219235807302"],
-        defaultCategory: "980926469737963530",
+        creationRoles: [ROLE_STAFF],
+        manageRoles: [ROLE_STAFF],
+        defaultCategory: CATEGORY_STAFF_TICKETS,
         opening: {
             content: " - This is a staff ticket"
         },
@@ -104,12 +135,12 @@ export const tickets: Record<string, TicketType> = {
     }
 }
 
-export const presets: {
+export const menus: {
     name: string
     value: string
     title: string
     desc: string
-    buttons: TicketType[]
+    ticketTypes: TicketType[]
 }[] = [{
     name: "Theorycrafting Tickets",
     value: "TC",
@@ -120,111 +151,11 @@ export const presets: {
 **Guide Ticket:** For guide submissions
 
 Please read the ticket guidelines above before opening a ticket.`,
-    buttons: [tickets.libsubs, tickets.guide]
+    ticketTypes: [tickets.libsubs, tickets.guide]
 }, {
     name: "Staff Tickets",
     value: "ST",
     title: "Staff Tasks",
     desc: "Click below to create a task",
-    buttons: [tickets.staff]
+    ticketTypes: [tickets.staff]
 }]
-
-
-const Logger = getLogger("tickets")
-export async function createTicket(ticketType: TicketType, name: string, member: GuildMember, guild: Guild) {
-    const parent = await guild.channels.fetch(ticketType.defaultCategory)
-    if (!parent || parent.type != "GUILD_CATEGORY")
-        throw Error("Invalid parent channel")
-
-    Logger.info(`Creating a ticket for ${member.id} (@${member.user.tag}) in ${guild.id}: ${name}`)
-
-    await client.transcriptionManager.updateServer(guild)
-
-    const channel = await guild.channels.create(trim(name), {
-        type: "GUILD_TEXT",
-        parent
-    })
-
-    const mgs = await channel.send({
-        content: `<@${member.id}>${ticketType.opening.content}`,
-        embeds: ticketType.opening.embeds,
-        components: ticketType.opening.components
-    })
-
-    await client.prisma.ticket.create({
-        data: {
-            channelId: channel.id,
-            name,
-            type: ticketType.id,
-            server: client.transcriptionManager.getServer(guild),
-            creator: await client.transcriptionManager.connectUser(member, guild.id),
-            contributors: await client.transcriptionManager.connectUser(member, guild.id),
-        },
-        select: { id: true }
-    })
-
-    await mgs.pin("Initial create ticket message")
-
-
-    try {
-        await channel.permissionOverwrites.create(member, {
-            VIEW_CHANNEL: true,
-            MANAGE_MESSAGES: true
-        })
-    } catch (error) {
-        Logger.error("Couldn't give creator permission for MANAGE_MESSAGES")
-    }
-    if (ticketType.creationChannel) {
-        const creationChannel = await guild.channels.fetch(ticketType.creationChannel)
-
-        if (creationChannel?.isText())
-            await creationChannel.send({
-                content: `<@${member.id}> created a ${ticketType.name}: ${name} over at <#${channel.id}>!`,
-                allowedMentions: {
-                    users: []
-                }
-            })
-    }
-
-    Logger.info(`Created ticket for ${channel.id} / ${channel.name}`)
-
-    return channel.id
-}
-
-export async function convertTicket(ticketType: TicketType, channel: TextChannel, member: GuildMember | User, status: string, guild: Guild) {
-    await client.transcriptionManager.updateServer(guild)
-
-    const pinned = await channel.messages.fetchPinned()
-    const target = pinned.find(m => m.content.includes("As an author, it is your responsibility to complete the ticket"))
-    if (target) {
-        const mentioned = target.mentions.users.find(x => x.id != "235719068726853632")
-        if (mentioned)
-            member = (await guild.members.fetch(mentioned.id)) ?? mentioned
-    }
-
-    try {
-        const ticket = await client.prisma.ticket.upsert({
-            where: {
-                channelId: channel.id
-            },
-            update: {
-                type: ticketType.id,
-                status
-            },
-            create: {
-                channelId: channel.id,
-                createdAt: channel.createdAt,
-                name: channel.name,
-                type: ticketType.id,
-                server: client.transcriptionManager.getServer(guild),
-                creator: await client.transcriptionManager.connectUser(member, guild.id),
-                status
-            },
-            select: { id: true }
-        })
-        Logger.info(`Converted ticket ${channel.id} / ${channel.id} -> ${ticket.id}`)
-        return `Created #${ticket.id} from <#${channel.id}> for <@${member.id}>`
-    } catch (error) {
-        return `${error}`
-    }
-}

@@ -1,7 +1,7 @@
 import { APIInteractionDataResolvedChannel } from "discord-api-types/v9"
-import { BaseGuildTextChannel, CommandInteraction, GuildBasedChannel, Message, MessageActionRow, MessageButton, MessageButtonStyleResolvable, MessageEmbed, TextBasedChannel, User } from "discord.js"
+import { BaseGuildTextChannel, CommandInteraction, GuildBasedChannel, Message, MessageActionRow, MessageButton, MessageEmbed, TextBasedChannel, User } from "discord.js"
 import Command from "../../utils/Command"
-import { presets } from "../../utils/TicketTypes"
+import { menus } from "../../utils/TicketTypes"
 import { CommandSource, SendMessage } from "../../utils/Types"
 import { Colors, sendMessage } from "../../utils/Utils"
 
@@ -18,7 +18,7 @@ export default class CreateTicketMenu extends Command {
                 name: "preset",
                 description: "Preset to use",
                 type: "STRING",
-                choices: presets.map(a => ({ name: a.name, value: a.value })),
+                choices: menus.map(a => ({ name: a.name, value: a.value })),
                 required: true
             }, {
                 name: "channel",
@@ -48,7 +48,7 @@ export default class CreateTicketMenu extends Command {
         if (!member.permissionsIn(channel.id).has("ADMINISTRATOR"))
             return await sendMessage(source, "Only Administrators can create ticket menu", undefined, true)
 
-        const set = presets.find(p => p.value == preset)
+        const set = menus.find(p => p.value == preset)
 
         if (!set)
             return await sendMessage(source, "Couldn't find preset", undefined, true)
@@ -60,11 +60,12 @@ export default class CreateTicketMenu extends Command {
                 .setColor(Colors.GREEN)
             ],
             components: [new MessageActionRow().setComponents(
-                set.buttons.map(b => new MessageButton()
+                set.ticketTypes.map(b => new MessageButton()
                     .setCustomId(`createticket-${b.id}`)
                     .setLabel(b.name)
                     .setEmoji(b.emoji)
-                    .setStyle(b.style as MessageButtonStyleResolvable))
+                    .setStyle(b.style)
+                )
             )]
         })
 

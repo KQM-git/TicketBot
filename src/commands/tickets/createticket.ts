@@ -1,6 +1,7 @@
 import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, Modal, ModalSubmitInteraction, TextInputComponent, User } from "discord.js"
 import Command from "../../utils/Command"
-import { createTicket, tickets } from "../../utils/TicketTypes"
+import {  tickets } from "../../utils/TicketTypes"
+import { createTicket } from "../../utils/TicketUtils"
 import { CommandSource, SendMessage } from "../../utils/Types"
 import { sendMessage } from "../../utils/Utils"
 

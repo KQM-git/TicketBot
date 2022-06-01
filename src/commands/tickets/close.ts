@@ -1,8 +1,8 @@
-import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButton, MessageEmbed, User } from "discord.js"
+import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageEmbed, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
-import { tickets } from "../../utils/TicketTypes"
+import { buttons, tickets } from "../../utils/TicketTypes"
 import { CommandSource, SendMessage, TicketStatus } from "../../utils/Types"
 import { sendMessage } from "../../utils/Utils"
 
@@ -74,21 +74,9 @@ export default class CloseTicket extends Command {
                     .setDescription(`Ticket closed by <@${member.id}>`)
             ],
             components: [new MessageActionRow().addComponents(
-                ...(ticketType?.verifications ? [new MessageButton()
-                    .setCustomId("verify")
-                    .setLabel("Verify")
-                    .setEmoji("✅")
-                    .setStyle("PRIMARY")] : []),
-                new MessageButton()
-                    .setCustomId("open")
-                    .setLabel("Open")
-                    .setEmoji("🔓")
-                    .setStyle("SECONDARY"),
-                new MessageButton()
-                    .setCustomId("transcript")
-                    .setLabel("Transcript")
-                    .setEmoji("📑")
-                    .setStyle("SECONDARY")
+                ...(ticketType?.verifications ? [buttons.VERIFY] : []),
+                buttons.OPEN,
+                buttons.TRANSCRIPT
             )]
         })
 

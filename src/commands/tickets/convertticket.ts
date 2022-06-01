@@ -1,7 +1,8 @@
 import { APIInteractionDataResolvedChannel } from "discord-api-types/v9"
 import { CommandInteraction, GuildBasedChannel, Message, User } from "discord.js"
 import Command from "../../utils/Command"
-import { convertTicket, tickets } from "../../utils/TicketTypes"
+import {  tickets } from "../../utils/TicketTypes"
+import { convertTicket } from "../../utils/TicketUtils"
 import { CommandSource, SendMessage, TicketStatus } from "../../utils/Types"
 import { sendMessage } from "../../utils/Utils"
 
