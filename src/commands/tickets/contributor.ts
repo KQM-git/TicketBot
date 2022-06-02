@@ -22,7 +22,8 @@ export default class ContributorTicket extends Command {
                 options: [{
                     name: "user",
                     description: "User to add as contributor",
-                    type: "USER"
+                    type: "USER",
+                    required: true
                 }]
             }, {
                 name: "remove",
@@ -31,7 +32,8 @@ export default class ContributorTicket extends Command {
                 options: [{
                     name: "user",
                     description: "User to remove from contributors",
-                    type: "USER"
+                    type: "USER",
+                    required: true
                 }]
             }]
         })

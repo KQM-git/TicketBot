@@ -21,6 +21,8 @@ intents.add(
     "GUILD_MESSAGES",
 )
 
+export const baseUrl = "https://tickets.deeznuts.moe"
+
 export default class TiBotClient extends Discord.Client {
     commands: Enmap<string, Command> = new Enmap()
     prisma: PrismaClient = new PrismaClient()
@@ -37,7 +39,7 @@ export default class TiBotClient extends Discord.Client {
                 status: "idle",
                 activities: [{
                     name: config.activity,
-                    type: "LISTENING"
+                    type: "WATCHING"
                 }]
             }
         })

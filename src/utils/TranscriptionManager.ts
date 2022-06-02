@@ -1,10 +1,12 @@
 import { PrismaClient, QueuedTranscript } from "@prisma/client"
 import { randomUUID } from "crypto"
-import { BaseGuildTextChannel, Guild, GuildMember, MessageEmbed, User } from "discord.js"
+import { BaseGuildTextChannel, Guild, GuildMember, MessageAttachment, MessageEmbed, User } from "discord.js"
 import { getLogger } from "log4js"
-import TiBotClient from "../TiBotClient"
+import TiBotClient, { baseUrl } from "../TiBotClient"
+import { ticketTypes } from "./TicketTypes"
 import { EndingAction, Enumerable, InputJsonValue, MessageInput, SendMessage, TicketStatus, UserInput } from "./Types"
-import { Colors, updateMessage } from "./Utils"
+import { Colors, displayTimestamp, updateMessage } from "./Utils"
+import AdmZip from "adm-zip"
 
 const Logger = getLogger("transcriber")
 export default class TranscriptionManager {
@@ -161,7 +163,70 @@ export default class TranscriptionManager {
                 try {
                     const channel = await this.client.channels.fetch(queued.dumpChannelId)
                     if (channel && channel instanceof BaseGuildTextChannel) {
-                        await channel.send(`Transcript for ${queued.channelName}: ${transcript?.slug}`)
+                        const fullTranscript = await this.prisma.transcript.findUnique({
+                            where: { id: queued.transcriptId },
+                            include: {
+                                messages: true,
+                                server: true,
+                                ticket: {
+                                    include: {
+                                        creator: {
+                                            select: { discordId: true, username: true, tag: true, avatar: true }
+                                        },
+                                        contributors: {
+                                            select: { discordId: true }
+                                        },
+                                        verifications: {
+                                            select: { verifier: { select: { discordId: true } }, createdAt: true }
+                                        }
+                                    }
+                                },
+                                users: true,
+                                verifications: true
+                            }
+                        })
+                        if (!fullTranscript)
+                            await channel.send("Couldn't fetch full transcript data?")
+                        else {
+                            const { ticket } = fullTranscript
+                            const users: [string, number][] = []
+                            fullTranscript.messages.forEach(m => {
+                                const ud = users.find(u => u[0] == m.userId)
+                                if (ud)
+                                    ud[1] = ud[1] + 1
+                                else
+                                    users.push([m.userId, 1])
+                            })
+
+                            const dump = Buffer.from(JSON.stringify(fullTranscript, (k, v) => v === null ? undefined : v))
+                            const files = dump.length < 1000 * 1000 * 8 ? [
+                                new MessageAttachment(Buffer.from(dump), `transcript-${transcript?.slug}.json`)
+                            ] : [
+                                new MessageAttachment(this.createZip(dump, `transcript-${transcript?.slug}.json`), `transcript-${transcript?.slug}.zip`)
+                            ]
+
+                            await channel.send({
+                                content: `Transcript for ${queued.channelName}: <${baseUrl}/transcripts/${transcript?.slug}>`,
+                                embeds: [new MessageEmbed()
+                                    .setAuthor({
+                                        name: `${ticket.creator.username}#${ticket.creator.tag}`,
+                                        iconURL: (ticket.creator.avatar && `https://cdn.discordapp.com/avatars/${ticket.creator.discordId}/${ticket.creator.avatar}.png`) || "https://cdn.discordapp.com/attachments/247122362942619649/980958465566572604/unknown.png"
+                                    })
+                                    .setDescription(`[Full transcript](${baseUrl}/transcripts/${transcript?.slug}) (${fullTranscript.messages.length} messages by ${users.length} users)`)
+                                    .addField("Ticket Name", ticket.name, true)
+                                    .addField("Type", ticketTypes[ticket.type]?.name ?? ticket.type, true)
+                                    .addField("Status", ticket.status, true)
+                                    .addField("Users in transcript", users
+                                        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+                                        .slice(0, 10)
+                                        .map(r => `${r[1]} - <@${r[0]}>`)
+                                        .join("\n"), true )
+                                    .addField("Verifications", ticket.verifications.map(v => `<@${v.verifier.discordId}> ${displayTimestamp(v.createdAt)}`).join("\n") || "Wasn't verified", true)
+                                    .addField("Contributors", ticket.contributors.map(c => `<@${c.discordId}>`).join(", ") || "No contributors added", true)
+                                ],
+                                files
+                            })
+                        }
                     }
                 } catch (error) {
                     Logger.error("Error while sending log", error)
@@ -231,6 +296,12 @@ export default class TranscriptionManager {
                 .setDescription(`Fetched ${newFetched} messages...`)
                 .setColor(Colors.ORANGE))
         setImmediate(async () => this.transcribe(queued).catch((e) => Logger.error(e)))
+    }
+
+    private createZip(dump: Buffer, name: string): Buffer {
+        const zip = new AdmZip()
+        zip.addFile(name, dump)
+        return zip.toBuffer()
     }
 
     private async deleteQueued(queued: QueuedTranscript): Promise<void> {

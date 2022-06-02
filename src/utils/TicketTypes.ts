@@ -1,5 +1,6 @@
 import { MessageActionRow, MessageButton } from "discord.js"
 import { TicketType } from "./Types"
+import config from "../data/config.json"
 
 export const buttons = {
     CLOSE: new MessageButton()
@@ -33,21 +34,48 @@ export const buttons = {
         .setStyle("LINK")
 }
 
-const ROLE_LIBSUB = "980899762054254593"
-const ROLE_GUIDESUBS = "980899740029956106"
-const ROLE_CONTRIBUTOR = "980899054177374268"
-const ROLE_THEORYCRAFTER = "980898982316351578"
-const ROLE_SCHOLAR = "980899103049383936"
-const ROLE_STAFF = "980899219235807302"
+const ROLE = config.production ? {
+    LIBSUB: "953173415836147792",
+    GUIDESUBS: "939413668553179147",
+    CONTRIBUTOR: "764838634280845312",
+    THEORYCRAFTER: "896043474699317259",
+    SCHOLAR: "810550138552320010",
+    EDITOR: "903791926162100256",
+    STAFF: [
+        "953164120952283206", // Pillar Staff
+        // TODO add more
+    ],
+} : {
+    LIBSUB: "980899762054254593",
+    GUIDESUBS: "980899740029956106",
+    CONTRIBUTOR: "980899054177374268",
+    THEORYCRAFTER: "980898982316351578",
+    SCHOLAR: "980899103049383936",
+    EDITOR: "981973618760228944",
+    STAFF: ["980899219235807302"],
+}
 
-const CATEGORY_GUIDES = "980838140099039272"
-const CATEGORY_OPEN_SUBS = "980837799076958310"
-const CATEGORY_FOR_REVIEW = "980837820929294367"
-const CATEGORY_PUBLISHING = "980838078300164096"
-const CATEGORY_STAFF_TICKETS = "980926469737963530"
+const CATEGORY = config.production ? {
+    GUIDES: "953147741415018526",
+    OPEN_SUBS: "953155656125411419",
+    FOR_REVIEW: "953148307771883530",
+    PUBLISHING: "953175594911289354",
+    STAFF_TICKETS: "953156640604041216",
+} : {
+    GUIDES: "980838140099039272",
+    OPEN_SUBS: "980837799076958310",
+    FOR_REVIEW: "980837820929294367",
+    PUBLISHING: "980838078300164096",
+    STAFF_TICKETS: "980926469737963530",
+}
 
-const CHANNEL_NEW_TICKETS = "981316199185014806"
-const CHANNEL_TRANSCRIPTS = "980924167648079892"
+const CHANNEL = config.production ? {
+    NEW_TICKETS: "763610791839924224", // TODO: Update (currently Theorycrafting)
+    TC_TRANSCRIPTS: "945097851195777054",
+} : {
+    NEW_TICKETS: "981316199185014806",
+    TC_TRANSCRIPTS: "980924167648079892",
+}
 
 export const ticketTypes: Record<string, TicketType> = {
     libsubs: {
@@ -62,6 +90,7 @@ export const ticketTypes: Record<string, TicketType> = {
 - You can rename your ticket with \`/rename <ticket name>\` or with the button below
 - If this ticket was created by accident or it can be deleted, you can use \`/delete\` within the first 5 minutes, otherwise ask a Scholar.
 - When you are ready to submit the ticket, compile everything into one message following the format below and pin it. Then type \`/close\` or click the button; the ticket will automatically be moved to be reviewed.
+- To add contributors to your ticket use \`/contributor add <user>\`.
 - The ticket will be scrapped if: No activity >1 week or open for >1 month.`,
             embeds: [{
                 title: "Write-up Format",
@@ -76,21 +105,21 @@ export const ticketTypes: Record<string, TicketType> = {
                 new MessageActionRow().addComponents(
                     buttons.CLOSE,
                     buttons.RENAME
-                ),
+                )
             ]
         },
-        creationRoles: [ROLE_LIBSUB],
-        manageRoles: [ROLE_SCHOLAR],
-        verifyRoles: [ROLE_THEORYCRAFTER],
-        defaultCategory: CATEGORY_OPEN_SUBS,
-        closeCategory: CATEGORY_FOR_REVIEW,
+        creationRoles: [ROLE.LIBSUB],
+        manageRoles: [ROLE.SCHOLAR],
+        verifyRoles: [ROLE.THEORYCRAFTER],
+        defaultCategory: CATEGORY.OPEN_SUBS,
+        closeCategory: CATEGORY.FOR_REVIEW,
         verifications: 1,
-        verifiedCategory: CATEGORY_PUBLISHING,
-        verifiedRole: ROLE_CONTRIBUTOR,
-        dumpChannel: CHANNEL_TRANSCRIPTS,
-        creationChannel: CHANNEL_NEW_TICKETS,
+        verifiedCategory: CATEGORY.PUBLISHING,
+        verifiedRole: ROLE.CONTRIBUTOR,
+        dumpChannel: CHANNEL.TC_TRANSCRIPTS,
+        creationChannel: CHANNEL.NEW_TICKETS,
         dinkDonk: {
-            time: 7 * 24 * 60 * 1000,
+            time: 7 * 24 * 3600 * 1000,
             message: "<a:dinkdonk:981687794000879696> This channel hasn't been active in the past week!"
         }
     },
@@ -117,21 +146,21 @@ export const ticketTypes: Record<string, TicketType> = {
                 )
             ]
         },
-        creationRoles: [ROLE_GUIDESUBS],
-        manageRoles: [ROLE_SCHOLAR],
-        verifyRoles: [ROLE_THEORYCRAFTER],
-        defaultCategory: CATEGORY_GUIDES,
+        creationRoles: [ROLE.GUIDESUBS],
+        manageRoles: [ROLE.SCHOLAR],
+        verifyRoles: [ROLE.THEORYCRAFTER],
+        defaultCategory: CATEGORY.GUIDES,
         verifications: 2,
-        dumpChannel: CHANNEL_TRANSCRIPTS,
-        creationChannel: CHANNEL_NEW_TICKETS
+        dumpChannel: CHANNEL.TC_TRANSCRIPTS,
+        creationChannel: CHANNEL.NEW_TICKETS
     },
     staff: {
         id: "staff",
         name: "Staff Ticket",
         emoji: "🐒",
-        creationRoles: [ROLE_STAFF],
-        manageRoles: [ROLE_STAFF],
-        defaultCategory: CATEGORY_STAFF_TICKETS,
+        creationRoles: ROLE.STAFF,
+        manageRoles: ROLE.STAFF,
+        defaultCategory: CATEGORY.STAFF_TICKETS,
         opening: {
             content: " - This is a staff ticket"
         },
