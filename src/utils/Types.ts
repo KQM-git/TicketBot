@@ -76,6 +76,20 @@ export type UserInput = {
     verified: boolean | null
 }
 
+export type RoleInput = {
+    discordId: string
+    serverId: string
+    name: string
+    roleColor: string | null
+}
+
+export type ChannelInput = {
+    discordId: string
+    serverId: string
+    name: string
+    type: string
+}
+
 
 export type Enumerable<T> = T | Array<T>
 export type InputJsonValue = string | number | boolean | InputJsonObject | InputJsonArray

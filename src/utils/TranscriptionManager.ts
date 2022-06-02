@@ -1,11 +1,11 @@
 import { PrismaClient, QueuedTranscript } from "@prisma/client"
 import AdmZip from "adm-zip"
 import { randomUUID } from "crypto"
-import { Guild, GuildMember, MessageAttachment, MessageEmbed, User } from "discord.js"
+import { EmbedField, EmbedFooterData, Guild, GuildMember, MessageActionRow, MessageActionRowComponent, MessageAttachment, MessageEmbed, MessageEmbedImage, MessageEmbedThumbnail, MessageMentions, MessageReaction, User } from "discord.js"
 import { getLogger } from "log4js"
 import TiBotClient, { baseUrl } from "../TiBotClient"
 import { ticketTypes } from "./TicketTypes"
-import { EndingAction, Enumerable, InputJsonValue, MessageInput, SendMessage, TicketableChannel, TicketStatus, UserInput } from "./Types"
+import { ChannelInput, EndingAction, Enumerable, InputJsonValue, MessageInput, RoleInput, SendMessage, TicketableChannel, TicketStatus, UserInput } from "./Types"
 import { Colors, displayTimestamp, isTicketable, trim, updateMessage } from "./Utils"
 
 const Logger = getLogger("transcriber")
@@ -19,7 +19,8 @@ export default class TranscriptionManager {
     }
 
     public async startTranscript(channel: TicketableChannel, reply: SendMessage, upTo: string | undefined, latest: string, transcriber: GuildMember, slug: string, dumpChannel: string | undefined, endAction: EndingAction) {
-        const initialSlug = trim(slug)
+        slug = trim(slug)
+        const initialSlug = slug
 
         let trans = await this.prisma.transcript.findUnique({ where: { slug } })
         if (trans) {
@@ -38,8 +39,7 @@ export default class TranscriptionManager {
 
         const transcript = await this.prisma.transcript.create({
             data: {
-                channelId: channel.id,
-                channelName: channel.name,
+                channel: this.getChannel(channel),
                 ticket: {
                     connect: {
                         channelId: channel.id
@@ -52,8 +52,7 @@ export default class TranscriptionManager {
 
         const response = await this.prisma.queuedTranscript.create({
             data: {
-                channelId: channel.id,
-                channelName: channel.name,
+                channel: this.getChannel(channel),
                 latest: (BigInt(latest) + BigInt(1)).toString(),
                 upTo,
                 transcriber: await this.connectUser(transcriber, transcriber.guild.id),
@@ -87,6 +86,25 @@ export default class TranscriptionManager {
         }
     }
 
+    private getChannel(channel: TicketableChannel) {
+        return {
+            connectOrCreate: {
+                create: {
+                    name: channel.name,
+                    type: channel.type,
+                    server: this.getServer(channel.guild),
+                    discordId: channel.id,
+                },
+                where: {
+                    discordId_serverId: {
+                        discordId: channel.id,
+                        serverId: channel.guild.id
+                    }
+                }
+            }
+        }
+    }
+
     public async ready() {
         const t = await this.prisma.queuedTranscript.findMany()
         t.forEach(async t => this.transcribe(t)
@@ -97,7 +115,7 @@ export default class TranscriptionManager {
     private async transcribe(queued: QueuedTranscript): Promise<void> {
         const channel = await this.client.channels.fetch(queued.channelId)
         if (!channel || !isTicketable(channel)) {
-            Logger.error(`Couldn't find channel for ${queued.channelId} (${queued.channelName}) ${JSON.stringify(queued)}`)
+            Logger.error(`Couldn't find channel for ${queued.channelId} ${JSON.stringify(queued)}`)
             await this.deleteQueued(queued)
             return
         }
@@ -107,6 +125,8 @@ export default class TranscriptionManager {
 
         const messages: MessageInput[] = []
         const users: UserInput[] = []
+        const mentionedRoles: RoleInput[] = []
+        const mentionedChannels: ChannelInput[] = []
         const guild = channel.guild
 
         let newLatest = latest
@@ -117,15 +137,19 @@ export default class TranscriptionManager {
             if (queued.upTo && BigInt(newLatest) < BigInt(queued.upTo))
                 break
 
+            const relevantRoles: Set<string> =  new Set()
+            const relevantUsers: Set<string> =  new Set()
+            const relevantChannels: Set<string> =  new Set()
+
             messages.push({
                 discordId: msg.id,
                 createdAt: msg.createdAt,
                 editedAt: msg.editedAt,
-                attachments: msg.attachments.map(a => a.toJSON() as unknown as Enumerable<InputJsonValue>),
-                reactions: msg.reactions.cache.map(r => r.toJSON() as unknown as Enumerable<InputJsonValue>),
-                embeds: msg.embeds.map(e => e.toJSON() as unknown as Enumerable<InputJsonValue>),
-                content: msg.content,
-                components: msg.components.map(c => c.toJSON() as unknown as Enumerable<InputJsonValue>),
+                attachments: msg.attachments.map(a => this.mapAttachment(a)),
+                reactions: msg.reactions.cache.map(r => this.mapReactions(r)),
+                embeds: msg.embeds.map(e => this.mapEmbeds(e, relevantRoles, relevantUsers, relevantChannels)),
+                content: this.parseText(msg.content, relevantRoles, relevantUsers, relevantChannels),
+                components: msg.components.map(c => this.mapRow(c)),
                 stickers: msg.stickers.toJSON() as unknown as Enumerable<InputJsonValue>,
                 reply: msg.reference?.messageId,
                 userId: msg.author.id,
@@ -150,12 +174,50 @@ export default class TranscriptionManager {
                         verified: null
                     })
                 }
-
             }
+
+            for (const uid of relevantUsers)
+                if (!users.find(u => u.discordId == uid))
+                    try {
+                        const member = await guild.members.fetch(uid)
+                        users.push(await this.getMember(member))
+                    } catch (error) {
+                        void 0
+                    }
+
+            for (const uid of relevantRoles)
+                if (!mentionedRoles.find(r => r.discordId == uid))
+                    try {
+                        const role = await guild.roles.fetch(uid)
+                        if (role)
+                            mentionedRoles.push({
+                                discordId: uid,
+                                serverId: guild.id,
+                                name: role.name,
+                                roleColor: role.hexColor,
+                            })
+                    } catch (error) {
+                        void 0
+                    }
+
+            for (const uid of relevantChannels)
+                if (!mentionedChannels.find(c => c.discordId == uid))
+                    try {
+                        const channel = await guild.channels.fetch(uid)
+                        if (channel)
+                            mentionedChannels.push({
+                                discordId: uid,
+                                serverId: guild.id,
+                                name: channel.name,
+                                type: channel.type,
+                            })
+                    } catch (error) {
+                        void 0
+                    }
         }
 
         if (messages.length == 0) {
-            Logger.info(`Finishing up queue #${queued.id} - transcript #${queued.transcriptId} (${queued.channelId} - ${queued.channelName}): ${fetched} msgs total`)
+            Logger.info(`Finishing up queue #${queued.id} - transcript #${queued.transcriptId} (${queued.channelId}): ${fetched} msgs total`)
 
             const transcript = await this.prisma.transcript.findUnique({ where: { id: queued.transcriptId } })
 
@@ -168,6 +230,9 @@ export default class TranscriptionManager {
                             include: {
                                 messages: true,
                                 server: true,
+                                channel: true,
+                                mentionedChannels: true,
+                                mentionedRoles: true,
                                 ticket: {
                                     include: {
                                         creator: {
@@ -178,7 +243,7 @@ export default class TranscriptionManager {
                                         },
                                         verifications: {
                                             select: { verifier: { select: { discordId: true } }, createdAt: true }
-                                        }
+                                        },
                                     }
                                 },
                                 users: true,
@@ -198,7 +263,7 @@ export default class TranscriptionManager {
                                     users.push([m.userId, 1])
                             })
 
-                            const dump = Buffer.from(JSON.stringify(fullTranscript, (k, v) => v === null ? undefined : v))
+                            const dump = Buffer.from(JSON.stringify(fullTranscript/* TODO , (k, v) => v === null ? undefined : v*/))
                             const files = dump.length < 1000 * 1000 * 8 ? [
                                 new MessageAttachment(Buffer.from(dump), `transcript-${transcript?.slug}.json`)
                             ] : [
@@ -206,7 +271,7 @@ export default class TranscriptionManager {
                             ]
 
                             await channel.send({
-                                content: `Transcript for ${queued.channelName}: <${baseUrl}/transcripts/${transcript?.slug}>`,
+                                content: `Transcript for ${fullTranscript.channel.name}: <${baseUrl}/transcripts/${transcript?.slug}>`,
                                 embeds: [new MessageEmbed()
                                     .setAuthor({
                                         name: `${ticket.creator.username}#${ticket.creator.tag}`,
@@ -256,7 +321,7 @@ export default class TranscriptionManager {
         queued.latest = newLatest
         queued.fetched = newFetched
 
-        Logger.info(`Queue #${queued.id} - transcript #${queued.transcriptId} (${queued.channelId} - ${queued.channelName}): from ${fetched} msgs; ${messages.length} messages and ${users.length} users fetched, pushing to db`)
+        Logger.info(`Queue #${queued.id} - transcript #${queued.transcriptId} (${queued.channelId} - ${channel.name}): from ${fetched} msgs; ${messages.length} messages and ${users.length} users fetched, pushing to db`)
 
         await this.prisma.$transaction([
             this.prisma.queuedTranscript.update({
@@ -275,12 +340,34 @@ export default class TranscriptionManager {
                 },
                 select: { id: true }
             })),
+            ...mentionedRoles.map(r => this.prisma.role.upsert({
+                create: r,
+                update: r,
+                where: {
+                    discordId_serverId: {
+                        discordId: r.discordId,
+                        serverId: r.serverId
+                    }
+                },
+                select: { id: true }
+            })),
+            ...mentionedChannels.map(c => this.prisma.channel.upsert({
+                create: c,
+                update: c,
+                where: {
+                    discordId_serverId: {
+                        discordId: c.discordId,
+                        serverId: c.serverId
+                    }
+                },
+                select: { id: true }
+            })),
             this.prisma.message.createMany({ data: messages }),
             this.prisma.transcript.update({
                 data: {
-                    users: {
-                        connect: users.map(u => ({ discordId_serverId: { discordId: u.discordId, serverId: u.serverId } } ))
-                    }
+                    users: this.mapConnectors(users),
+                    mentionedRoles: this.mapConnectors(mentionedRoles),
+                    mentionedChannels: this.mapConnectors(mentionedChannels),
                 },
                 where: {
                     id: queued.transcriptId
@@ -289,7 +376,7 @@ export default class TranscriptionManager {
             })
         ])
 
-        Logger.info(`Queue #${queued.id} - transcript #${queued.transcriptId} (${queued.channelId} - ${queued.channelName}): from ${fetched} msgs; ${messages.length} messages and ${users.length} users fetched, pushed!`)
+        Logger.info(`Queue #${queued.id} - transcript #${queued.transcriptId} (${queued.channelId} - ${channel.name}): from ${fetched} msgs; ${messages.length} messages and ${users.length} users fetched, pushed!`)
         if (newFetched % 1000 == 0)
             await updateMessage(queued.botChannelId, queued.botReplyId, new MessageEmbed()
                 .setTitle("Creating transcript...")
@@ -371,5 +458,118 @@ export default class TranscriptionManager {
                 name: guild.name
             }
         })
+    }
+
+    private mapConnectors(list: { discordId: string, serverId: string }[]) {
+        return {
+            connect: list.map(item => ({ discordId_serverId: { discordId: item.discordId, serverId: item.serverId } } ))
+        }
+    }
+
+    private mapAttachment(a: MessageAttachment) {
+        return {
+            name: a.name ?? undefined,
+            desc: a.description ?? undefined,
+            url: a.url,
+            size: a.size,
+            width: a.width ?? undefined,
+            height: a.height ?? undefined,
+            spoiler: a.spoiler
+        }
+    }
+
+    private mapReactions(r: MessageReaction) {
+        return {
+            emoji: {
+                name: r.emoji.name ?? undefined,
+                id: r.emoji.id ?? undefined,
+                url: r.emoji.url ?? undefined
+            },
+            count: r.count
+        }
+    }
+
+    private mapEmbeds(e: MessageEmbed, relevantRoles: Set<string>, relevantUsers: Set<string>, relevantChannels: Set<string>) {
+        function mapFooter(f: EmbedFooterData | null) {
+            if (!f) return undefined
+            return {
+                text: f.text,
+                url: f.iconURL ?? undefined,
+            }
+        }
+        function mapImage(i: MessageEmbedImage| MessageEmbedThumbnail | null) {
+            if (!i) return undefined
+            return {
+                url: i.url,
+                width: i.width,
+                height: i.height
+            }
+        }
+        function mapField(f: EmbedField) {
+            return {
+                name: f.name,
+                value: f.value,
+                inline: f.inline
+            }
+        }
+        return {
+            title: e.title || undefined,
+            author: e.author ? {
+                name: e.author.name,
+                iconUrl: e.author.iconURL ?? undefined
+            } : undefined,
+            color: e.hexColor ?? undefined,
+            description: this.parseText(e.description, relevantRoles, relevantUsers, relevantChannels) ?? undefined,
+            fields: e.fields.map(f => mapField(f)),
+            footer: mapFooter(e.footer),
+            image: mapImage(e.image),
+            thumbnail: mapImage(e.thumbnail),
+            timestamp: e.timestamp ?? undefined,
+        }
+    }
+    private parseText<T>(text: T, relevantRoles: Set<string>, relevantUsers: Set<string>, relevantChannels: Set<string>): T {
+        if (typeof text !== "string") return text
+
+        for (const role of text.matchAll(MessageMentions.ROLES_PATTERN))
+            relevantRoles.add(role[1])
+
+        for (const user of text.matchAll(MessageMentions.USERS_PATTERN))
+            relevantUsers.add(user[1])
+
+        for (const channel of text.matchAll(MessageMentions.CHANNELS_PATTERN))
+            relevantChannels.add(channel[1])
+
+        return text
+    }
+
+    private mapRow(c: MessageActionRow) {
+        function mapComponent(d: MessageActionRowComponent) {
+            if (d.type == "BUTTON")
+                return {
+                    type: d.type,
+                    disabled: d.disabled,
+                    emoji: d.emoji ?? undefined,
+                    label: d.label ?? undefined,
+                    style: d.style,
+                    url: d.url ?? undefined
+                }
+
+            if (d.type == "SELECT_MENU")
+                return {
+                    type: d.type,
+                    disabled: d.disabled,
+                    minValues: d.minValues ?? undefined,
+                    maxValues: d.maxValues ?? undefined,
+                    options: d.options,
+                    placeholder: d.placeholder ?? undefined,
+                }
+
+            // @ts-expect-error There shouldn't be another type (add above if there is)
+            return d.toJSON()
+        }
+        return {
+            type: c.type,
+            components: c.components.map(c => mapComponent(c))
+        }
     }
 }

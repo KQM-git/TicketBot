@@ -29,26 +29,28 @@ model Ticket {
 }
 
 model Transcript {
-  id               Int               @id @default(autoincrement())
-  slug             String            @unique
-  createdAt        DateTime          @default(now())
-  channelId        String
-  channelName      String
-  messages         Message[]
-  users            User[]
-  verifications    Verification[]
-  server           Server            @relation(fields: [serverId], references: [id])
-  serverId         String
-  ticket           Ticket            @relation(fields: [ticketId], references: [id])
-  ticketId         Int
-  QueuedTranscript QueuedTranscript?
+  id                Int               @id @default(autoincrement())
+  slug              String            @unique
+  createdAt         DateTime          @default(now())
+  channel           Channel           @relation("created_for", fields: [channelId, serverId], references: [discordId, serverId])
+  channelId         String
+  messages          Message[]
+  users             User[]
+  mentionedRoles    Role[]            @relation("mentioned_roles")
+  mentionedChannels Channel[]         @relation("mentioned_channels")
+  verifications     Verification[]
+  server            Server            @relation(fields: [serverId], references: [id])
+  serverId          String
+  ticket            Ticket            @relation(fields: [ticketId], references: [id])
+  ticketId          Int
+  QueuedTranscript  QueuedTranscript?
 }
 
 model QueuedTranscript {
   id            Int        @id @default(autoincrement())
   createdAt     DateTime   @default(now())
+  channel       Channel    @relation(fields: [channelId, serverId], references: [discordId, serverId])
   channelId     String
-  channelName   String
   botReplyId    String
   botChannelId  String
   dumpChannelId String?
@@ -92,12 +94,40 @@ model User {
   bot       Boolean?
   verified  Boolean?
 
-  QueuedTranscript QueuedTranscript[]
-  Verification     Verification[]
-  Transcript       Transcript[]
-  Message          Message[]
-  Tickets          Ticket[]           @relation("created")
-  Contributed      Ticket[]           @relation("contributes")
+  queuedTranscripts QueuedTranscript[]
+  verifications     Verification[]
+  transcripts       Transcript[]
+  messages          Message[]
+  tickets           Ticket[]           @relation("created")
+  contributed       Ticket[]           @relation("contributes")
+
+  @@unique([discordId, serverId])
+}
+
+model Role {
+  id        Int     @id @default(autoincrement())
+  discordId String
+  server    Server  @relation(fields: [serverId], references: [id])
+  serverId  String
+  name      String
+  roleColor String?
+
+  Transcript Transcript[] @relation("mentioned_roles")
+
+  @@unique([discordId, serverId])
+}
+
+model Channel {
+  id        Int    @id @default(autoincrement())
+  discordId String
+  server    Server @relation(fields: [serverId], references: [id])
+  serverId  String
+  name      String
+  type      String
+
+  mentionedIn       Transcript[]       @relation("mentioned_channels")
+  transcripts       Transcript[]       @relation("created_for")
+  queuedTranscripts QueuedTranscript[]
 
   @@unique([discordId, serverId])
 }
@@ -108,13 +138,15 @@ model Server {
   name      String
   icon      String?
 
-  Transcript       Transcript[]
-  QueuedTranscript QueuedTranscript[]
-  Verification     Verification[]
-  User             User[]
-  Message          Message[]
-  Tickets          Ticket[]
-  TicketDirectory  TicketDirectory[]
+  transcripts       Transcript[]
+  queuedTranscripts QueuedTranscript[]
+  verifications     Verification[]
+  users             User[]
+  messages          Message[]
+  tickets           Ticket[]
+  ticketDirectory   TicketDirectory[]
+  roles             Role[]
+  channels          Channel[]
 }
 
 model Message {
@@ -135,7 +167,7 @@ model Message {
   userId       String
   server       Server     @relation(fields: [serverId], references: [id])
   serverId     String
-  Transcript   Transcript @relation(fields: [transcriptId], references: [id])
+  transcript   Transcript @relation(fields: [transcriptId], references: [id])
   transcriptId Int
 }
 
