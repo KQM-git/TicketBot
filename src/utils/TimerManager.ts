@@ -168,5 +168,4 @@ export default class TimerManager {
         Logger.info(`Scheduling next check in ${(delay / 1000).toFixed(1)}s at ${nextCheck.toISOString()}`)
         setTimeout(async () => this.runTask().catch((e) => Logger.error(e)), delay)
     }
-
 }
