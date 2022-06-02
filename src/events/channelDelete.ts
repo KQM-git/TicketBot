@@ -34,4 +34,16 @@ export async function handle(channel: DMChannel | GuildChannel): Promise<void> {
     } catch (error) {
         Logger.error(error)
     }
+
+    try {
+        const td = await client.prisma.ticketDirectory.deleteMany({
+            where: {
+                channelId: channel.id
+            }
+        })
+        if (td.count > 0)
+            Logger.info(`Deleted ${td.count} from ticket directory due to channel deletion`)
+    } catch (error) {
+        Logger.error(error)
+    }
 }

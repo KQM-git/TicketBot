@@ -114,6 +114,7 @@ model Server {
   User             User[]
   Message          Message[]
   Tickets          Ticket[]
+  TicketDirectory  TicketDirectory[]
 }
 
 model Message {
@@ -136,4 +137,14 @@ model Message {
   serverId     String
   Transcript   Transcript @relation(fields: [transcriptId], references: [id])
   transcriptId Int
+}
+
+model TicketDirectory {
+  server    Server @relation(fields: [serverId], references: [id])
+  serverId  String
+  channelId String
+  messageId String
+  type      String
+
+  @@unique([channelId, serverId, type])
 }

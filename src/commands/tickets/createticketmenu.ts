@@ -45,8 +45,8 @@ export default class CreateTicketMenu extends Command {
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
 
         // TODO check perms
-        if (!member.permissionsIn(channel.id).has("ADMINISTRATOR"))
-            return await sendMessage(source, "Only Administrators can create ticket menu", undefined, true)
+        if (!member.permissionsIn(channel.id).has("MANAGE_CHANNELS"))
+            return await sendMessage(source, "Only people who can manage the target channel can create ticket menu", undefined, true)
 
         const set = menus.find(p => p.value == preset)
 
