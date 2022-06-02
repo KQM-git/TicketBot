@@ -1,10 +1,10 @@
-import { ButtonInteraction, CommandInteraction, GuildMember, Message, MessageEmbed, User } from "discord.js"
+import { BaseGuildTextChannel, ButtonInteraction, CommandInteraction, GuildMember, Message, MessageEmbed, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
 import { ticketTypes } from "../../utils/TicketTypes"
 import { CommandSource, EndingAction, SendMessage, TicketStatus } from "../../utils/Types"
-import { Colors, sendMessage } from "../../utils/Utils"
+import { Colors, isTicketable, sendMessage } from "../../utils/Utils"
 
 const Logger = getLogger("verify")
 export default class VerifyTicket extends Command {
@@ -30,7 +30,7 @@ export default class VerifyTicket extends Command {
     }
 
     async runMessage(source: Message): Promise<SendMessage | undefined> {
-        return await sendMessage(source, "This command isn't available in text form, please refer to the slash-command")
+        return await this.run(source, source.author)
     }
 
     async run(source: CommandSource, user: User): Promise<SendMessage | undefined> {
@@ -39,7 +39,7 @@ export default class VerifyTicket extends Command {
         const member = await source.guild.members.fetch(user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
 
-        if (!source.channel || source.channel.type != "GUILD_TEXT") return await sendMessage(source, "Couldn't get channel ID / not a text channel", undefined, true)
+        if (!source.channel || !isTicketable(source.channel)) return await sendMessage(source, "Couldn't get channel ID / not a text channel", undefined, true)
 
         const ticket = await client.prisma.ticket.findUnique({
             where: {
@@ -75,7 +75,7 @@ export default class VerifyTicket extends Command {
 
         if (enough) {
             Logger.info(`Enough verifications for ticket ${ticket.id}: ${ticket.name} by ${user.id} (${user.tag}), doing some extra actions...`)
-            if (ticketType?.verifiedCategory)
+            if (ticketType?.verifiedCategory && source.channel instanceof BaseGuildTextChannel)
                 await source.channel.setParent(ticketType?.verifiedCategory)
 
 

@@ -1,11 +1,11 @@
 import { APIInteractionDataResolvedGuildMember, APIRole } from "discord-api-types/v9"
-import { CommandInteraction, GuildMember, Message, MessageEmbed, Role, User } from "discord.js"
+import { BaseGuildTextChannel, CommandInteraction, GuildMember, Message, MessageEmbed, Role, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
 import { ticketTypes } from "../../utils/TicketTypes"
 import { CommandSource, SendMessage } from "../../utils/Types"
-import { Colors, sendMessage } from "../../utils/Utils"
+import { Colors, isTicketable, sendMessage } from "../../utils/Utils"
 
 const Logger = getLogger("remove")
 export default class RemoveUserTicket extends Command {
@@ -40,7 +40,7 @@ export default class RemoveUserTicket extends Command {
         const member = await source.guild.members.fetch(user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
 
-        if (!source.channel || source.channel.type != "GUILD_TEXT") return await sendMessage(source, "Couldn't get channel ID / not a text channel", undefined, true)
+        if (!source.channel || !isTicketable(source.channel)) return await sendMessage(source, "Couldn't get channel ID / not a text channel", undefined, true)
 
         const targetId = (target as User).id
 
@@ -65,7 +65,8 @@ export default class RemoveUserTicket extends Command {
 
         Logger.info(`Removing group ${targetId} ticket ${ticket.id} (${ticket.name}) by ${member.id} (${member.user.tag})`)
 
-        await source.channel.permissionOverwrites.create(targetId, { VIEW_CHANNEL: null })
+        if (source.channel instanceof BaseGuildTextChannel)
+            await source.channel.permissionOverwrites.create(targetId, { VIEW_CHANNEL: null })
         await source.channel.send({
             embeds: [
                 new MessageEmbed()

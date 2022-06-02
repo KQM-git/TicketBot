@@ -1,10 +1,10 @@
-import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageEmbed, User } from "discord.js"
+import { BaseGuildTextChannel, ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageEmbed, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
 import { buttons, ticketTypes } from "../../utils/TicketTypes"
 import { CommandSource, SendMessage, TicketStatus } from "../../utils/Types"
-import { displayTimestamp, sendMessage } from "../../utils/Utils"
+import { displayTimestamp, isTicketable, sendMessage } from "../../utils/Utils"
 
 
 const Logger = getLogger("open")
@@ -31,7 +31,7 @@ export default class OpenTicket extends Command {
     }
 
     async runMessage(source: Message): Promise<SendMessage | undefined> {
-        return await sendMessage(source, "This command isn't available in text form, please refer to the slash-command")
+        return this.run(source, source.author)
     }
 
     async run(source: CommandSource, user: User): Promise<SendMessage | undefined> {
@@ -40,7 +40,7 @@ export default class OpenTicket extends Command {
         const member = await source.guild.members.fetch(user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
 
-        if (!source.channel || source.channel.type != "GUILD_TEXT") return await sendMessage(source, "Couldn't get channel ID / not a text channel", undefined, true)
+        if (!source.channel || !isTicketable(source.channel)) return await sendMessage(source, "Couldn't get channel ID / not a text channel", undefined, true)
 
         const ticket = await client.prisma.ticket.findUnique({
             where: {
@@ -68,9 +68,10 @@ export default class OpenTicket extends Command {
             return await sendMessage(source, "Only the ticket creator and people with management roles can open tickets", undefined, true)
 
         Logger.info(`Opening ticket ${source.channel.id} / ${source.channel.id} -> ${ticket.id} by ${user.id} (${user.tag})`)
-        await source.channel.permissionOverwrites.create(ticket.creator.discordId, { SEND_MESSAGES: null })
-        if (ticketType?.defaultCategory) {
-            await source.channel.setParent(ticketType?.defaultCategory)
+        if (source.channel instanceof BaseGuildTextChannel) {
+            await source.channel.permissionOverwrites.create(ticket.creator.discordId, { SEND_MESSAGES: null })
+            if (ticketType?.defaultCategory)
+                await source.channel.setParent(ticketType?.defaultCategory)
         }
 
         await source.channel.send({

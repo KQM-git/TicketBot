@@ -2,11 +2,12 @@ import { DMChannel, GuildChannel } from "discord.js"
 import log4js from "log4js"
 import client from "../main"
 import { TicketStatus } from "../utils/Types"
+import { isTicketable } from "../utils/Utils"
 
 const Logger = log4js.getLogger("channelDelete")
 
 export async function handle(channel: DMChannel | GuildChannel): Promise<void> {
-    if (!(channel instanceof GuildChannel)) return
+    if (!(isTicketable(channel))) return
 
     Logger.info(`Delete ${channel.id} - ${channel.name} in ${channel.guild.id}`)
     try {

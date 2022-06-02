@@ -1,10 +1,12 @@
 import { APIMessage } from "discord-api-types/v9"
-import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButtonStyle, MessageEmbedOptions, ModalSubmitInteraction } from "discord.js"
+import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButtonStyle, MessageEmbedOptions, ModalSubmitInteraction, NewsChannel, TextChannel, ThreadChannel } from "discord.js"
 
 // Discord shortcuts
 export type CommandSource = Message | CommandInteraction | ModalSubmitInteraction | ButtonInteraction
 export type SendMessage = Message | APIMessage
 export type CommandResponse = Promise<unknown> | unknown
+
+export type TicketableChannel = NewsChannel | TextChannel | ThreadChannel
 
 // Ticket data
 export enum TicketStatus {

@@ -77,7 +77,7 @@ export default class CreateTicket extends Command {
     }
 
     async run(source: CommandSource, user: User, type: string, name: string): Promise<SendMessage | undefined> {
-        if (!source.guild) return await sendMessage(source, "Can't make transcripts here", undefined, true)
+        if (!source.guild) return await sendMessage(source, "Can't make tickets here", undefined, true)
 
         const member = await source.guild.members.fetch(user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)

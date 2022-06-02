@@ -1,10 +1,11 @@
 import { APIInteractionDataResolvedChannel } from "discord-api-types/v9"
 import { CommandInteraction, GuildBasedChannel, Message, User } from "discord.js"
+import client from "../../main"
 import Command from "../../utils/Command"
-import {  ticketTypes } from "../../utils/TicketTypes"
+import { ticketTypes } from "../../utils/TicketTypes"
 import { convertTicket } from "../../utils/TicketUtils"
 import { CommandSource, SendMessage, TicketStatus } from "../../utils/Types"
-import { sendMessage } from "../../utils/Utils"
+import { isTicketable, sendMessage } from "../../utils/Utils"
 
 
 export default class ConvertTicket extends Command {
@@ -54,11 +55,15 @@ export default class ConvertTicket extends Command {
         return await sendMessage(source, "This command isn't available in text form, please refer to the slash-command")
     }
 
-    async run(source: CommandSource, user: User, type: string, channel: APIInteractionDataResolvedChannel | GuildBasedChannel, status: string): Promise<SendMessage | undefined> {
-        if (!source.guild) return await sendMessage(source, "Can't make transcripts here", undefined, true)
+    async run(source: CommandSource, user: User, type: string, chan: APIInteractionDataResolvedChannel | GuildBasedChannel, status: string): Promise<SendMessage | undefined> {
+        if (!source.guild) return await sendMessage(source, "Can't convert tickets here", undefined, true)
 
         const member = await source.guild.members.fetch(user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
+
+        const channel = await client.channels.fetch(chan.id)
+        if (!channel)
+            return await sendMessage(source, "Couldn't fetch channel data", undefined, true)
 
         // TODO check perms
         if (!member.permissionsIn(channel.id).has("MANAGE_CHANNELS"))
@@ -74,11 +79,11 @@ export default class ConvertTicket extends Command {
                 const children = channel.children.map(x => x)
                 const converted: string[] = []
                 for (const child of children) {
-                    if (child.type == "GUILD_TEXT")
+                    if (child.isText())
                         converted.push(await convertTicket(ticketType, child, member, status, source.guild))
                 }
                 return await sendMessage(source, converted.join("\n").substring(0, 1900), undefined)
-            } else if (channel.type == "GUILD_TEXT") {
+            } else if (isTicketable(channel)) {
                 return await sendMessage(source, `${await convertTicket(ticketType, channel, member, status, source.guild)}`, undefined)
             } else {
                 return await sendMessage(source, `Can't convert channel type ${channel.type}`, undefined, true)

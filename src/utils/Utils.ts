@@ -1,7 +1,7 @@
-import { BaseGuildTextChannel, ColorResolvable, Message, MessageActionRow, MessageEmbed } from "discord.js"
+import { AnyChannel, ColorResolvable, GuildChannel, Message, MessageActionRow, MessageEmbed, TextBasedChannel } from "discord.js"
 import log4js from "log4js"
 import client from "../main"
-import { CommandSource, SendMessage, TicketStatus } from "./Types"
+import { CommandSource, SendMessage, TicketableChannel, TicketStatus } from "./Types"
 
 const Logger = log4js.getLogger("Utils")
 
@@ -23,7 +23,7 @@ export async function updateMessage(channelId: string, replyId: string, response
 
     try {
         const channel = await client.channels.fetch(channelId)
-        if (channel && channel instanceof BaseGuildTextChannel) {
+        if (channel && isTicketable(channel)) {
             const msg = await channel.messages.fetch(replyId)
             await msg.edit({ content, embeds, components })
             return msg
@@ -126,6 +126,11 @@ export function findFuzzyBestCandidates(target: string[], search: string, amount
         })
         .sort((a, b) => b.d - a.d)
         .map(e => e.t)
+}
+
+export function isTicketable(channel: AnyChannel | GuildChannel | TextBasedChannel | null): channel is TicketableChannel {
+    if (!channel) return false
+    return channel.type == "GUILD_TEXT" || channel.type == "GUILD_PUBLIC_THREAD" || channel.type == "GUILD_PRIVATE_THREAD" || channel.type == "GUILD_NEWS" || channel.type == "GUILD_NEWS_THREAD"
 }
 
 

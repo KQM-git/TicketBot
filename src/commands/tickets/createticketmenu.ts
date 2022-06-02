@@ -1,9 +1,10 @@
 import { APIInteractionDataResolvedChannel } from "discord-api-types/v9"
-import { BaseGuildTextChannel, CommandInteraction, GuildBasedChannel, Message, MessageActionRow, MessageButton, MessageEmbed, TextBasedChannel, User } from "discord.js"
+import { CommandInteraction, GuildBasedChannel, Message, MessageActionRow, MessageButton, MessageEmbed, TextBasedChannel, User } from "discord.js"
+import client from "../../main"
 import Command from "../../utils/Command"
 import { menus } from "../../utils/TicketTypes"
 import { CommandSource, SendMessage } from "../../utils/Types"
-import { Colors, sendMessage } from "../../utils/Utils"
+import { Colors, isTicketable, sendMessage } from "../../utils/Utils"
 
 
 export default class CreateTicketMenu extends Command {
@@ -37,9 +38,15 @@ export default class CreateTicketMenu extends Command {
         return await sendMessage(source, "This command isn't available in text form, please refer to the slash-command")
     }
 
-    async run(source: CommandSource, user: User, preset: string, channel: TextBasedChannel | GuildBasedChannel | APIInteractionDataResolvedChannel | null): Promise<SendMessage | undefined> {
-        if (!channel) return await sendMessage(source, "Couldn't fetch channel", undefined, true)
-        if (!(channel instanceof BaseGuildTextChannel) || !source.guild) return await sendMessage(source, "Can't make transcripts here", undefined, true)
+    async run(source: CommandSource, user: User, preset: string, chan: TextBasedChannel | GuildBasedChannel | APIInteractionDataResolvedChannel | null): Promise<SendMessage | undefined> {
+        if (!source.guild) return await sendMessage(source, "Can't make ticket menu here", undefined, true)
+        if (!chan) return await sendMessage(source, "Couldn't fetch channel", undefined, true)
+
+        const channel = await client.channels.fetch(chan.id)
+        if (!channel)
+            return await sendMessage(source, "Couldn't fetch channel data", undefined, true)
+        if (!isTicketable(channel))
+            return await sendMessage(source, "Can't make ticket menu here", undefined, true)
 
         const member = await source.guild.members.fetch(user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)

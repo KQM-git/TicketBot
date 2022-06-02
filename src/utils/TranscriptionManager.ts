@@ -1,12 +1,12 @@
 import { PrismaClient, QueuedTranscript } from "@prisma/client"
+import AdmZip from "adm-zip"
 import { randomUUID } from "crypto"
-import { BaseGuildTextChannel, Guild, GuildMember, MessageAttachment, MessageEmbed, User } from "discord.js"
+import { Guild, GuildMember, MessageAttachment, MessageEmbed, User } from "discord.js"
 import { getLogger } from "log4js"
 import TiBotClient, { baseUrl } from "../TiBotClient"
 import { ticketTypes } from "./TicketTypes"
-import { EndingAction, Enumerable, InputJsonValue, MessageInput, SendMessage, TicketStatus, UserInput } from "./Types"
-import { Colors, displayTimestamp, updateMessage } from "./Utils"
-import AdmZip from "adm-zip"
+import { EndingAction, Enumerable, InputJsonValue, MessageInput, SendMessage, TicketableChannel, TicketStatus, UserInput } from "./Types"
+import { Colors, displayTimestamp, isTicketable, trim, updateMessage } from "./Utils"
 
 const Logger = getLogger("transcriber")
 export default class TranscriptionManager {
@@ -18,8 +18,8 @@ export default class TranscriptionManager {
         this.prisma = client.prisma
     }
 
-    public async startTranscript(channel: BaseGuildTextChannel, reply: SendMessage, upTo: string | undefined, latest: string, transcriber: GuildMember, slug: string, dumpChannel: string | undefined, endAction: EndingAction) {
-        const initialSlug = slug
+    public async startTranscript(channel: TicketableChannel, reply: SendMessage, upTo: string | undefined, latest: string, transcriber: GuildMember, slug: string, dumpChannel: string | undefined, endAction: EndingAction) {
+        const initialSlug = trim(slug)
 
         let trans = await this.prisma.transcript.findUnique({ where: { slug } })
         if (trans) {
@@ -96,7 +96,7 @@ export default class TranscriptionManager {
 
     private async transcribe(queued: QueuedTranscript): Promise<void> {
         const channel = await this.client.channels.fetch(queued.channelId)
-        if (!channel || !(channel instanceof BaseGuildTextChannel)) {
+        if (!channel || !isTicketable(channel)) {
             Logger.error(`Couldn't find channel for ${queued.channelId} (${queued.channelName}) ${JSON.stringify(queued)}`)
             await this.deleteQueued(queued)
             return
@@ -162,7 +162,7 @@ export default class TranscriptionManager {
             if (queued.dumpChannelId)
                 try {
                     const channel = await this.client.channels.fetch(queued.dumpChannelId)
-                    if (channel && channel instanceof BaseGuildTextChannel) {
+                    if (channel && isTicketable(channel)) {
                         const fullTranscript = await this.prisma.transcript.findUnique({
                             where: { id: queued.transcriptId },
                             include: {

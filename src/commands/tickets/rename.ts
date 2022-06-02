@@ -4,7 +4,7 @@ import client from "../../main"
 import Command from "../../utils/Command"
 import { ticketTypes } from "../../utils/TicketTypes"
 import { CommandSource, SendMessage } from "../../utils/Types"
-import { sendMessage } from "../../utils/Utils"
+import { isTicketable, sendMessage } from "../../utils/Utils"
 
 const Logger = getLogger("rename")
 export default class RenameTicket extends Command {
@@ -57,8 +57,10 @@ export default class RenameTicket extends Command {
     }
 
 
-    async runMessage(source: Message): Promise<SendMessage | undefined> {
-        return await sendMessage(source, "This command isn't available in text form, please refer to the slash-command")
+    async runMessage(source: Message, args: string[]): Promise<SendMessage | string | undefined> {
+        if (args.length == 0)
+            return sendMessage(source, "No new name provided!")
+        return this.run(source, source.author, args.join(" "))
     }
 
     async run(source: CommandSource, user: User, name?: string): Promise<SendMessage | undefined | string> {
@@ -67,7 +69,7 @@ export default class RenameTicket extends Command {
         const member = await source.guild.members.fetch(user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
 
-        if (!source.channel || source.channel.type != "GUILD_TEXT") return await sendMessage(source, "Couldn't get channel ID / not a text channel", undefined, true)
+        if (!source.channel || !isTicketable(source.channel)) return await sendMessage(source, "Couldn't get channel ID / not a text channel", undefined, true)
 
         const ticket = await client.prisma.ticket.findUnique({
             where: {

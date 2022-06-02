@@ -54,7 +54,7 @@ export default class ContributorTicket extends Command {
         const member = await source.guild.members.fetch(user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
 
-        if (!source.channel || source.channel.type != "GUILD_TEXT") return await sendMessage(source, "Couldn't get channel ID / not a text channel", undefined, true)
+        if (!source.channel || !source.channel.isText()) return await sendMessage(source, "Couldn't get channel ID / not a text channel", undefined, true)
 
         const ticket = await client.prisma.ticket.findUnique({
             where: {

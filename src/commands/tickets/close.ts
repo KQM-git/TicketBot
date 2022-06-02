@@ -1,4 +1,4 @@
-import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageEmbed, User } from "discord.js"
+import { BaseGuildTextChannel, ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageEmbed, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
@@ -30,7 +30,7 @@ export default class CloseTicket extends Command {
     }
 
     async runMessage(source: Message): Promise<SendMessage | undefined> {
-        return await sendMessage(source, "This command isn't available in text form, please refer to the slash-command")
+        return await this.run(source, source.author)
     }
 
     async run(source: CommandSource, user: User): Promise<SendMessage | undefined> {
@@ -39,7 +39,7 @@ export default class CloseTicket extends Command {
         const member = await source.guild.members.fetch(user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
 
-        if (!source.channel || source.channel.type != "GUILD_TEXT") return await sendMessage(source, "Couldn't get channel ID / not a text channel", undefined, true)
+        if (!source.channel || !source.channel.isText()) return await sendMessage(source, "Couldn't get channel ID / not a text channel", undefined, true)
 
         const ticket = await client.prisma.ticket.findUnique({
             where: {
@@ -63,9 +63,11 @@ export default class CloseTicket extends Command {
 
         Logger.info(`Closing ticket ${ticket.id} (${ticket.name}) by ${member.id} (${member.user.tag})`)
 
-        await source.channel.permissionOverwrites.create(ticket.creator.discordId, { SEND_MESSAGES: false })
-        if (ticketType?.closeCategory) {
-            await source.channel.setParent(ticketType.closeCategory)
+        if (source.channel instanceof BaseGuildTextChannel) {
+            await source.channel.permissionOverwrites.create(ticket.creator.discordId, { SEND_MESSAGES: false })
+            if (ticketType?.closeCategory) {
+                await source.channel.setParent(ticketType.closeCategory)
+            }
         }
 
         await source.channel.send({

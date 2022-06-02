@@ -4,7 +4,7 @@ import client from "../../main"
 import Command from "../../utils/Command"
 import { ticketTypes } from "../../utils/TicketTypes"
 import { CommandSource, EndingAction, SendMessage } from "../../utils/Types"
-import { Colors, sendMessage, trim } from "../../utils/Utils"
+import { Colors, isTicketable, sendMessage, trim } from "../../utils/Utils"
 
 const Logger = getLogger("deleter")
 export default class DeleteTicket extends Command {
@@ -62,7 +62,7 @@ export default class DeleteTicket extends Command {
         const member = await source.guild.members.fetch(user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
 
-        if (!source.channel || source.channel.type != "GUILD_TEXT") return await sendMessage(source, "Couldn't get channel ID / not a text channel", undefined, true)
+        if (!source.channel || !isTicketable(source.channel)) return await sendMessage(source, "Couldn't get channel ID / not a text channel", undefined, true)
 
         const ticket = await client.prisma.ticket.findUnique({
             where: {

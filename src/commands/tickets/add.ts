@@ -1,5 +1,5 @@
 import { APIInteractionDataResolvedGuildMember, APIRole } from "discord-api-types/v9"
-import { CommandInteraction, GuildMember, Message, MessageEmbed, Role, User } from "discord.js"
+import { BaseGuildTextChannel, CommandInteraction, GuildMember, Message, MessageEmbed, Role, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
@@ -40,7 +40,7 @@ export default class AddUserTicket extends Command {
         const member = await source.guild.members.fetch(user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
 
-        if (!source.channel || source.channel.type != "GUILD_TEXT") return await sendMessage(source, "Couldn't get channel ID / not a text channel", undefined, true)
+        if (!source.channel || !source.channel.isText()) return await sendMessage(source, "Couldn't get channel ID / not a text channel", undefined, true)
 
         const targetId = (target as User).id
 
@@ -65,7 +65,9 @@ export default class AddUserTicket extends Command {
 
         Logger.info(`Adding group ${targetId} ticket ${ticket.id} (${ticket.name}) by ${member.id} (${member.user.tag})`)
 
-        await source.channel.permissionOverwrites.create(targetId, { VIEW_CHANNEL: true })
+        if (source.channel instanceof BaseGuildTextChannel)
+            await source.channel.permissionOverwrites.create(targetId, { VIEW_CHANNEL: true })
+
         await source.channel.send({
             embeds: [
                 new MessageEmbed()

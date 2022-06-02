@@ -1,10 +1,10 @@
-import { BaseGuildTextChannel, ButtonInteraction, CommandInteraction, Message, MessageEmbed, Snowflake, TextBasedChannel } from "discord.js"
+import { ButtonInteraction, CommandInteraction, Message, MessageEmbed, Snowflake, TextBasedChannel } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
 import { ticketTypes } from "../../utils/TicketTypes"
 import { CommandSource, EndingAction, SendMessage } from "../../utils/Types"
-import { Colors, sendMessage } from "../../utils/Utils"
+import { Colors, isTicketable, sendMessage } from "../../utils/Utils"
 
 const Logger = getLogger("transcript")
 const discordMessageLink = /^https:\/\/discord.com\/channels\/\d+\/\d+\/(\d+)$/
@@ -49,7 +49,7 @@ export default class Transcript extends Command {
 
     async run(source: CommandSource, senderId: Snowflake, channel: TextBasedChannel | null, upTo?: string | null, latest?: string | null, slug?: string | null): Promise<SendMessage | undefined> {
         if (!channel) return await sendMessage(source, "Couldn't fetch channel", undefined, true)
-        if (!(channel instanceof BaseGuildTextChannel) || !source.guild) return await sendMessage(source, "Can't make transcripts here", undefined, true)
+        if (!source.guild || !isTicketable(channel)) return await sendMessage(source, "Can't make transcripts here", undefined, true)
 
         const sender = await source.guild.members.fetch(senderId)
         if (!sender) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)

@@ -1,7 +1,7 @@
-import { Guild, GuildMember, TextChannel, User } from "discord.js"
+import { Guild, GuildMember, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../main"
-import { TicketType } from "./Types"
+import { TicketableChannel, TicketType } from "./Types"
 import { trim } from "./Utils"
 
 
@@ -66,7 +66,7 @@ export async function createTicket(ticketType: TicketType, name: string, member:
     return channel.id
 }
 
-export async function convertTicket(ticketType: TicketType, channel: TextChannel, member: GuildMember | User, status: string, guild: Guild) {
+export async function convertTicket(ticketType: TicketType, channel: TicketableChannel, member: GuildMember | User, status: string, guild: Guild) {
     await client.transcriptionManager.updateServer(guild)
 
     const pinned = await channel.messages.fetchPinned()
@@ -88,7 +88,7 @@ export async function convertTicket(ticketType: TicketType, channel: TextChannel
             },
             create: {
                 channelId: channel.id,
-                createdAt: channel.createdAt,
+                createdAt: channel.createdAt ?? undefined,
                 name: channel.name,
                 type: ticketType.id,
                 server: client.transcriptionManager.getServer(guild),
