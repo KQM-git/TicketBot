@@ -158,13 +158,14 @@ export const ticketTypes: Record<string, TicketType> = {
         id: "staff",
         name: "Staff Ticket",
         emoji: "🐒",
+        style: "DANGER",
         creationRoles: ROLE.STAFF,
         manageRoles: ROLE.STAFF,
         defaultCategory: CATEGORY.STAFF_TICKETS,
         opening: {
             content: " - This is a staff ticket"
         },
-        style: "DANGER"
+        randomDefaultSlug: true
     }
 }
 

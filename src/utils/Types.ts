@@ -45,6 +45,7 @@ export type TicketType = {
         time: number
         message: string
     }
+    randomDefaultSlug?: true
 }
 
 // Database stuff

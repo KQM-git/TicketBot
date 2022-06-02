@@ -306,7 +306,7 @@ export default class TranscriptionManager {
             } else {
                 await updateMessage(queued.botChannelId, queued.botReplyId, new MessageEmbed()
                     .setTitle("Created transcript!")
-                    .setDescription(`:wicked: ${transcript?.slug} - Fetched ${fetched} messages!`)
+                    .setDescription(`<a:hellawicked:982029314285514793> Transcription has been made and is available on ${baseUrl}/transcripts/${transcript?.slug} - Fetched a total of ${fetched} messages!`)
                     .setColor(Colors.GREEN))
             }
 
