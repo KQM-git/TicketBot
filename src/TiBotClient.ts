@@ -39,7 +39,7 @@ export default class TiBotClient extends Discord.Client {
                 status: "idle",
                 activities: [{
                     name: config.activity,
-                    type: "WATCHING"
+                    type: "COMPETING"
                 }]
             }
         })
@@ -53,6 +53,7 @@ export default class TiBotClient extends Discord.Client {
         Logger.info("Disconnecting DB...")
         await this.prisma.$disconnect()
         Logger.info("Done!")
+        this.destroy()
         process.exit(type)
     }
 

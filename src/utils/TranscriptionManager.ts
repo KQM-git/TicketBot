@@ -137,6 +137,9 @@ export default class TranscriptionManager {
             if (queued.upTo && BigInt(newLatest) < BigInt(queued.upTo))
                 break
 
+            if (msg.system)
+                continue
+
             const relevantRoles: Set<string> =  new Set()
             const relevantUsers: Set<string> =  new Set()
             const relevantChannels: Set<string> =  new Set()
@@ -277,7 +280,7 @@ export default class TranscriptionManager {
                                         name: `${ticket.creator.username}#${ticket.creator.tag}`,
                                         iconURL: (ticket.creator.avatar && `https://cdn.discordapp.com/avatars/${ticket.creator.discordId}/${ticket.creator.avatar}.png`) || "https://cdn.discordapp.com/attachments/247122362942619649/980958465566572604/unknown.png"
                                     })
-                                    .setDescription(`[Full transcript](${baseUrl}/transcripts/${transcript?.slug}) (${fullTranscript.messages.length} messages by ${users.length} users)`)
+                                    .setDescription(`[Full transcript](${baseUrl}/transcripts/${transcript?.slug}) (${fullTranscript.messages.length} messages by ${users.length} users) of <#${fullTranscript.channel.discordId}>`)
                                     .addField("Ticket Name", ticket.name, true)
                                     .addField("Type", ticketTypes[ticket.type]?.name ?? ticket.type, true)
                                     .addField("Status", ticket.status, true)

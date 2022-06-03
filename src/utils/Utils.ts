@@ -62,7 +62,7 @@ function caps(str: string): string {
 }
 
 export function trim(input: string): string {
-    return input.toLowerCase().replace(/[():"'-]/g, "").trim().replace(/ +/g, "-")
+    return input.toLowerCase().replace(/[():"']/g, "").trim().replace(/[ -]+/g, "-")
 }
 
 
