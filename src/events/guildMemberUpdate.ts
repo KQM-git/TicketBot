@@ -6,7 +6,7 @@ const Logger = log4js.getLogger("userUpdate")
 
 export async function handle(old: GuildMember, member: GuildMember): Promise<void> {
     if (member.displayColor == old.displayColor && member.nickname == old.nickname) return
-    Logger.info(`Update member ${member.id}:  ${old.nickname} -> ${member.nickname} / ${old.displayHexColor} -> ${member.displayHexColor} in ${member.guild.id}`)
+    Logger.info(`Update member ${member.id}: ${old.nickname} -> ${member.nickname} / ${old.displayHexColor} -> ${member.displayHexColor} in ${member.guild.id}`)
     try {
         await client.prisma.user.updateMany({
             where: {

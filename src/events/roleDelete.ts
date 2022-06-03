@@ -5,7 +5,7 @@ import client from "../main"
 const Logger = log4js.getLogger("roleUpdate")
 
 export async function handle(_: Role, role: Role): Promise<void> {
-    Logger.info(`Deleted role ${role.id}:  ${role.name} in ${role.guild.id}`)
+    Logger.info(`Deleted role ${role.id}: ${role.name} in ${role.guild.id}`)
     try {
         await client.prisma.role.updateMany({
             where: {
