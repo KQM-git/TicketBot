@@ -3,10 +3,11 @@ import AdmZip from "adm-zip"
 import { randomUUID } from "crypto"
 import { EmbedField, EmbedFooterData, Guild, GuildMember, MessageActionRow, MessageActionRowComponent, MessageAttachment, MessageEmbed, MessageEmbedImage, MessageEmbedThumbnail, MessageMentions, MessageReaction, User } from "discord.js"
 import { getLogger } from "log4js"
-import TiBotClient, { baseUrl } from "../TiBotClient"
+import TiBotClient from "../TiBotClient"
 import { ticketTypes } from "./TicketTypes"
 import { ChannelInput, EndingAction, Enumerable, InputJsonValue, MessageInput, RoleInput, SendMessage, TicketableChannel, UserInput } from "./Types"
 import { Colors, displayTimestamp, isTicketable, trim, updateMessage } from "./Utils"
+import { baseUrl } from "../data/config.json"
 
 const Logger = getLogger("transcriber")
 export default class TranscriptionManager {

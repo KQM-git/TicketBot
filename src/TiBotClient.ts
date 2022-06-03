@@ -23,8 +23,6 @@ intents.add(
     "GUILD_MEMBERS",
 )
 
-export const baseUrl = config.production ? "https://tickets.deeznuts.moe" : "http://localhost:3000"
-
 export default class TiBotClient extends Discord.Client {
     commands: Enmap<string, Command> = new Enmap()
     prisma: PrismaClient = new PrismaClient()
