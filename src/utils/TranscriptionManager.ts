@@ -5,7 +5,7 @@ import { EmbedField, EmbedFooterData, Guild, GuildMember, MessageActionRow, Mess
 import { getLogger } from "log4js"
 import TiBotClient, { baseUrl } from "../TiBotClient"
 import { ticketTypes } from "./TicketTypes"
-import { ChannelInput, EndingAction, Enumerable, InputJsonValue, MessageInput, RoleInput, SendMessage, TicketableChannel, TicketStatus, UserInput } from "./Types"
+import { ChannelInput, EndingAction, Enumerable, InputJsonValue, MessageInput, RoleInput, SendMessage, TicketableChannel, UserInput } from "./Types"
 import { Colors, displayTimestamp, isTicketable, trim, updateMessage } from "./Utils"
 
 const Logger = getLogger("transcriber")
@@ -140,9 +140,9 @@ export default class TranscriptionManager {
             if (msg.system)
                 continue
 
-            const relevantRoles: Set<string> =  new Set()
-            const relevantUsers: Set<string> =  new Set()
-            const relevantChannels: Set<string> =  new Set()
+            const relevantRoles: Set<string> = new Set()
+            const relevantUsers: Set<string> = new Set()
+            const relevantChannels: Set<string> = new Set()
 
             messages.push({
                 discordId: msg.id,
@@ -303,7 +303,7 @@ export default class TranscriptionManager {
             if (queued.endAction == EndingAction.DELETE) {
                 await this.prisma.ticket.update({
                     where: { channelId: queued.channelId },
-                    data: { status: TicketStatus.DELETED }
+                    data: { deleted: true }
                 })
                 await channel.delete(`Deleted with transcript - ${transcript?.slug}`)
             } else {

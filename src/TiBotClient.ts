@@ -19,6 +19,8 @@ intents.add(
     "GUILDS",
     // For handling commands in guilds
     "GUILD_MESSAGES",
+    // Updating members
+    "GUILD_MEMBERS",
 )
 
 export const baseUrl = "https://tickets.deeznuts.moe"
@@ -64,6 +66,7 @@ export default class TiBotClient extends Discord.Client {
                 // eslint-disable-next-line @typescript-eslint/no-var-requires
                 const event = require(`./events/${file}`)
                 const eventName = file.split(".")[0] as keyof ClientEvents
+                Logger.info(`Loading event ${eventName}`)
                 this.on(eventName, event.handle)
             })
         })
@@ -77,7 +80,7 @@ export default class TiBotClient extends Discord.Client {
                     // eslint-disable-next-line @typescript-eslint/no-var-requires
                     const props = require(`${dir}${file}`)
                     const commandName = file.split(".")[0]
-                    Logger.info(`Loading ${commandName}`)
+                    Logger.info(`Loading command ${commandName}`)
 
                     const command: Command = new (props.default)(commandName)
                     // Check if command is already registered

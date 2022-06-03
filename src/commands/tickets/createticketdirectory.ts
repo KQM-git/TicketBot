@@ -3,7 +3,7 @@ import { CommandInteraction, GuildBasedChannel, Message, MessageEmbed, TextBased
 import client from "../../main"
 import Command from "../../utils/Command"
 import { ticketTypes } from "../../utils/TicketTypes"
-import { CommandSource, SendMessage, TicketStatus } from "../../utils/Types"
+import { CommandSource, SendMessage } from "../../utils/Types"
 import { Colors, isTicketable, sendMessage } from "../../utils/Utils"
 
 
@@ -92,7 +92,7 @@ export default class CreateTicketDirectory extends Command {
 
         const tickets = await client.prisma.ticket.findMany({
             where: {
-                status: { not: TicketStatus.DELETED },
+                deleted: false,
                 type: td.type,
                 serverId: td.serverId
             }

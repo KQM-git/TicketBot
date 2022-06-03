@@ -12,8 +12,7 @@ export type TicketableChannel = NewsChannel | TextChannel | ThreadChannel
 export enum TicketStatus {
     OPEN = "OPEN",
     CLOSED = "CLOSED",
-    VERIFIED = "VERIFIED",
-    DELETED = "DELETED"
+    VERIFIED = "VERIFIED"
 }
 
 export enum EndingAction {

@@ -151,5 +151,4 @@ export const Colors: Record<Color, ColorResolvable> = {
     OPEN: "#F49C1F",
     CLOSED: "#F4231F",
     VERIFIED: "#00EA69",
-    DELETED: "#F4231F"
 }

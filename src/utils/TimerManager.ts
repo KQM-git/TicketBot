@@ -93,13 +93,13 @@ export default class TimerManager {
 
         const ticketType = ticketTypes[td.type]
 
-        const stats: Record<Exclude<TicketStatus, "DELETED">, Ticket[]> = {
+        const stats: Record<TicketStatus, Ticket[]> = {
             OPEN: [],
             CLOSED: [],
             VERIFIED: []
         }
 
-        tickets.forEach(t => stats[t.status as Exclude<TicketStatus, "DELETED">]?.push(t))
+        tickets.forEach(t => stats[t.status as TicketStatus]?.push(t))
 
         const embeds: MessageEmbed[] = []
         if (stats.OPEN.length > 0)
@@ -140,7 +140,7 @@ export default class TimerManager {
         try {
             const allTickets = await this.prisma.ticket.findMany({
                 where: {
-                    status: { not: TicketStatus.DELETED }
+                    deleted: false
                 }
             })
             const open = allTickets.filter(t => t.status == TicketStatus.OPEN)
