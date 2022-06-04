@@ -42,6 +42,7 @@ export async function handle(): Promise<void> {
 
             for (const id of ["247122362942619649", "980837690285109349"]) {
                 const commands = client.guilds.cache.get(id)?.commands
+                await commands?.fetch()
                 if (commands)
                     for (const c of commands.cache.map(v => v))
                         await c.delete()

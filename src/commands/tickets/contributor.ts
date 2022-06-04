@@ -12,7 +12,7 @@ export default class ContributorTicket extends Command {
         super({
             name,
             category: "Tickets",
-            help: "Manage the contributors.",
+            help: "Manage the contributors of a ticket.",
             usage: "contributor",
             aliases: [],
             options: [{

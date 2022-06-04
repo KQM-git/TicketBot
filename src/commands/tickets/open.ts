@@ -13,7 +13,7 @@ export default class OpenTicket extends Command {
         super({
             name,
             category: "Tickets",
-            help: "Opens a ticket.",
+            help: "Opens the current ticket (resets verifiers).",
             usage: "open",
             aliases: [],
             options: []

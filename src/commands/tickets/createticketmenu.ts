@@ -12,7 +12,7 @@ export default class CreateTicketMenu extends Command {
         super({
             name,
             category: "Tickets",
-            help: "Create ticket creation menu.",
+            help: "Post a ticket creation menu.",
             usage: "createticketmenu",
             aliases: [],
             options: [{
