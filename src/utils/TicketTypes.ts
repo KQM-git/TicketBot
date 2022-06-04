@@ -155,7 +155,11 @@ export const ticketTypes: Record<string, TicketType> = {
         defaultCategory: CATEGORY.GUIDES,
         verifications: 2,
         dumpChannel: CHANNEL.TC_TRANSCRIPTS,
-        creationChannel: CHANNEL.NEW_TICKETS
+        creationChannel: CHANNEL.NEW_TICKETS,
+        dinkDonk: {
+            time: 7 * 24 * 3600 * 1000,
+            message: "<a:dinkdonk:981687794000879696> This channel hasn't been active in the past week!"
+        }
     },
     staff: {
         id: "staff",
