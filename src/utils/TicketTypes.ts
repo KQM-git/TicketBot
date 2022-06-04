@@ -68,7 +68,7 @@ const CATEGORY = config.production ? {
     FOR_REVIEW: "980837820929294367",
     PUBLISHING: "980838078300164096",
     STAFF_TICKETS: "980926469737963530",
-    STAFF_CLOSED: "953416056549015552",
+    STAFF_CLOSED: "982768252033835058",
 }
 
 const CHANNEL = config.production ? {
@@ -165,6 +165,7 @@ export const ticketTypes: Record<string, TicketType> = {
         creationRoles: ROLE.STAFF,
         manageRoles: ROLE.STAFF,
         defaultCategory: CATEGORY.STAFF_TICKETS,
+        closeCategory: CATEGORY.STAFF_CLOSED,
         opening: {
             content: ` - This is a staff ticket.
 
