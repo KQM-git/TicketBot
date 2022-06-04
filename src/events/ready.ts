@@ -39,8 +39,13 @@ export async function handle(): Promise<void> {
     try {
         if (config.production) {
             await client.application?.commands.set(cmds)
-            await client.guilds.cache.get("247122362942619649")?.commands.set([])
-            await client.guilds.cache.get("980837690285109349")?.commands.set([])
+
+            for (const id of ["247122362942619649", "980837690285109349"]) {
+                const commands = client.guilds.cache.get(id)?.commands
+                if (commands)
+                    for (const c of commands.cache.map(v => v))
+                        await c.delete()
+            }
         } else {
             await client.guilds.cache.get("247122362942619649")?.commands.set(cmds)
             await client.guilds.cache.get("980837690285109349")?.commands.set(cmds)
