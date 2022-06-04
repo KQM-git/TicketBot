@@ -37,9 +37,11 @@ export async function handle(): Promise<void> {
         })
 
     try {
-        if (config.production)
+        if (config.production) {
             await client.application?.commands.set(cmds)
-        else {
+            await client.guilds.cache.get("247122362942619649")?.commands.set([])
+            await client.guilds.cache.get("980837690285109349")?.commands.set([])
+        } else {
             await client.guilds.cache.get("247122362942619649")?.commands.set(cmds)
             await client.guilds.cache.get("980837690285109349")?.commands.set(cmds)
         }
