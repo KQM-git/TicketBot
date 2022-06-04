@@ -61,6 +61,7 @@ export default class CreateTicketMenu extends Command {
             return await sendMessage(source, "Couldn't find preset", undefined, true)
 
         await channel.send({
+            content: set.content,
             embeds: [new MessageEmbed()
                 .setTitle(set.title)
                 .setDescription(set.desc)

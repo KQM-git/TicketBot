@@ -64,16 +64,16 @@ export default class CloseTicket extends Command {
         Logger.info(`Closing ticket ${ticket.id} (${ticket.name}) by ${member.id} (${member.user.tag})`)
 
         if (source.channel instanceof BaseGuildTextChannel) {
-            await source.channel.permissionOverwrites.create(ticket.creator.discordId, { SEND_MESSAGES: false })
-            if (ticketType?.closeCategory) {
+            if (ticketType?.muteOwnerOnClose)
+                await source.channel.permissionOverwrites.create(ticket.creator.discordId, { SEND_MESSAGES: false })
+            if (ticketType?.closeCategory)
                 await source.channel.setParent(ticketType.closeCategory)
-            }
         }
 
         await source.channel.send({
             embeds: [
                 new MessageEmbed()
-                    .setDescription(`Ticket closed by <@${member.id}>`)
+                    .setDescription(`Ticket closed by <@${member.id}>. If there are any issues with it - it can be reopened by the owner or staff by using the buttons below or \`/open\`.`)
             ],
             components: [new MessageActionRow().addComponents(
                 ...(ticketType?.verifications ? [buttons.VERIFY] : []),

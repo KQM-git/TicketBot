@@ -43,7 +43,7 @@ const ROLE = config.production ? {
     EDITOR: "903791926162100256",
     STAFF: [
         "953164120952283206", // Pillar Staff
-        // TODO add more
+        "819165586889506868"  // The Trades
     ],
 } : {
     LIBSUB: "980899762054254593",
@@ -61,12 +61,14 @@ const CATEGORY = config.production ? {
     FOR_REVIEW: "953148307771883530",
     PUBLISHING: "953175594911289354",
     STAFF_TICKETS: "953156640604041216",
+    STAFF_CLOSED: "953416056549015552",
 } : {
     GUIDES: "980838140099039272",
     OPEN_SUBS: "980837799076958310",
     FOR_REVIEW: "980837820929294367",
     PUBLISHING: "980838078300164096",
     STAFF_TICKETS: "980926469737963530",
+    STAFF_CLOSED: "953416056549015552",
 }
 
 const CHANNEL = config.production ? {
@@ -89,9 +91,9 @@ export const ticketTypes: Record<string, TicketType> = {
 **Guidelines**
 - You can rename your ticket with \`/rename <ticket name>\` or with the button below
 - If this ticket was created by accident or it can be deleted, you can use \`/delete\` within the first 5 minutes, otherwise ask a Scholar.
-- When you are ready to submit the ticket, compile everything into one message following the format below and pin it. Then type \`/close\` or click the button; the ticket will automatically be moved to be reviewed.
-- To add contributors to your ticket use \`/contributor add <user>\`.
-- The ticket will be scrapped if: No activity >1 week or open for >1 month.`,
+- When you are ready to submit the ticket, compile everything into one message following the format below and pin it. Then type \`/close\` or click the button below; the ticket will automatically be moved to be reviewed.
+- To add contributors to your ticket you can use \`/contributor add <user>\`.
+- The ticket will be scrapped if: no activity >1 week or open for >1 month.`,
             embeds: [{
                 title: "Write-up Format",
                 description: `**Theory/Finding/Bug:** Title of your submission
@@ -113,7 +115,8 @@ export const ticketTypes: Record<string, TicketType> = {
         verifyRoles: [ROLE.THEORYCRAFTER],
         defaultCategory: CATEGORY.OPEN_SUBS,
         closeCategory: CATEGORY.FOR_REVIEW,
-        verifications: 1,
+        muteOwnerOnClose: true,
+        verifications: 2,
         verifiedCategory: CATEGORY.PUBLISHING,
         verifiedRole: ROLE.CONTRIBUTOR,
         dumpChannel: CHANNEL.TC_TRANSCRIPTS,
@@ -163,7 +166,17 @@ export const ticketTypes: Record<string, TicketType> = {
         manageRoles: ROLE.STAFF,
         defaultCategory: CATEGORY.STAFF_TICKETS,
         opening: {
-            content: " - This is a staff ticket"
+            content: ` - This is a staff ticket.
+
+- To add people to this ticket, use \`/add <user or role>\`
+- You can rename your ticket with \`/rename <ticket name>\` or with the button below
+- If you are done with this ticket, type \`/close\` or click the button below.`,
+            components: [
+                new MessageActionRow().addComponents(
+                    buttons.CLOSE,
+                    buttons.RENAME
+                )
+            ]
         },
         randomDefaultSlug: true
     }
@@ -172,6 +185,7 @@ export const ticketTypes: Record<string, TicketType> = {
 export const menus: {
     name: string
     value: string
+    content?: string
     title: string
     desc: string
     ticketTypes: TicketType[]
@@ -189,6 +203,15 @@ Please read the ticket guidelines above before opening a ticket.`,
 }, {
     name: "Staff Tickets",
     value: "ST",
+    content: `**⏬ UwU what's this**
+1. **Pillar Staff** and **The Trades** can use this to create a ticket/channel in Staff Tasks, for unique channel discussions / proposals / brainstorming.
+→ Task system is better suited for large undertakings: like the KQM speedrun, wikia, etc.
+2. For your sanity, mute the category, please.
+<https://media.discordapp.net/attachments/763589418086432778/821235562589192213/unknown.png>
+
+**⏬ Adding a member or a role to the ticket**
+Newly created tickets are only visible to the person who opened it (and the admins).
+For anyone else you want to add in, you can use \`/add <person or role>\` in the channel.`,
     title: "Staff Tasks",
     desc: "Click below to create a task",
     ticketTypes: [ticketTypes.staff]

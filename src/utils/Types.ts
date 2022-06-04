@@ -35,6 +35,7 @@ export type TicketType = {
     manageRoles: string[]
     defaultCategory: string
     closeCategory?: string
+    muteOwnerOnClose?: true
     verifications?: number
     verifiedCategory?: string
     verifiedRole?: string
