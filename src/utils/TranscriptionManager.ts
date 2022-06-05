@@ -23,16 +23,12 @@ export default class TranscriptionManager {
         slug = trim(slug)
         const initialSlug = slug
 
-        let trans = await this.prisma.transcript.findUnique({ where: { slug } })
-        if (trans) {
+        if (await this.prisma.transcript.findUnique({ where: { slug } })) {
             slug = `${initialSlug}-${channel.id}`
-            trans = await this.prisma.transcript.findUnique({ where: { slug } })
-            if (trans) {
+            if (await this.prisma.transcript.findUnique({ where: { slug } })) {
                 slug = `${initialSlug}-${channel.id}-${Date.now()}`
-                trans = await this.prisma.transcript.findUnique({ where: { slug } })
-                if (trans) {
+                if (await this.prisma.transcript.findUnique({ where: { slug } }))
                     slug = randomUUID()
-                }
             }
         }
 
@@ -274,25 +270,36 @@ export default class TranscriptionManager {
                                 new MessageAttachment(this.createZip(dump, `transcript-${transcript?.slug}.json`), `transcript-${transcript?.slug}.zip`)
                             ]
 
-                            await channel.send({
-                                content: `Transcript for ${fullTranscript.channel.name}: <${baseUrl}/transcripts/${transcript?.slug}>`,
-                                embeds: [new MessageEmbed()
+                            const embed = new MessageEmbed()
+                                .setDescription(`[Full transcript](${baseUrl}/transcripts/${transcript?.slug}) (${fullTranscript.messages.length} messages by ${users.length} users) of <#${fullTranscript.channel.discordId}>`)
+
+                            if (ticket)
+                                embed
                                     .setAuthor({
                                         name: `${ticket.creator.username}#${ticket.creator.tag}`,
                                         iconURL: (ticket.creator.avatar && `https://cdn.discordapp.com/avatars/${ticket.creator.discordId}/${ticket.creator.avatar}.png`) || "https://cdn.discordapp.com/attachments/247122362942619649/980958465566572604/unknown.png"
                                     })
-                                    .setDescription(`[Full transcript](${baseUrl}/transcripts/${transcript?.slug}) (${fullTranscript.messages.length} messages by ${users.length} users) of <#${fullTranscript.channel.discordId}>`)
                                     .addField("Ticket Name", ticket.name, true)
                                     .addField("Type", ticketTypes[ticket.type]?.name ?? ticket.type, true)
                                     .addField("Status", ticket.status, true)
-                                    .addField("Users in transcript", users
-                                        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-                                        .slice(0, 10)
-                                        .map(r => `${r[1]} - <@${r[0]}>`)
-                                        .join("\n"), true )
+
+                            embed.addField(
+                                "Users in transcript",
+                                users
+                                    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+                                    .slice(0, 10)
+                                    .map(r => `${r[1]} - <@${r[0]}>`)
+                                    .join("\n"), true
+                            )
+
+                            if (ticket)
+                                embed
                                     .addField("Verifications", ticket.verifications.map(v => `<@${v.verifier.discordId}> ${displayTimestamp(v.createdAt)}`).join("\n") || "Wasn't verified", true)
                                     .addField("Contributors", ticket.contributors.map(c => `<@${c.discordId}>`).join(", ") || "No contributors added", true)
-                                ],
+
+                            await channel.send({
+                                content: `Transcript for ${fullTranscript.channel.name}: <${baseUrl}/transcripts/${transcript?.slug}>`,
+                                embeds: [embed],
                                 files
                             })
                         }

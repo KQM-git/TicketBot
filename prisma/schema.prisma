@@ -42,9 +42,9 @@ model Transcript {
   verifications     Verification[]
   server            Server            @relation(fields: [serverId], references: [id])
   serverId          String
-  ticket            Ticket            @relation(fields: [ticketId], references: [id])
-  ticketId          Int
-  QueuedTranscript  QueuedTranscript?
+  ticket            Ticket?           @relation(fields: [ticketId], references: [id])
+  ticketId          Int?
+  queuedTranscript  QueuedTranscript?
 }
 
 model QueuedTranscript {
