@@ -62,6 +62,9 @@ export default class VerifyTicket extends Command {
         if (ticket.verifications.find(v => v.userId == user.id))
             return await sendMessage(source, "You already verified this ticket!", undefined, true)
 
+        if (ticket.status == TicketStatus.VERIFIED)
+            return await sendMessage(source, "This ticket is already marked as verified!", undefined, true)
+
         const ticketType = ticketTypes[ticket.type]
         if (!(ticketType && member.roles.cache.hasAny(...ticketType.manageRoles, ...(ticketType.verifyRoles ?? []))))
             return await sendMessage(source, "Only people with verify or management roles can verify tickets", undefined, true)

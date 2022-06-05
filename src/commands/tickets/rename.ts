@@ -1,10 +1,10 @@
-import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, Modal, ModalSubmitInteraction, TextInputComponent, User } from "discord.js"
+import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageEmbed, Modal, ModalSubmitInteraction, TextInputComponent, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
 import { ticketTypes } from "../../utils/TicketTypes"
 import { CommandSource, SendMessage } from "../../utils/Types"
-import { isTicketable, sendMessage } from "../../utils/Utils"
+import { Colors, isTicketable, sendMessage, trim } from "../../utils/Utils"
 
 const Logger = getLogger("rename")
 export default class RenameTicket extends Command {
@@ -103,7 +103,14 @@ export default class RenameTicket extends Command {
         })
 
         try {
-            await source.channel.setName(name, `Rename by ${user.id} (${user.tag})`)
+            await source.channel.setName(trim(name), `Rename by ${user.id} (${user.tag})`)
+            await source.channel.send({
+                embeds: [
+                    new MessageEmbed()
+                        .setDescription(`This ticket has been renamed to \`${name.replace(/`/g, "")}\` by <@${member.id}>`)
+                        .setColor(Colors.GREEN)
+                ],
+            })
         } catch (error) {
             return await sendMessage(source, "Couldn't rename ticket!", undefined, true)
         }
