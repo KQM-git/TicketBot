@@ -41,7 +41,9 @@ export async function handle(): Promise<void> {
             await client.application?.commands.set(cmds)
 
             for (const id of ["247122362942619649", "980837690285109349"]) {
-                const commands = client.guilds.cache.get(id)?.commands
+                const guild = await client.guilds.fetch(id)
+                const commands = guild?.commands
+                await commands?.set([])
                 await commands?.fetch()
                 if (commands)
                     for (const c of commands.cache.map(v => v))
