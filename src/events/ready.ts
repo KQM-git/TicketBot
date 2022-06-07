@@ -37,7 +37,7 @@ export async function handle(): Promise<void> {
         })
 
     try {
-        if (config.production) {
+        if (config.production || (client.application?.commands.cache.size ?? 0) > 0) {
             await client.application?.commands.set(cmds)
 
             for (const id of ["247122362942619649", "980837690285109349"]) {
