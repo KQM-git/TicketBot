@@ -41,6 +41,12 @@ export default class TiBotClient extends Discord.Client {
                     name: config.activity,
                     type: "COMPETING"
                 }]
+            },
+            allowedMentions: {
+                parse: [],
+                repliedUser: false,
+                users: [],
+                roles: []
             }
         })
 

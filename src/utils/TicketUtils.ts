@@ -22,6 +22,9 @@ export async function createTicket(ticketType: TicketType, name: string, member:
 
     const mgs = await channel.send({
         content: `<@${member.id}>${ticketType.opening.content}`,
+        allowedMentions: {
+            users: [member.id, ...(ticketType.opening.pingUsers ?? [])]
+        },
         embeds: ticketType.opening.embeds,
         components: ticketType.opening.components
     })
@@ -54,10 +57,7 @@ export async function createTicket(ticketType: TicketType, name: string, member:
 
         if (creationChannel?.isText())
             await creationChannel.send({
-                content: `<@${member.id}> created a ${ticketType.name}: ${name} over at <#${channel.id}>!`,
-                allowedMentions: {
-                    parse: []
-                }
+                content: `<@${member.id}> created a ${ticketType.name}: ${name} over at <#${channel.id}>!`
             })
     }
 

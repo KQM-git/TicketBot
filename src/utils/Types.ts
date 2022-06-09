@@ -29,6 +29,7 @@ export type TicketType = {
         content: string
         embeds?: [MessageEmbedOptions]
         components?: [MessageActionRow]
+        pingUsers?: string[]
     }
     creationRoles: string[]
     verifyRoles?: string[]
@@ -44,6 +45,11 @@ export type TicketType = {
     dinkDonk?: {
         time: number
         message: string
+    }
+    dinkDonkVerifiers?: {
+        time: number
+        message: string
+        roles: string[]
     }
     randomDefaultSlug?: true
 }

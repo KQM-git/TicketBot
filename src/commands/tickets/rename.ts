@@ -83,7 +83,7 @@ export default class RenameTicket extends Command {
         if (ticket == null)
             return await sendMessage(source, "No ticket data associated with this channel!", undefined, true)
 
-        if (ticket.lastRename && ticket.lastRename?.getTime() + 5 * 60 * 1000> Date.now())
+        if (ticket.lastRename && ticket.lastRename?.getTime() + 5 * 60 * 1000 > Date.now())
             return await sendMessage(source, "Please wait a couple minutes between renames!", undefined, true)
 
         const ticketType = ticketTypes[ticket.type]

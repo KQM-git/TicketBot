@@ -11,22 +11,23 @@ datasource db {
 }
 
 model Ticket {
-  id            Int            @id @default(autoincrement())
-  createdAt     DateTime       @default(now())
-  lastRename    DateTime?
-  lastMessage   DateTime       @default(now())
-  type          String
-  status        String         @default("OPEN")
-  deleted       Boolean        @default(false)
-  channelId     String         @unique
-  name          String
-  creator       User           @relation("created", fields: [creatorId, serverId], references: [discordId, serverId])
-  creatorId     String
-  server        Server         @relation(fields: [serverId], references: [id])
-  serverId      String
-  verifications Verification[]
-  transcript    Transcript[]
-  contributors  User[]         @relation("contributes")
+  id               Int            @id @default(autoincrement())
+  createdAt        DateTime       @default(now())
+  lastRename       DateTime?
+  lastVerifierPing DateTime?
+  lastMessage      DateTime       @default(now())
+  type             String
+  status           String         @default("OPEN")
+  deleted          Boolean        @default(false)
+  channelId        String         @unique
+  name             String
+  creator          User           @relation("created", fields: [creatorId, serverId], references: [discordId, serverId])
+  creatorId        String
+  server           Server         @relation(fields: [serverId], references: [id])
+  serverId         String
+  verifications    Verification[]
+  transcript       Transcript[]
+  contributors     User[]         @relation("contributes")
 }
 
 model Transcript {

@@ -28,6 +28,11 @@ export const buttons = {
         .setCustomId("rename")
         .setEmoji("✏️")
         .setStyle("SECONDARY"),
+    DINKDONK: new MessageButton()
+        .setLabel("Remind verifiers")
+        .setCustomId("pingverifiers")
+        .setEmoji("<a:dinkdonk:981687794000879696>")
+        .setStyle("DANGER"),
     GUIDE_LINK: new MessageButton()
         .setLabel("Guide Guidelines")
         .setURL("https://docs.google.com/document/d/1hZ0bNmMy1t5R8TOF1v8mcuzQpR0BgJD5pKY2T_t6uh0/edit?usp=sharing")
@@ -45,6 +50,7 @@ const ROLE = config.production ? {
         "953164120952283206", // Pillar Staff
         "819165586889506868"  // The Trades
     ],
+    GUIDE_VERIFICATION_PING: "945105638839705630"
 } : {
     LIBSUB: "980899762054254593",
     GUIDESUBS: "980899740029956106",
@@ -53,6 +59,7 @@ const ROLE = config.production ? {
     SCHOLAR: "980899103049383936",
     EDITOR: "981973618760228944",
     STAFF: ["980899219235807302"],
+    GUIDE_VERIFICATION_PING: "984490976817066046"
 }
 
 const CATEGORY = config.production ? {
@@ -142,6 +149,7 @@ export const ticketTypes: Record<string, TicketType> = {
                 description: "Here are the KQM Guide standards if you are interested. These are not enforced at the moment but it is heavily encouraged you follow them.",
                 color: "#A758BF"
             }],
+            pingUsers: ["235719068726853632"],
             components: [
                 new MessageActionRow().addComponents(
                     buttons.GUIDE_LINK,
@@ -159,6 +167,11 @@ export const ticketTypes: Record<string, TicketType> = {
         dinkDonk: {
             time: 7 * 24 * 3600 * 1000,
             message: "<a:dinkdonk:981687794000879696> This channel hasn't been active in the past week!"
+        },
+        dinkDonkVerifiers: {
+            time: 24 * 3600 * 1000,
+            message: `<@&${ROLE.GUIDE_VERIFICATION_PING}> - This guide is ready for verification`,
+            roles: [ROLE.GUIDE_VERIFICATION_PING]
         }
     },
     staff: {

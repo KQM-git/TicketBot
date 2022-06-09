@@ -78,7 +78,8 @@ export default class CloseTicket extends Command {
             components: [new MessageActionRow().addComponents(
                 ...(ticketType?.verifications ? [buttons.VERIFY] : []),
                 buttons.OPEN,
-                buttons.TRANSCRIPT
+                buttons.TRANSCRIPT,
+                ...(ticketType?.dinkDonkVerifiers ? [buttons.DINKDONK] : []),
             )]
         })
 
