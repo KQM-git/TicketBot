@@ -17,7 +17,8 @@ export enum TicketStatus {
 
 export enum EndingAction {
     DELETE = "DELETE",
-    NOTHING = "NOTHING"
+    NOTHING = "NOTHING",
+    VERIFIED = "VERIFIED"
 }
 
 export type TicketType = {
@@ -40,6 +41,7 @@ export type TicketType = {
     verifications?: number
     verifiedCategory?: string
     verifiedRole?: string
+    verifiedChannel?: string
     dumpChannel?: string
     creationChannel?: string
     dinkDonk?: {

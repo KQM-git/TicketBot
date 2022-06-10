@@ -81,9 +81,11 @@ const CATEGORY = config.production ? {
 const CHANNEL = config.production ? {
     NEW_TICKETS: "763610791839924224", // TODO: Update (currently Theorycrafting)
     TC_TRANSCRIPTS: "945097851195777054",
+    VERIFIED_TRANSCRIPTS: "873920651742814318",
 } : {
     NEW_TICKETS: "981316199185014806",
     TC_TRANSCRIPTS: "980924167648079892",
+    VERIFIED_TRANSCRIPTS: "984846200492666880",
 }
 
 export const ticketTypes: Record<string, TicketType> = {
@@ -126,6 +128,7 @@ export const ticketTypes: Record<string, TicketType> = {
         verifications: 2,
         verifiedCategory: CATEGORY.PUBLISHING,
         verifiedRole: ROLE.CONTRIBUTOR,
+        verifiedChannel: CHANNEL.VERIFIED_TRANSCRIPTS,
         dumpChannel: CHANNEL.TC_TRANSCRIPTS,
         creationChannel: CHANNEL.NEW_TICKETS,
         dinkDonk: {
@@ -162,6 +165,7 @@ export const ticketTypes: Record<string, TicketType> = {
         verifyRoles: [ROLE.THEORYCRAFTER],
         defaultCategory: CATEGORY.GUIDES,
         verifications: 2,
+        verifiedChannel: CHANNEL.VERIFIED_TRANSCRIPTS,
         dumpChannel: CHANNEL.TC_TRANSCRIPTS,
         creationChannel: CHANNEL.NEW_TICKETS,
         dinkDonk: {

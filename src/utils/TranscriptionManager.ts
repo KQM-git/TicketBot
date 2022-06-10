@@ -224,90 +224,114 @@ export default class TranscriptionManager {
             if (queued.dumpChannelId)
                 try {
                     const channel = await this.client.channels.fetch(queued.dumpChannelId)
-                    if (channel && isTicketable(channel)) {
-                        const fullTranscript = await this.prisma.transcript.findUnique({
-                            where: { id: queued.transcriptId },
-                            include: {
-                                messages: true,
-                                server: true,
-                                channel: true,
-                                mentionedChannels: true,
-                                mentionedRoles: true,
-                                ticket: {
-                                    include: {
-                                        creator: {
-                                            select: { discordId: true, username: true, tag: true, avatar: true }
-                                        },
-                                        contributors: {
-                                            select: { discordId: true }
-                                        },
-                                        verifications: {
-                                            select: { verifier: { select: { discordId: true } }, createdAt: true }
-                                        },
-                                    }
-                                },
-                                users: true,
-                                verifications: true
-                            }
-                        })
-                        if (!fullTranscript)
+                    const fullTranscript = await this.prisma.transcript.findUnique({
+                        where: { id: queued.transcriptId },
+                        include: {
+                            messages: true,
+                            server: true,
+                            channel: true,
+                            mentionedChannels: true,
+                            mentionedRoles: true,
+                            ticket: {
+                                include: {
+                                    creator: {
+                                        select: { discordId: true, username: true, tag: true, avatar: true }
+                                    },
+                                    contributors: {
+                                        select: { discordId: true }
+                                    },
+                                    verifications: {
+                                        select: { verifier: { select: { discordId: true } }, createdAt: true }
+                                    },
+                                }
+                            },
+                            users: true,
+                            verifications: true
+                        }
+                    })
+                    if (!fullTranscript)
+                        if (channel && channel.isText())
                             await channel.send(`Couldn't fetch full transcript data? Stored stuff over at ${baseUrl}/transcripts/${transcript?.slug}`)
-                        else {
-                            const { ticket } = fullTranscript
-                            const users: [string, number][] = []
-                            fullTranscript.messages.forEach(m => {
-                                const ud = users.find(u => u[0] == m.userId)
-                                if (ud)
-                                    ud[1] = ud[1] + 1
-                                else
-                                    users.push([m.userId, 1])
-                            })
+                        else Logger.error(`Couldn't send to transcript channel - couldn't fetch full transcript data? Stored stuff over at ${baseUrl}/transcripts/${transcript?.slug}`)
+                    else {
+                        const { ticket } = fullTranscript
+                        const users: [string, number][] = []
+                        fullTranscript.messages.forEach(m => {
+                            const ud = users.find(u => u[0] == m.userId)
+                            if (ud)
+                                ud[1] = ud[1] + 1
+                            else
+                                users.push([m.userId, 1])
+                        })
 
-                            const dump = Buffer.from(JSON.stringify(fullTranscript/* TODO , (k, v) => v === null ? undefined : v*/))
-                            const files = dump.length < 1000 * 1000 * 8 ? [
-                                new MessageAttachment(Buffer.from(dump), `transcript-${transcript?.slug}.json`)
-                            ] : [
-                                new MessageAttachment(this.createZip(dump, `transcript-${transcript?.slug}.json`), `transcript-${transcript?.slug}.zip`)
-                            ]
+                        const dump = Buffer.from(JSON.stringify(fullTranscript/* TODO , (k, v) => v === null ? undefined : v*/))
+                        const files = dump.length < 1000 * 1000 * 8 ? [
+                            new MessageAttachment(Buffer.from(dump), `transcript-${transcript?.slug}.json`)
+                        ] : [
+                            new MessageAttachment(this.createZip(dump, `transcript-${transcript?.slug}.json`), `transcript-${transcript?.slug}.zip`)
+                        ]
 
-                            const embed = new MessageEmbed()
-                                .setDescription(`[Full transcript](${baseUrl}/transcripts/${transcript?.slug}) (${fullTranscript.messages.length} messages by ${users.length} users) of <#${fullTranscript.channel.discordId}> / ${fullTranscript.channel.name}`)
+                        const embed = new MessageEmbed()
+                            .setDescription(`[Full transcript](${baseUrl}/transcripts/${transcript?.slug}) (${fullTranscript.messages.length} messages by ${users.length} users) of <#${fullTranscript.channel.discordId}> / ${fullTranscript.channel.name}`)
 
-                            if (ticket)
-                                embed
-                                    .setAuthor({
-                                        name: `${ticket.creator.username}#${ticket.creator.tag}`,
-                                        iconURL: (ticket.creator.avatar && `https://cdn.discordapp.com/avatars/${ticket.creator.discordId}/${ticket.creator.avatar}.png`) || "https://cdn.discordapp.com/attachments/247122362942619649/980958465566572604/unknown.png"
-                                    })
-                                    .addField("Ticket Name", ticket.name, true)
-                                    .addField("Type", ticketTypes[ticket.type]?.name ?? ticket.type, true)
-                                    .addField("Status", ticket.status, true)
+                        if (ticket)
+                            embed
+                                .setAuthor({
+                                    name: `${ticket.creator.username}#${ticket.creator.tag}`,
+                                    iconURL: (ticket.creator.avatar && `https://cdn.discordapp.com/avatars/${ticket.creator.discordId}/${ticket.creator.avatar}.png`) || "https://cdn.discordapp.com/attachments/247122362942619649/980958465566572604/unknown.png"
+                                })
+                                .addField("Ticket Name", ticket.name, true)
+                                .addField("Type", ticketTypes[ticket.type]?.name ?? ticket.type, true)
+                                .addField("Status", ticket.status, true)
 
-                            embed.addField(
-                                "Top users in transcript",
-                                users
-                                    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-                                    .slice(0, 10)
-                                    .map(r => `${r[1]} - <@${r[0]}>`)
-                                    .join("\n"), true
-                            )
+                        embed.addField(
+                            "Top users in transcript",
+                            users
+                                .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+                                .slice(0, 10)
+                                .map(r => `${r[1]} - <@${r[0]}>`)
+                                .join("\n"), true
+                        )
 
-                            if (ticket)
-                                embed
-                                    .addField("Verifications", ticket.verifications.map(v => `<@${v.verifier.discordId}> ${displayTimestamp(v.createdAt)}`).join("\n") || "Wasn't verified", true)
-                                    .addField("Contributors", ticket.contributors.map(c => `<@${c.discordId}>`).join(", ") || "No contributors added", true)
+                        if (ticket)
+                            embed
+                                .addField("Verifications", ticket.verifications.map(v => `<@${v.verifier.discordId}> ${displayTimestamp(v.createdAt)}`).join("\n") || "Wasn't verified", true)
+                                .addField("Contributors", ticket.contributors.map(c => `<@${c.discordId}>`).join(", ") || "No contributors added", true)
 
-                            try {
+
+                        try {
+                            if (queued.endAction == EndingAction.VERIFIED && ticket) {
+                                const id = ticketTypes[ticket.type].verifiedChannel
+                                if (id) {
+                                    const verifiedChannel = await this.client.channels.fetch(id)
+                                    if (verifiedChannel && verifiedChannel.isText())
+                                        await verifiedChannel.send({
+                                            embeds: [embed]
+                                        })
+                                    else
+                                        Logger.error("Couldn't send to verified channel - not a text channel/not found")
+                                }
+                            }
+                        } catch (error) {
+                            Logger.error("Couldn't send to verified channel", error)
+                        }
+
+                        try {
+                            if (channel && channel.isText())
                                 await channel.send({
                                     content: `Transcript for ${fullTranscript.channel.name}: <${baseUrl}/transcripts/${transcript?.slug}>`,
                                     embeds: [embed],
                                     files
                                 })
-                            } catch (error) {
-                                Logger.error("Error while sending transcription message", error)
+                            else Logger.error(`Couldn't send to channel - Transcript for ${fullTranscript.channel.name}: ${baseUrl}/transcripts/${transcript?.slug}`)
+
+                        } catch (error) {
+                            Logger.error("Error while sending transcription message", error)
+
+                            if (channel && channel.isText())
                                 await channel.send(`Error occurred while sending transcript details for ${baseUrl}/transcripts/${transcript?.slug}`)
-                            }
                         }
+
                     }
                 } catch (error) {
                     Logger.error("Error while sending log", error)

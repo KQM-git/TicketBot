@@ -118,7 +118,7 @@ export default class VerifyTicket extends Command {
             Logger.info(`Giving contribution role for ${member.id} (${member.user.tag}) from ticket ${ticket.id}: ${ticket.name}`)
             const response = await source.channel.send({ embeds: [ new MessageEmbed().setTitle("Creating transcript...").setColor(Colors.ORANGE) ] })
             if (response)
-                await client.transcriptionManager.startTranscript(source.channel, response, undefined, response.id, member, source.channel.name, ticketType.dumpChannel, EndingAction.NOTHING)
+                await client.transcriptionManager.startTranscript(source.channel, response, undefined, response.id, member, source.channel.name, ticketType.dumpChannel, EndingAction.VERIFIED)
         }
 
 
