@@ -251,7 +251,7 @@ export default class TranscriptionManager {
                             }
                         })
                         if (!fullTranscript)
-                            await channel.send("Couldn't fetch full transcript data?")
+                            await channel.send(`Couldn't fetch full transcript data? Stored stuff over at ${baseUrl}/transcripts/${transcript?.slug}`)
                         else {
                             const { ticket } = fullTranscript
                             const users: [string, number][] = []
@@ -271,7 +271,7 @@ export default class TranscriptionManager {
                             ]
 
                             const embed = new MessageEmbed()
-                                .setDescription(`[Full transcript](${baseUrl}/transcripts/${transcript?.slug}) (${fullTranscript.messages.length} messages by ${users.length} users) of <#${fullTranscript.channel.discordId}>`)
+                                .setDescription(`[Full transcript](${baseUrl}/transcripts/${transcript?.slug}) (${fullTranscript.messages.length} messages by ${users.length} users) of <#${fullTranscript.channel.discordId}> / ${fullTranscript.channel.name}`)
 
                             if (ticket)
                                 embed
@@ -284,7 +284,7 @@ export default class TranscriptionManager {
                                     .addField("Status", ticket.status, true)
 
                             embed.addField(
-                                "Users in transcript",
+                                "Top users in transcript",
                                 users
                                     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
                                     .slice(0, 10)
@@ -297,11 +297,16 @@ export default class TranscriptionManager {
                                     .addField("Verifications", ticket.verifications.map(v => `<@${v.verifier.discordId}> ${displayTimestamp(v.createdAt)}`).join("\n") || "Wasn't verified", true)
                                     .addField("Contributors", ticket.contributors.map(c => `<@${c.discordId}>`).join(", ") || "No contributors added", true)
 
-                            await channel.send({
-                                content: `Transcript for ${fullTranscript.channel.name}: <${baseUrl}/transcripts/${transcript?.slug}>`,
-                                embeds: [embed],
-                                files
-                            })
+                            try {
+                                await channel.send({
+                                    content: `Transcript for ${fullTranscript.channel.name}: <${baseUrl}/transcripts/${transcript?.slug}>`,
+                                    embeds: [embed],
+                                    files
+                                })
+                            } catch (error) {
+                                Logger.error("Error while sending transcription message", error)
+                                await channel.send(`Error occurred while sending transcript details for ${baseUrl}/transcripts/${transcript?.slug}`)
+                            }
                         }
                     }
                 } catch (error) {
