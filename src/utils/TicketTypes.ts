@@ -50,7 +50,9 @@ const ROLE = config.production ? {
         "953164120952283206", // Pillar Staff
         "819165586889506868"  // The Trades
     ],
-    GUIDE_VERIFICATION_PING: "945105638839705630"
+    GUIDE_VERIFICATION_PING: "945105638839705630",
+    FEIYUN: "840649229021085736",
+    FEIYUN_ADMIN: "841871289894305793"
 } : {
     LIBSUB: "980899762054254593",
     GUIDESUBS: "980899740029956106",
@@ -59,7 +61,9 @@ const ROLE = config.production ? {
     SCHOLAR: "980899103049383936",
     EDITOR: "981973618760228944",
     STAFF: ["980899219235807302"],
-    GUIDE_VERIFICATION_PING: "984490976817066046"
+    GUIDE_VERIFICATION_PING: "984490976817066046",
+    FEIYUN: "981973618760228944", // SAME AS EDITOR,
+    FEIYUN_ADMIN: "980899219235807302" // SAME AS STAFF
 }
 
 const CATEGORY = config.production ? {
@@ -69,6 +73,7 @@ const CATEGORY = config.production ? {
     PUBLISHING: "953175594911289354",
     STAFF_TICKETS: "953156640604041216",
     STAFF_CLOSED: "953416056549015552",
+    FEIYUN_PROJECTS: "946636283667681331",
 } : {
     GUIDES: "980838140099039272",
     OPEN_SUBS: "980837799076958310",
@@ -76,16 +81,21 @@ const CATEGORY = config.production ? {
     PUBLISHING: "980838078300164096",
     STAFF_TICKETS: "980926469737963530",
     STAFF_CLOSED: "982768252033835058",
+    FEIYUN_PROJECTS: "980926469737963530",
 }
 
 const CHANNEL = config.production ? {
     NEW_TICKETS: "763610791839924224", // TODO: Update (currently Theorycrafting)
     TC_TRANSCRIPTS: "945097851195777054",
     VERIFIED_TRANSCRIPTS: "873920651742814318",
+    STAFF_TRANSCRIPTS: "812974281461596221",
+    FEIYUN_TRANSCRIPTS: "954151143842398260"
 } : {
     NEW_TICKETS: "981316199185014806",
     TC_TRANSCRIPTS: "980924167648079892",
     VERIFIED_TRANSCRIPTS: "984846200492666880",
+    STAFF_TRANSCRIPTS: "986748960041467954",
+    FEIYUN_TRANSCRIPTS: "986748960041467954"
 }
 
 export const ticketTypes: Record<string, TicketType> = {
@@ -200,6 +210,27 @@ export const ticketTypes: Record<string, TicketType> = {
                 )
             ]
         },
+        dumpChannel: CHANNEL.STAFF_TRANSCRIPTS,
+        randomDefaultSlug: true
+    },
+    feiyun: {
+        id: "feiyun",
+        name: "Feiyun Ticket",
+        emoji: "📹",
+        style: "PRIMARY",
+        creationRoles: [ROLE.FEIYUN],
+        manageRoles: [ROLE.FEIYUN_ADMIN],
+        defaultCategory: CATEGORY.FEIYUN_PROJECTS,
+        opening: {
+            content: " - Welcome. Please use this channel to work on your project and ping the relevant QC roles when done.",
+            components: [
+                new MessageActionRow().addComponents(
+                    buttons.CLOSE,
+                    buttons.RENAME
+                )
+            ]
+        },
+        dumpChannel: CHANNEL.FEIYUN_TRANSCRIPTS,
         randomDefaultSlug: true
     }
 }
@@ -237,4 +268,10 @@ For anyone else you want to add in, you can use \`/add <person or role>\` in the
     title: "Staff Tasks",
     desc: "Click below to create a task",
     ticketTypes: [ticketTypes.staff]
+}, {
+    name: "Feiyun Tickets",
+    value: "FY",
+    title: "Projects",
+    desc: "Click below to create a new project",
+    ticketTypes: [ticketTypes.feiyun]
 }]

@@ -65,14 +65,16 @@ export default class ConvertTicket extends Command {
         if (!channel)
             return await sendMessage(source, "Couldn't fetch channel data", undefined, true)
 
-        // TODO check perms
-        if (!member.permissionsIn(channel.id).has("MANAGE_CHANNELS"))
-            return await sendMessage(source, "You can only convert tickets where you have manage channel permission", undefined, true)
-
         const ticketType = ticketTypes[type]
 
         if (!ticketType)
             return await sendMessage(source, "Couldn't find type", undefined, true)
+
+        if (!member.roles.cache.hasAny(...ticketType.manageRoles))
+            return await sendMessage(source, `You can't make transcripts of ${ticketType.name} here`, undefined, true)
+
+        if (!member.permissionsIn(channel.id).has("MANAGE_CHANNELS"))
+            return await sendMessage(source, "You can only convert tickets where you have manage channel permission", undefined, true)
 
         try {
             if (channel.type == "GUILD_CATEGORY") {
