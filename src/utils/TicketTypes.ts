@@ -74,6 +74,7 @@ const CATEGORY = config.production ? {
     STAFF_TICKETS: "953156640604041216",
     STAFF_CLOSED: "953416056549015552",
     FEIYUN_PROJECTS: "946636283667681331",
+    FEIYUN_CLOSED: "844652678591152128",
 } : {
     GUIDES: "980838140099039272",
     OPEN_SUBS: "980837799076958310",
@@ -82,6 +83,7 @@ const CATEGORY = config.production ? {
     STAFF_TICKETS: "980926469737963530",
     STAFF_CLOSED: "982768252033835058",
     FEIYUN_PROJECTS: "980926469737963530",
+    FEIYUN_CLOSED: "982768252033835058",
 }
 
 const CHANNEL = config.production ? {
@@ -221,6 +223,7 @@ export const ticketTypes: Record<string, TicketType> = {
         creationRoles: [ROLE.FEIYUN],
         manageRoles: [ROLE.FEIYUN_ADMIN],
         defaultCategory: CATEGORY.FEIYUN_PROJECTS,
+        closeCategory: CATEGORY.FEIYUN_CLOSED,
         opening: {
             content: " - Welcome. Please use this channel to work on your project and ping the relevant QC roles when done.",
             components: [
