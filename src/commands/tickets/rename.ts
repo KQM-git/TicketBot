@@ -87,6 +87,10 @@ export default class RenameTicket extends Command {
             return await sendMessage(source, "Please wait a couple minutes between renames!", undefined, true)
 
         const ticketType = ticketTypes[ticket.type]
+
+        if (ticketType && member.roles.cache.hasAny(...(ticketType.blacklistRoles ?? [])))
+            return await sendMessage(source, "You are blacklisted from renaming a ticket", undefined, true)
+
         if (!(ticket.creator.discordId == user.id || (ticketType && member.roles.cache.hasAny(...ticketType.manageRoles))))
             return await sendMessage(source, "Only the ticket creator and people with management roles can rename tickets", undefined, true)
 

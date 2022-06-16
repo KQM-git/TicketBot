@@ -58,6 +58,9 @@ export default class CloseTicket extends Command {
 
         const ticketType = ticketTypes[ticket.type]
 
+        if (member.roles.cache.hasAny(...(ticketType.blacklistRoles ?? [])))
+            return await sendMessage(source, "You are blacklisted from closing a ticket", undefined, true)
+
         if (!(ticket.creator.discordId == user.id || (ticketType && member.roles.cache.hasAny(...ticketType.manageRoles))))
             return await sendMessage(source, "Only the ticket creator and people with management roles can close tickets", undefined, true)
 

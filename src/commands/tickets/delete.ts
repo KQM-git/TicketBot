@@ -77,6 +77,10 @@ export default class DeleteTicket extends Command {
             return await sendMessage(source, "No ticket data associated with this channel!", undefined, true)
 
         const ticketType = ticketTypes[ticket.type]
+
+        if (ticketType && member.roles.cache.hasAny(...(ticketType.blacklistRoles ?? [])))
+            return await sendMessage(source, "You are blacklisted from deleting a ticket", undefined, true)
+
         if (!(ticketType && member.roles.cache.hasAny(...ticketType.manageRoles))) {
             if (member.id == ticket.creator.discordId) {
                 if (ticket.createdAt.getTime() + 5 * 60 * 1000 < Date.now())

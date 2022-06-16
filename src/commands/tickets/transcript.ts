@@ -63,7 +63,6 @@ export default class Transcript extends Command {
         if (!ticketType)
             return await sendMessage(source, "Couldn't find ticket type", undefined, true)
 
-        // TODO check perms
         if (!sender.roles.cache.hasAny(...ticketType.manageRoles))
             return await sendMessage(source, `You can't make transcripts of ${ticketType.name}`, undefined, true)
 

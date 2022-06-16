@@ -33,6 +33,7 @@ export type TicketType = {
         pingUsers?: string[]
     }
     creationRoles: string[]
+    blacklistRoles?: string[]
     verifyRoles?: string[]
     manageRoles: string[]
     defaultCategory: string

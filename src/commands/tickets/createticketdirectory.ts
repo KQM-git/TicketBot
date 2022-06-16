@@ -51,7 +51,6 @@ export default class CreateTicketDirectory extends Command {
         const member = await source.guild.members.fetch(user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
 
-        // TODO check perms
         if (!member.permissionsIn(channel.id).has("MANAGE_CHANNELS"))
             return await sendMessage(source, "Only people who can manage the target channel can create a ticket directory", undefined, true)
 
@@ -59,6 +58,9 @@ export default class CreateTicketDirectory extends Command {
 
         if (!ticketType)
             return await sendMessage(source, "Couldn't find ticket type", undefined, true)
+
+        if (!member.roles.cache.hasAny(...ticketType.manageRoles))
+            return await sendMessage(source, `You can't make a ticket directory of ${ticketType.name} here`, undefined, true)
 
         const response = await channel.send({
             embeds: [new MessageEmbed()

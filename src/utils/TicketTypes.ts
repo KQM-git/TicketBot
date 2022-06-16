@@ -51,6 +51,10 @@ const ROLE = config.production ? {
         "819165586889506868"  // The Trades
     ],
     GUIDE_VERIFICATION_PING: "945105638839705630",
+    BLACKLIST: [
+        "839680495453077534", // Coffin
+        "771259671671078913", // Muted
+    ],
     FEIYUN: "840649229021085736",
     FEIYUN_ADMIN: "841871289894305793"
 } : {
@@ -62,6 +66,9 @@ const ROLE = config.production ? {
     EDITOR: "981973618760228944",
     STAFF: ["980899219235807302"],
     GUIDE_VERIFICATION_PING: "984490976817066046",
+    BLACKLIST: [
+        "987118008910610444", // Coffin
+    ],
     FEIYUN: "981973618760228944", // SAME AS EDITOR,
     FEIYUN_ADMIN: "980899219235807302" // SAME AS STAFF
 }
@@ -132,7 +139,8 @@ export const ticketTypes: Record<string, TicketType> = {
             ]
         },
         creationRoles: [ROLE.LIBSUB],
-        manageRoles: [ROLE.SCHOLAR],
+        blacklistRoles: ROLE.BLACKLIST,
+        manageRoles: [ROLE.SCHOLAR, ROLE.EDITOR],
         verifyRoles: [ROLE.THEORYCRAFTER],
         defaultCategory: CATEGORY.OPEN_SUBS,
         closeCategory: CATEGORY.FOR_REVIEW,
@@ -173,7 +181,8 @@ export const ticketTypes: Record<string, TicketType> = {
             ]
         },
         creationRoles: [ROLE.GUIDESUBS],
-        manageRoles: [ROLE.SCHOLAR],
+        blacklistRoles: ROLE.BLACKLIST,
+        manageRoles: [ROLE.SCHOLAR, ROLE.EDITOR],
         verifyRoles: [ROLE.THEORYCRAFTER],
         defaultCategory: CATEGORY.GUIDES,
         verifications: 2,

@@ -51,7 +51,6 @@ export default class CreateTicketMenu extends Command {
         const member = await source.guild.members.fetch(user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
 
-        // TODO check perms
         if (!member.permissionsIn(channel.id).has("MANAGE_CHANNELS"))
             return await sendMessage(source, "Only people who can manage the target channel can create ticket menu", undefined, true)
 

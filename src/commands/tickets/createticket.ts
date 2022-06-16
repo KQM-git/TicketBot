@@ -87,6 +87,9 @@ export default class CreateTicket extends Command {
         if (!ticketType)
             return await sendMessage(source, "Couldn't find ticket type", undefined, true)
 
+        if (member.roles.cache.hasAny(...(ticketType.blacklistRoles ?? [])))
+            return await sendMessage(source, "You are blacklisted from creating a ticket", undefined, true)
+
         if (!member.roles.cache.hasAny(...ticketType.creationRoles))
             return await sendMessage(source, "You don't have one of the roles required to create this type of ticket", undefined, true)
 
