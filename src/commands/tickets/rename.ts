@@ -38,10 +38,11 @@ export default class RenameTicket extends Command {
             .setCustomId("name")
             .setLabel("Name")
             .setStyle("SHORT")
+            .setValue(currentName)
             .setPlaceholder("Enter new ticket name")
 
         const modal = new Modal()
-            .setTitle(`Renaming ticket ${currentName}`)
+            .setTitle("Renaming ticket")
             .setCustomId(source.customId)
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
