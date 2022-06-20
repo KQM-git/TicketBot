@@ -48,8 +48,10 @@ const ROLE = config.production ? {
     EDITOR: "903791926162100256",
     STAFF: [
         "953164120952283206", // Pillar Staff
-        "819165586889506868"  // The Trades
+        "819165586889506868", // The Trades
+        "810410368622395392", // Keqing's Key
     ],
+    ADMIN: "810410368622395392",
     GUIDE_VERIFICATION_PING: "945105638839705630",
     BLACKLIST: [
         "839680495453077534", // Coffin
@@ -65,6 +67,7 @@ const ROLE = config.production ? {
     SCHOLAR: "980899103049383936",
     EDITOR: "981973618760228944",
     STAFF: ["980899219235807302"],
+    ADMIN: "980899219235807302",
     GUIDE_VERIFICATION_PING: "984490976817066046",
     BLACKLIST: [
         "987118008910610444", // Coffin
@@ -140,9 +143,9 @@ export const ticketTypes: Record<string, TicketType> = {
                 )
             ]
         },
-        creationRoles: [ROLE.LIBSUB],
+        creationRoles: [ROLE.LIBSUB, ROLE.ADMIN],
         blacklistRoles: ROLE.BLACKLIST,
-        manageRoles: [ROLE.SCHOLAR, ROLE.EDITOR],
+        manageRoles: [ROLE.SCHOLAR, ROLE.EDITOR, ROLE.ADMIN],
         verifyRoles: [ROLE.THEORYCRAFTER],
         defaultCategory: CATEGORY.OPEN_SUBS,
         closeCategory: CATEGORY.FOR_REVIEW,
@@ -182,9 +185,9 @@ export const ticketTypes: Record<string, TicketType> = {
                 )
             ]
         },
-        creationRoles: [ROLE.GUIDESUBS],
+        creationRoles: [ROLE.GUIDESUBS, ROLE.ADMIN],
         blacklistRoles: ROLE.BLACKLIST,
-        manageRoles: [ROLE.SCHOLAR, ROLE.EDITOR],
+        manageRoles: [ROLE.SCHOLAR, ROLE.EDITOR, ROLE.ADMIN],
         verifyRoles: [ROLE.THEORYCRAFTER],
         defaultCategory: CATEGORY.GUIDES,
         verifications: 2,
@@ -230,9 +233,9 @@ export const ticketTypes: Record<string, TicketType> = {
                 )
             ]
         },
-        creationRoles: [ROLE.SCHOLAR, ROLE.EDITOR],
+        creationRoles: [ROLE.SCHOLAR, ROLE.EDITOR, ROLE.ADMIN],
         blacklistRoles: ROLE.BLACKLIST,
-        manageRoles: [ROLE.SCHOLAR, ROLE.EDITOR],
+        manageRoles: [ROLE.SCHOLAR, ROLE.EDITOR, ROLE.ADMIN],
         verifyRoles: [ROLE.THEORYCRAFTER],
         defaultCategory: CATEGORY.TC_PROJECT,
         verifications: 2,
