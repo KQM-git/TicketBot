@@ -1,5 +1,6 @@
 import { APIInteractionDataResolvedChannel } from "discord-api-types/v9"
 import { CommandInteraction, GuildBasedChannel, Message, User } from "discord.js"
+import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
 import { ticketTypes } from "../../utils/TicketTypes"
@@ -8,6 +9,7 @@ import { CommandSource, SendMessage, TicketStatus } from "../../utils/Types"
 import { isTicketable, sendMessage } from "../../utils/Utils"
 
 
+const Logger = getLogger("convert")
 export default class ConvertTicket extends Command {
     constructor(name: string) {
         super({
@@ -91,6 +93,7 @@ export default class ConvertTicket extends Command {
                 return await sendMessage(source, `Can't convert channel type ${channel.type}`, undefined, true)
             }
         } catch (error) {
+            Logger.error(error)
             return await sendMessage(source, `Converting ticket failed: ${error}`, undefined, true)
         }
     }

@@ -69,9 +69,11 @@ export async function createTicket(ticketType: TicketType, name: string, member:
 export async function convertTicket(ticketType: TicketType, channel: TicketableChannel, member: GuildMember | User, status: string, guild: Guild) {
     await client.transcriptionManager.updateServer(guild)
 
+    Logger.info(`Checking pins of ${channel.id}`)
     const pinned = await channel.messages.fetchPinned()
     const target = pinned.find(m => m.content.includes("As an author, it is your responsibility to complete the ticket"))
     if (target) {
+        Logger.info("Found message, fetching member")
         const mentioned = target.mentions.users.find(x => x.id != "235719068726853632")
         if (mentioned)
             member = (await guild.members.fetch(mentioned.id)) ?? mentioned
