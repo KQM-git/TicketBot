@@ -38,7 +38,6 @@ export default class RenameTicket extends Command {
             .setCustomId("name")
             .setLabel("Name")
             .setStyle("SHORT")
-            .setValue(currentName)
             .setPlaceholder("Enter new ticket name")
 
         const modal = new Modal()
