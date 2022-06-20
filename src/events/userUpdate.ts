@@ -6,9 +6,8 @@ const Logger = log4js.getLogger("memberUpdate")
 
 export async function handle(old: User, user: User): Promise<void> {
     if (user.username == old.username && user.discriminator == old.discriminator && user.avatar == old.avatar) return
-    Logger.info(`Update user ${user.id}: ${old.username}#${old.discriminator} -> ${user.username}#${user.discriminator}`)
     try {
-        await client.prisma.user.updateMany({
+        const response = await client.prisma.user.updateMany({
             where: {
                 discordId: user.id,
             },
@@ -18,6 +17,8 @@ export async function handle(old: User, user: User): Promise<void> {
                 avatar: user.avatar,
             }
         })
+        if (response.count > 0)
+            Logger.info(`Updated user ${user.id}: ${old.username}#${old.discriminator} -> ${user.username}#${user.discriminator}`)
     } catch (error) {
         Logger.error(error)
     }
