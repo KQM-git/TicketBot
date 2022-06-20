@@ -75,6 +75,7 @@ const ROLE = config.production ? {
 
 const CATEGORY = config.production ? {
     GUIDES: "953147741415018526",
+    TC_PROJECT: "953342753557868604",
     OPEN_SUBS: "953155656125411419",
     FOR_REVIEW: "953148307771883530",
     PUBLISHING: "953175594911289354",
@@ -84,6 +85,7 @@ const CATEGORY = config.production ? {
     FEIYUN_CLOSED: "844652678591152128",
 } : {
     GUIDES: "980838140099039272",
+    TC_PROJECT: "980837799076958310",
     OPEN_SUBS: "980837799076958310",
     FOR_REVIEW: "980837820929294367",
     PUBLISHING: "980838078300164096",
@@ -198,6 +200,47 @@ export const ticketTypes: Record<string, TicketType> = {
             message: `<@&${ROLE.GUIDE_VERIFICATION_PING}> - This guide is ready for verification`,
             roles: [ROLE.GUIDE_VERIFICATION_PING]
         }
+    },
+    tcproject: {
+        id: "tcproject",
+        name: "TC Project",
+        emoji: "🔖",
+        style: "PRIMARY",
+        opening: {
+            content: ` - As an author, it is your responsibility to complete the ticket
+
+**Guidelines**
+- You can rename your ticket with \`/rename <ticket name>\` or with the button below
+- If this ticket was created by accident or it can be deleted, you can use \`/delete\` within the first 5 minutes, otherwise ask a Scholar.
+- When you are ready to submit the ticket, compile everything into one message following the format below and pin it. Then type \`/close\` or click the button below; the ticket will automatically be moved to be reviewed.
+- To add contributors to your ticket you can use \`/contributor add <user>\`.`,
+            embeds: [{
+                title: "Write-up Format",
+                description: `**Theory/Finding/Bug:** Title of your submission
+
+**Evidence:** Explanations with calculations and/or YouTube/Imgur proofs
+
+**Significance:** Conclusion`,
+                color: "#A758BF"
+            }],
+            components: [
+                new MessageActionRow().addComponents(
+                    buttons.CLOSE,
+                    buttons.RENAME
+                )
+            ]
+        },
+        creationRoles: [ROLE.SCHOLAR, ROLE.EDITOR],
+        blacklistRoles: ROLE.BLACKLIST,
+        manageRoles: [ROLE.SCHOLAR, ROLE.EDITOR],
+        verifyRoles: [ROLE.THEORYCRAFTER],
+        defaultCategory: CATEGORY.TC_PROJECT,
+        verifications: 2,
+        verifiedCategory: CATEGORY.PUBLISHING,
+        verifiedRole: ROLE.CONTRIBUTOR,
+        verifiedChannel: CHANNEL.VERIFIED_TRANSCRIPTS,
+        dumpChannel: CHANNEL.TC_TRANSCRIPTS,
+        creationChannel: CHANNEL.NEW_TICKETS
     },
     staff: {
         id: "staff",
