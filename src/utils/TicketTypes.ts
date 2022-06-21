@@ -44,8 +44,11 @@ const ROLE = config.production ? {
     GUIDESUBS: "939413668553179147",
     CONTRIBUTOR: "764838634280845312",
     THEORYCRAFTER: "896043474699317259",
-    SCHOLAR: "810550138552320010",
-    EDITOR: "903791926162100256",
+    TC_STAFF: [
+        "810550138552320010", // Scholar
+        "903791926162100256", // Editor
+        "873486216782299137", // Mod
+    ],
     STAFF: [
         "953164120952283206", // Pillar Staff
         "819165586889506868", // The Trades
@@ -64,8 +67,10 @@ const ROLE = config.production ? {
     GUIDESUBS: "980899740029956106",
     CONTRIBUTOR: "980899054177374268",
     THEORYCRAFTER: "980898982316351578",
-    SCHOLAR: "980899103049383936",
-    EDITOR: "981973618760228944",
+    TC_STAFF: [
+        "980899103049383936", // Scholar
+        "981973618760228944", // Editor
+    ],
     STAFF: ["980899219235807302"],
     ADMIN: "980899219235807302",
     GUIDE_VERIFICATION_PING: "984490976817066046",
@@ -145,7 +150,7 @@ export const ticketTypes: Record<string, TicketType> = {
         },
         creationRoles: [ROLE.LIBSUB, ROLE.ADMIN],
         blacklistRoles: ROLE.BLACKLIST,
-        manageRoles: [ROLE.SCHOLAR, ROLE.EDITOR, ROLE.ADMIN],
+        manageRoles: [...ROLE.TC_STAFF, ROLE.ADMIN],
         verifyRoles: [ROLE.THEORYCRAFTER],
         defaultCategory: CATEGORY.OPEN_SUBS,
         closeCategory: CATEGORY.FOR_REVIEW,
@@ -187,7 +192,7 @@ export const ticketTypes: Record<string, TicketType> = {
         },
         creationRoles: [ROLE.GUIDESUBS, ROLE.ADMIN],
         blacklistRoles: ROLE.BLACKLIST,
-        manageRoles: [ROLE.SCHOLAR, ROLE.EDITOR, ROLE.ADMIN],
+        manageRoles: [...ROLE.TC_STAFF, ROLE.ADMIN],
         verifyRoles: [ROLE.THEORYCRAFTER],
         defaultCategory: CATEGORY.GUIDES,
         verifications: 2,
@@ -233,9 +238,9 @@ export const ticketTypes: Record<string, TicketType> = {
                 )
             ]
         },
-        creationRoles: [ROLE.SCHOLAR, ROLE.EDITOR, ROLE.ADMIN],
+        creationRoles: [...ROLE.TC_STAFF, ROLE.ADMIN],
         blacklistRoles: ROLE.BLACKLIST,
-        manageRoles: [ROLE.SCHOLAR, ROLE.EDITOR, ROLE.ADMIN],
+        manageRoles: [...ROLE.TC_STAFF, ROLE.ADMIN],
         verifyRoles: [ROLE.THEORYCRAFTER],
         defaultCategory: CATEGORY.TC_PROJECT,
         verifications: 2,
