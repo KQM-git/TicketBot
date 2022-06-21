@@ -44,11 +44,21 @@ export async function sendMessage(source: CommandSource, response: string | Mess
 
     try {
         if (source instanceof Message)
-            return await source.reply({ content, embeds, components, allowedMentions: { } })
+            return await source.reply({ content, embeds, components, allowedMentions: {
+                parse: [],
+                repliedUser: false,
+                roles: [],
+                users: []
+            } })
         else if (source.deferred)
             return await source.editReply({ content, embeds, components })
         else
-            return await source.reply({ content, embeds, components, fetchReply: true, ephemeral, allowedMentions: { } })
+            return await source.reply({ content, embeds, components, fetchReply: true, ephemeral, allowedMentions: {
+                parse: [],
+                repliedUser: false,
+                roles: [],
+                users: []
+            } })
     } catch (error) {
         Logger.error("sendMessage", error)
     }

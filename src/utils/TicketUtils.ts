@@ -97,10 +97,15 @@ export async function convertTicket(ticketType: TicketType, channel: TicketableC
                 creator: await client.transcriptionManager.connectUser(member, guild.id),
                 status
             },
-            select: { id: true }
+            select: {
+                id: true,
+                creator: {
+                    select: { discordId: true }
+                }
+            }
         })
-        Logger.info(`Converted ticket ${channel.id} / ${channel.id} -> ${ticket.id}`)
-        return `Created #${ticket.id} from <#${channel.id}> for <@${member.id}>`
+        Logger.info(`Converted ticket ${channel.id} / ${channel.name} -> ${ticket.id}`)
+        return `Created #${ticket.id} from <#${channel.id}> for <@${ticket.creator.discordId}>`
     } catch (error) {
         return `${error}`
     }
