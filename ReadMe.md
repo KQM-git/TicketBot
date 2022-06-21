@@ -16,7 +16,7 @@ Tickets can be created by using the command or by pressing the relevant button.
 - `/transcript [oldest message to include, defaults to first] [newest message to include, defaults to the bot response to this command] [slug, the unique tag used in URL on site, defaults to channel name or a random UUID depending on the ticket type]`: Creates a transcript of the current channel/ticket. Can be done by people who have one of the management roles (`manageRoles`) for that ticket type. Once done, it'll be posted in the `dumpChannel` for that type (if configured).
 - `/close`: Closes the current ticket. Can be done by the ticket owner and by people who have one of the management roles (`manageRoles`) for that ticket type. This moves the ticket to the closed category (if `closeCategory` is set on that ticket type), disables the owner from chatting (if `muteOwnerOnClose` is configured by that ticket type). 
 - `/open`: Opens the current ticket. Can be done by the ticket owner and by people who have one of the management roles (`manageRoles`) for that ticket type. This moves the ticket to the open category, clears the owner mute overwrite and clears out current verifications (if any).
-- `/ticketinfo`: Checks info about a ticket linked to the current channel.
+- `/ticketinfo [channel]`: Checks info about a ticket linked to the current channel or a specified channel.
 
 Open tickets that haven't received a chat message in a certain amount of time, might receive a `dinkDonk` message reminding of the ticket.
 
@@ -24,7 +24,7 @@ Open tickets that haven't received a chat message in a certain amount of time, m
 The bot can automatically add a contribution role to all contributors when the ticket reaches the required amount of verifications.
 - `/contributor add <user>`: Adds a user to the list of contributors. Can be done by the ticket owner and by people who have one of the management roles (`manageRoles`) for that ticket type.
 - `/contributor remove <user>`: Removes a user to the list of contributors. Can be done by the ticket owner and by people who have one of the management roles (`manageRoles`) for that ticket type.
-- `/verify`: Verifies the current ticket. Can be done by people who haven't already verified the ticket, have one of the the management (`manageRoles`) or verification roles (`verifyRoles`) for that ticket type and while the ticket isn't already verified. If enough `verifications` are reached, the channel will be moved to the verified category (if `verifiedCategory` is configured on the type), a role (`verifiedRole`) will be given out to all contributors and a transcript will be made of this channel.
+- `/verify`: Verifies the current ticket. Can be done by people who haven't already verified the ticket, have one of the the management (`manageRoles`) or verification roles (`verifyRoles`) for that ticket type and while the ticket isn't already verified and isn't open. If enough `verifications` are reached, the channel will be moved to the verified category (if `verifiedCategory` is configured on the type), a role (`verifiedRole`) will be given out to all contributors and a transcript will be made of this channel.
 
 ## Access
 - `/add <user/role>`: Adds a user/role from the current ticket. Useable by people with the ticket type'one of the management roles (`manageRoles`).

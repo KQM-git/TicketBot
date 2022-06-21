@@ -64,6 +64,8 @@ export default class VerifyTicket extends Command {
 
         if (ticket.status == TicketStatus.VERIFIED)
             return await sendMessage(source, "This ticket is already marked as verified!", undefined, true)
+        else if (ticket.status == TicketStatus.OPEN)
+            return await sendMessage(source, "This ticket is not yet ready for verification! Ask the owner to close this ticket first", undefined, true)
 
         const ticketType = ticketTypes[ticket.type]
         if (!(ticketType && member.roles.cache.hasAny(...ticketType.manageRoles, ...(ticketType.verifyRoles ?? []))))
@@ -76,7 +78,7 @@ export default class VerifyTicket extends Command {
             embeds: [new MessageEmbed().setDescription(`Ticket verified by <@${member.id}>`)]
         })
 
-        if (enough) {
+        if (enough && ticket.status != TicketStatus.VERIFIED) {
             Logger.info(`Enough verifications for ticket ${ticket.id}: ${ticket.name} by ${user.id} (${user.tag}), doing some extra actions...`)
             if (ticketType?.verifiedCategory && source.channel instanceof BaseGuildTextChannel)
                 await source.channel.setParent(ticketType?.verifiedCategory)
