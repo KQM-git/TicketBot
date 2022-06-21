@@ -4,7 +4,7 @@ import { getLogger } from "log4js"
 import TiBotClient from "../TiBotClient"
 import { ticketTypes } from "./TicketTypes"
 import { TicketStatus } from "./Types"
-import { Colors } from "./Utils"
+import { Colors, trim } from "./Utils"
 
 const Logger = getLogger("timer")
 export default class TimerManager {
@@ -99,7 +99,9 @@ export default class TimerManager {
             VERIFIED: []
         }
 
-        tickets.forEach(t => stats[t.status as TicketStatus]?.push(t))
+        tickets
+            .sort((a, b) => trim(a.name).localeCompare(trim(b.name)))
+            .forEach(t => stats[t.status as TicketStatus]?.push(t))
 
         const embeds: MessageEmbed[] = []
         if (stats.OPEN.length > 0)
