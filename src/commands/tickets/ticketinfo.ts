@@ -18,8 +18,7 @@ export default class TicketInfo extends Command {
             options: [{
                 name: "channel",
                 description: "Channel to check",
-                type: "CHANNEL",
-                required: true
+                type: "CHANNEL"
             }]
         })
     }
