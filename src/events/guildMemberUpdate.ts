@@ -2,7 +2,7 @@ import { GuildMember } from "discord.js"
 import log4js from "log4js"
 import client from "../main"
 
-const Logger = log4js.getLogger("userUpdate")
+const Logger = log4js.getLogger("memberUpdate")
 
 export async function handle(old: GuildMember, member: GuildMember): Promise<void> {
     if (member.displayColor == old.displayColor && member.nickname == old.nickname) return
