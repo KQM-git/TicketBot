@@ -461,7 +461,7 @@ export default class TranscriptionManager {
             nickname: member.nickname,
             username: member.user.username,
             tag: member.user.discriminator,
-            avatar: member.avatar ?? member.user.avatar,
+            avatar: member.user.avatar,
             bot: member.user.bot,
             verified: (await member.user.fetchFlags()).has("VERIFIED_BOT"),
             serverId: member.guild.id

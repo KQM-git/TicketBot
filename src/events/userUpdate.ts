@@ -2,7 +2,7 @@ import { User } from "discord.js"
 import log4js from "log4js"
 import client from "../main"
 
-const Logger = log4js.getLogger("memberUpdate")
+const Logger = log4js.getLogger("userUpdate")
 
 export async function handle(old: User, user: User): Promise<void> {
     if (user.username == old.username && user.discriminator == old.discriminator && user.avatar == old.avatar) return
