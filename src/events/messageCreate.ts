@@ -1,13 +1,22 @@
 import { DMChannel, Message } from "discord.js"
 import log4js from "log4js"
 import config from "../data/config.json"
+import client from "../main"
 import { getCommand, handleLegacyCommand } from "../utils/CommandHandler"
 import { isTicketable } from "../utils/Utils"
 
 const Logger = log4js.getLogger("message")
 
 export async function handle(message: Message): Promise<void> {
-    if (message.author.bot) return
+    if (message.author.bot) {
+        if (message.type == "CHANNEL_PINNED_MESSAGE" && message.author.id == client.user?.id)
+            try {
+                await message.delete()
+            } catch (a) {
+                Logger.error(a)
+            }
+        return
+    }
 
     if (!message.content.toLowerCase().startsWith(config.prefix)) return
     const args = message.content.slice(config.prefix.length).trim().split(/ +/g)
