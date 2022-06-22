@@ -557,6 +557,7 @@ export default class TranscriptionManager {
                 name: e.author.name,
                 iconUrl: e.author.iconURL ?? undefined
             } : undefined,
+            url: e.url,
             color: e.hexColor ?? undefined,
             description: this.parseText(e.description, relevantRoles, relevantUsers, relevantChannels) ?? undefined,
             fields: e.fields.map(f => mapField(f)),
