@@ -68,9 +68,9 @@ export default class CloseTicket extends Command {
 
         if (source.channel instanceof BaseGuildTextChannel) {
             if (ticketType?.muteOwnerOnClose)
-                await source.channel.permissionOverwrites.create(ticket.creator.discordId, { SEND_MESSAGES: false })
+                await source.channel.permissionOverwrites.edit(ticket.creator.discordId, { SEND_MESSAGES: false })
             if (ticketType?.closeCategory)
-                await source.channel.setParent(ticketType.closeCategory)
+                await source.channel.setParent(ticketType.closeCategory, { lockPermissions: false })
         }
 
         await source.channel.send({

@@ -45,7 +45,7 @@ export async function createTicket(ticketType: TicketType, name: string, member:
 
 
     try {
-        await channel.permissionOverwrites.create(member, {
+        await channel.permissionOverwrites.edit(member, {
             VIEW_CHANNEL: true,
             MANAGE_MESSAGES: true
         })

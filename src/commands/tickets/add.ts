@@ -66,7 +66,7 @@ export default class AddUserTicket extends Command {
         Logger.info(`Adding group ${targetId} ticket ${ticket.id} (${ticket.name}) by ${member.id} (${member.user.tag})`)
 
         if (source.channel instanceof BaseGuildTextChannel)
-            await source.channel.permissionOverwrites.create(targetId, { VIEW_CHANNEL: true })
+            await source.channel.permissionOverwrites.edit(targetId, { VIEW_CHANNEL: true })
 
         await source.channel.send({
             embeds: [

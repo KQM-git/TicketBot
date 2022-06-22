@@ -69,9 +69,9 @@ export default class OpenTicket extends Command {
 
         Logger.info(`Opening ticket ${source.channel.id} / ${source.channel.id} -> ${ticket.id} by ${user.id} (${user.tag})`)
         if (source.channel instanceof BaseGuildTextChannel) {
-            await source.channel.permissionOverwrites.create(ticket.creator.discordId, { SEND_MESSAGES: null })
+            await source.channel.permissionOverwrites.edit(ticket.creator.discordId, { SEND_MESSAGES: null })
             if (ticketType?.defaultCategory)
-                await source.channel.setParent(ticketType?.defaultCategory)
+                await source.channel.setParent(ticketType?.defaultCategory, { lockPermissions: false })
         }
 
         await source.channel.send({

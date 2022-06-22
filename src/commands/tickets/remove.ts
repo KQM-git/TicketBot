@@ -66,7 +66,7 @@ export default class RemoveUserTicket extends Command {
         Logger.info(`Removing group ${targetId} ticket ${ticket.id} (${ticket.name}) by ${member.id} (${member.user.tag})`)
 
         if (source.channel instanceof BaseGuildTextChannel)
-            await source.channel.permissionOverwrites.create(targetId, { VIEW_CHANNEL: null })
+            await source.channel.permissionOverwrites.edit(targetId, { VIEW_CHANNEL: null })
         await source.channel.send({
             embeds: [
                 new MessageEmbed()

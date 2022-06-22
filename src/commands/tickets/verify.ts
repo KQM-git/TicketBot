@@ -81,7 +81,7 @@ export default class VerifyTicket extends Command {
         if (enough && ticket.status != TicketStatus.VERIFIED) {
             Logger.info(`Enough verifications for ticket ${ticket.id}: ${ticket.name} by ${user.id} (${user.tag}), doing some extra actions...`)
             if (ticketType?.verifiedCategory && source.channel instanceof BaseGuildTextChannel)
-                await source.channel.setParent(ticketType?.verifiedCategory)
+                await source.channel.setParent(ticketType?.verifiedCategory, { lockPermissions: false })
 
 
             if (ticketType.verifiedRole) {
