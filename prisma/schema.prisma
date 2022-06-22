@@ -14,7 +14,7 @@ model Ticket {
   id               Int            @id @default(autoincrement())
   createdAt        DateTime       @default(now())
   lastRename       DateTime?
-  lastVerifierPing DateTime?
+  lastVerifierPing Json?
   lastMessage      DateTime       @default(now())
   type             String
   status           String         @default("OPEN")
@@ -40,7 +40,6 @@ model Transcript {
   users             User[]
   mentionedRoles    Role[]            @relation("mentioned_roles")
   mentionedChannels Channel[]         @relation("mentioned_channels")
-  verifications     Verification[]
   server            Server            @relation(fields: [serverId], references: [id])
   serverId          String
   ticket            Ticket?           @relation(fields: [ticketId], references: [id])
@@ -73,12 +72,11 @@ model Verification {
   createdAt    DateTime    @default(now())
   channelId    String
   channelName  String
+  type         String      @default("DEFAULT")
   verifier     User        @relation(fields: [userId, serverId], references: [discordId, serverId])
   userId       String
   server       Server      @relation(fields: [serverId], references: [id])
   serverId     String
-  transcript   Transcript? @relation(fields: [transcriptId], references: [id])
-  transcriptId Int?
   ticket       Ticket      @relation(fields: [ticketsId], references: [id])
   ticketsId    Int
 }

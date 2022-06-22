@@ -3,8 +3,8 @@ import { ButtonInteraction, CommandInteraction, GuildBasedChannel, Message, Mess
 import client from "../../main"
 import Command from "../../utils/Command"
 import { ticketTypes } from "../../utils/TicketTypes"
-import { CommandSource, SendMessage, TicketStatus } from "../../utils/Types"
-import { Colors, displayTimestamp, sendMessage } from "../../utils/Utils"
+import { CommandSource, SendMessage, TicketStatus, VerifierType } from "../../utils/Types"
+import { Colors, displayTimestamp, sendMessage, verificationTypeName } from "../../utils/Utils"
 
 
 export default class TicketInfo extends Command {
@@ -100,7 +100,7 @@ export default class TicketInfo extends Command {
             .setTitle(`${ticketType?.name ?? ticketInfo.type} (Ticket #${ticketInfo.id})`)
             .setDescription(`Created by <@${ticketInfo.creator.discordId}> (${ticketInfo.creator.username}#${ticketInfo.creator.tag}) ${displayTimestamp(ticketInfo.createdAt)}`)
             .addField("Status", ticketInfo.status)
-            .addField("Verifications", `${ticketInfo.verifications.map(v => `- <@${v.verifier.discordId}> at ${displayTimestamp(v.createdAt)}`).join("\n") || "Not yet verified"}`)
+            .addField("Verifications", `${ticketInfo.verifications.map(v => `- ${verificationTypeName[v.type as VerifierType] ?? "Unknown"} <@${v.verifier.discordId}> at ${displayTimestamp(v.createdAt)}`).join("\n") || "Not yet verified"}`)
             .addField("Contributors", `${ticketInfo.contributors.map(c => `<@${c.discordId}>`).join(", ") || "No contributors added"}`)
             .setColor(Colors[ticketInfo.status as TicketStatus])
         , undefined, true)

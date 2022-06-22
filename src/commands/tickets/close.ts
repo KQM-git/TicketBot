@@ -1,4 +1,4 @@
-import { BaseGuildTextChannel, ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageEmbed, User } from "discord.js"
+import { BaseGuildTextChannel, ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButton, MessageEmbed, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
@@ -73,17 +73,32 @@ export default class CloseTicket extends Command {
                 await source.channel.setParent(ticketType.closeCategory, { lockPermissions: false })
         }
 
+        const components = [new MessageActionRow().addComponents(
+            ...(ticketType?.verifications?.map(v => new MessageButton()
+                .setCustomId(`verify-${v.type}`)
+                .setLabel(v.button.label)
+                .setEmoji(v.button.emoji)
+                .setStyle(v.button.style)
+            ) ?? []),
+            buttons.OPEN,
+            buttons.TRANSCRIPT
+        )]
+
+        const dinkDonks = ticketType.verifications?.filter(x => x.dinkDonk)
+        if (dinkDonks && dinkDonks.length > 0)
+            components.push(new MessageActionRow().addComponents(...dinkDonks.map(v => new MessageButton()
+                .setCustomId(`pingverifiers-${v.type}`)
+                .setLabel(v.dinkDonk?.button.label ?? "Remind verifiers")
+                .setEmoji(v.dinkDonk?.button.emoji ?? "<a:dinkdonk:981687794000879696>")
+                .setStyle(v.dinkDonk?.button.style ?? "DANGER")
+            )))
+
         await source.channel.send({
             embeds: [
                 new MessageEmbed()
                     .setDescription(`Ticket closed by <@${member.id}>. If there are any issues with it - it can be reopened by the owner or staff by using the buttons below or \`/open\`.`)
             ],
-            components: [new MessageActionRow().addComponents(
-                ...(ticketType?.verifications ? [buttons.VERIFY] : []),
-                buttons.OPEN,
-                buttons.TRANSCRIPT,
-                ...(ticketType?.dinkDonkVerifiers ? [buttons.DINKDONK] : []),
-            )]
+            components
         })
 
         await client.prisma.ticket.update({

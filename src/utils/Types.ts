@@ -21,6 +21,18 @@ export enum EndingAction {
     VERIFIED = "VERIFIED"
 }
 
+export enum VerifierType {
+    DEFAULT = "DEFAULT",
+    GUIDE = "GUIDE",
+    CALCS = "CALCS",
+}
+
+type ButtonStyling = {
+    label: string
+    emoji: string
+    style: MessageButtonStyle
+}
+
 export type TicketType = {
     id: string
     name: string
@@ -34,12 +46,22 @@ export type TicketType = {
     }
     creationRoles: string[]
     blacklistRoles?: string[]
-    verifyRoles?: string[]
     manageRoles: string[]
     defaultCategory: string
     closeCategory?: string
     muteOwnerOnClose?: true
-    verifications?: number
+    verifications?: {
+        type: VerifierType
+        roles: string[]
+        button: ButtonStyling
+        required?: number
+        dinkDonk?: {
+            time: number
+            message: string
+            roles: string[]
+            button: ButtonStyling
+        }
+    }[]
     verifiedCategory?: string
     verifiedRole?: string
     verifiedChannel?: string
@@ -48,11 +70,6 @@ export type TicketType = {
     dinkDonk?: {
         time: number
         message: string
-    }
-    dinkDonkVerifiers?: {
-        time: number
-        message: string
-        roles: string[]
     }
     randomDefaultSlug?: true
 }

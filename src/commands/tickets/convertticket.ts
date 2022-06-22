@@ -70,7 +70,7 @@ export default class ConvertTicket extends Command {
         const ticketType = ticketTypes[type]
 
         if (!ticketType)
-            return await sendMessage(source, "Couldn't find type", undefined, true)
+            return await sendMessage(source, "Couldn't find ticket type", undefined, true)
 
         if (!member.roles.cache.hasAny(...ticketType.manageRoles))
             return await sendMessage(source, `You can't make transcripts of ${ticketType.name} here`, undefined, true)

@@ -1,7 +1,7 @@
 import { AnyChannel, ColorResolvable, GuildChannel, Message, MessageActionRow, MessageEmbed, TextBasedChannel } from "discord.js"
 import log4js from "log4js"
 import client from "../main"
-import { CommandSource, SendMessage, TicketableChannel, TicketStatus } from "./Types"
+import { CommandSource, SendMessage, TicketableChannel, TicketStatus, VerifierType } from "./Types"
 
 const Logger = log4js.getLogger("Utils")
 
@@ -31,6 +31,12 @@ export async function updateMessage(channelId: string, replyId: string, response
     } catch (error) {
         Logger.error(`Couldn't update message ${replyId}`, error)
     }
+}
+
+export const verificationTypeName: Record<VerifierType, string> = {
+    DEFAULT: "Ticket",
+    CALCS: "Calculations",
+    GUIDE: "Guide"
 }
 
 export async function sendMessage(source: CommandSource, response: string | MessageEmbed, components?: (MessageActionRow)[], ephemeral?: boolean): Promise<SendMessage | undefined> {

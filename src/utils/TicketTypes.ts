@@ -1,5 +1,5 @@
 import { MessageActionRow, MessageButton } from "discord.js"
-import { TicketType } from "./Types"
+import { TicketType, VerifierType } from "./Types"
 import config from "../data/config.json"
 
 export const buttons = {
@@ -13,11 +13,6 @@ export const buttons = {
         .setLabel("Open")
         .setEmoji("🔓")
         .setStyle("SECONDARY"),
-    VERIFY: new MessageButton()
-        .setCustomId("verify")
-        .setLabel("Verify")
-        .setEmoji("✅")
-        .setStyle("PRIMARY"),
     TRANSCRIPT: new MessageButton()
         .setCustomId("transcript")
         .setLabel("Transcript")
@@ -28,11 +23,6 @@ export const buttons = {
         .setCustomId("rename")
         .setEmoji("✏️")
         .setStyle("SECONDARY"),
-    DINKDONK: new MessageButton()
-        .setLabel("Remind verifiers")
-        .setCustomId("pingverifiers")
-        .setEmoji("<a:dinkdonk:981687794000879696>")
-        .setStyle("DANGER"),
     GUIDE_LINK: new MessageButton()
         .setLabel("Guide Guidelines")
         .setURL("https://docs.google.com/document/d/1hZ0bNmMy1t5R8TOF1v8mcuzQpR0BgJD5pKY2T_t6uh0/edit?usp=sharing")
@@ -47,6 +37,7 @@ const ROLE = config.production ? {
     TC_STAFF: [
         "810550138552320010", // Scholar
         "903791926162100256", // Editor
+        "975990552812204032", // Monke
         "873486216782299137", // Mod
     ],
     STAFF: [
@@ -56,6 +47,7 @@ const ROLE = config.production ? {
     ],
     ADMIN: "810410368622395392",
     GUIDE_VERIFICATION_PING: "945105638839705630",
+    CALCS_VERIFICATION_PING: "989266525280145478",
     BLACKLIST: [
         "839680495453077534", // Coffin
         "771259671671078913", // Muted
@@ -74,6 +66,7 @@ const ROLE = config.production ? {
     STAFF: ["980899219235807302"],
     ADMIN: "980899219235807302",
     GUIDE_VERIFICATION_PING: "984490976817066046",
+    CALCS_VERIFICATION_PING: "984490976817066046",
     BLACKLIST: [
         "987118008910610444", // Coffin
     ],
@@ -112,7 +105,7 @@ const CHANNEL = config.production ? {
 } : {
     NEW_TICKETS: "981316199185014806",
     TC_TRANSCRIPTS: "980924167648079892",
-    VERIFIED_TRANSCRIPTS: "984846200492666880",
+    VERIFIED_TRANSCRIPTS: "980837690285109352",
     STAFF_TRANSCRIPTS: "986748960041467954",
     FEIYUN_TRANSCRIPTS: "986748960041467954"
 }
@@ -151,11 +144,19 @@ export const ticketTypes: Record<string, TicketType> = {
         creationRoles: [ROLE.LIBSUB, ROLE.ADMIN],
         blacklistRoles: ROLE.BLACKLIST,
         manageRoles: [...ROLE.TC_STAFF, ROLE.ADMIN],
-        verifyRoles: [ROLE.THEORYCRAFTER],
         defaultCategory: CATEGORY.OPEN_SUBS,
         closeCategory: CATEGORY.FOR_REVIEW,
         muteOwnerOnClose: true,
-        verifications: 2,
+        verifications: [{
+            type: VerifierType.DEFAULT,
+            required: 2,
+            roles: [ROLE.THEORYCRAFTER],
+            button: {
+                label: "Verify",
+                emoji: "✅",
+                style: "PRIMARY"
+            }
+        }],
         verifiedCategory: CATEGORY.PUBLISHING,
         verifiedRole: ROLE.CONTRIBUTOR,
         verifiedChannel: CHANNEL.VERIFIED_TRANSCRIPTS,
@@ -193,20 +194,52 @@ export const ticketTypes: Record<string, TicketType> = {
         creationRoles: [ROLE.GUIDESUBS, ROLE.ADMIN],
         blacklistRoles: ROLE.BLACKLIST,
         manageRoles: [...ROLE.TC_STAFF, ROLE.ADMIN],
-        verifyRoles: [ROLE.THEORYCRAFTER],
         defaultCategory: CATEGORY.GUIDES,
-        verifications: 2,
+        verifications: [{
+            type: VerifierType.GUIDE,
+            required: 2,
+            roles: [ROLE.THEORYCRAFTER],
+            dinkDonk: {
+                time: 24 * 3600 * 1000,
+                message: `<@&${ROLE.GUIDE_VERIFICATION_PING}> - This guide is ready for guide verification`,
+                roles: [ROLE.GUIDE_VERIFICATION_PING],
+                button: {
+                    emoji: "<a:dinkdonk:981687794000879696>",
+                    label: "Ping guide verifiers",
+                    style: "DANGER"
+                }
+            },
+            button: {
+                label: "Verify guide",
+                emoji: "✅",
+                style: "PRIMARY"
+            }
+        }, {
+            type: VerifierType.CALCS,
+            required: 1,
+            roles: [ROLE.THEORYCRAFTER],
+            dinkDonk: {
+                time: 24 * 3600 * 1000,
+                message: `<@&${ROLE.CALCS_VERIFICATION_PING}> - This guide is ready for calc verification`,
+                roles: [ROLE.CALCS_VERIFICATION_PING],
+                button: {
+                    emoji: "<a:dinkdonk:981687794000879696>",
+                    label: "Ping calc verifiers",
+                    style: "DANGER"
+                }
+            },
+            button: {
+                label: "Verify calcs",
+                emoji: "✅",
+                style: "PRIMARY"
+            }
+        }],
         verifiedChannel: CHANNEL.VERIFIED_TRANSCRIPTS,
         dumpChannel: CHANNEL.TC_TRANSCRIPTS,
         creationChannel: CHANNEL.NEW_TICKETS,
         dinkDonk: {
             time: 7 * 24 * 3600 * 1000,
             message: "<a:dinkdonk:981687794000879696> This channel hasn't been active in the past week!"
-        },
-        dinkDonkVerifiers: {
-            time: 24 * 3600 * 1000,
-            message: `<@&${ROLE.GUIDE_VERIFICATION_PING}> - This guide is ready for verification`,
-            roles: [ROLE.GUIDE_VERIFICATION_PING]
         }
     },
     tcproject: {
@@ -241,9 +274,17 @@ export const ticketTypes: Record<string, TicketType> = {
         creationRoles: [...ROLE.TC_STAFF, ROLE.ADMIN],
         blacklistRoles: ROLE.BLACKLIST,
         manageRoles: [...ROLE.TC_STAFF, ROLE.ADMIN],
-        verifyRoles: [ROLE.THEORYCRAFTER],
         defaultCategory: CATEGORY.TC_PROJECT,
-        verifications: 2,
+        verifications: [{
+            type: VerifierType.DEFAULT,
+            required: 2,
+            roles: [ROLE.THEORYCRAFTER],
+            button: {
+                label: "Verify",
+                emoji: "✅",
+                style: "PRIMARY"
+            }
+        }],
         verifiedCategory: CATEGORY.PUBLISHING,
         verifiedRole: ROLE.CONTRIBUTOR,
         verifiedChannel: CHANNEL.VERIFIED_TRANSCRIPTS,

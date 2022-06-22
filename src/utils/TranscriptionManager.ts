@@ -1,12 +1,12 @@
 import { PrismaClient, QueuedTranscript } from "@prisma/client"
 import AdmZip from "adm-zip"
 import { randomUUID } from "crypto"
-import { EmbedField, EmbedFooterData, Guild, GuildMember, MessageActionRow, MessageActionRowComponent, MessageAttachment, MessageEmbed, MessageEmbedImage, MessageEmbedThumbnail, MessageMentions, MessageReaction, User } from "discord.js"
+import { EmbedField, EmbedFooterData, Guild, GuildMember, MessageActionRow, MessageActionRowComponent, MessageAttachment, MessageEmbed, MessageEmbedImage, MessageEmbedThumbnail, MessageEmbedVideo, MessageMentions, MessageReaction, User } from "discord.js"
 import { getLogger } from "log4js"
 import TiBotClient from "../TiBotClient"
 import { ticketTypes } from "./TicketTypes"
-import { ChannelInput, EndingAction, Enumerable, InputJsonValue, MessageInput, RoleInput, SendMessage, TicketableChannel, UserInput } from "./Types"
-import { Colors, displayTimestamp, isTicketable, trim, updateMessage } from "./Utils"
+import { ChannelInput, EndingAction, Enumerable, InputJsonValue, MessageInput, RoleInput, SendMessage, TicketableChannel, UserInput, VerifierType } from "./Types"
+import { Colors, displayTimestamp, isTicketable, trim, updateMessage, verificationTypeName } from "./Utils"
 import { baseUrl } from "../data/config.json"
 
 const Logger = getLogger("transcriber")
@@ -241,12 +241,11 @@ export default class TranscriptionManager {
                                         select: { discordId: true }
                                     },
                                     verifications: {
-                                        select: { verifier: { select: { discordId: true } }, createdAt: true }
+                                        select: { verifier: { select: { discordId: true } }, createdAt: true, type: true }
                                     },
                                 }
                             },
-                            users: true,
-                            verifications: true
+                            users: true
                         }
                     })
                     if (!fullTranscript)
@@ -295,7 +294,7 @@ export default class TranscriptionManager {
 
                         if (ticket)
                             embed
-                                .addField("Verifications", ticket.verifications.map(v => `<@${v.verifier.discordId}> ${displayTimestamp(v.createdAt)}`).join("\n") || "Wasn't verified", true)
+                                .addField("Verifications", ticket.verifications.map(v => `${verificationTypeName[v.type as VerifierType] ?? "Unknown"} <@${v.verifier.discordId}> ${displayTimestamp(v.createdAt)}`).join("\n") || "Wasn't verified", true)
                                 .addField("Contributors", ticket.contributors.map(c => `<@${c.discordId}>`).join(", ") || "No contributors added", true)
 
 
@@ -537,7 +536,7 @@ export default class TranscriptionManager {
                 url: f.iconURL ?? undefined,
             }
         }
-        function mapImage(i: MessageEmbedImage| MessageEmbedThumbnail | null) {
+        function mapImage(i: MessageEmbedImage| MessageEmbedThumbnail | MessageEmbedVideo | null) {
             if (!i) return undefined
             return {
                 url: i.url,
@@ -564,6 +563,7 @@ export default class TranscriptionManager {
             footer: mapFooter(e.footer),
             image: mapImage(e.image),
             thumbnail: mapImage(e.thumbnail),
+            video: mapImage(e.video),
             timestamp: e.timestamp ?? undefined,
         }
     }

@@ -3,8 +3,8 @@ import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
 import { ticketTypes } from "../../utils/TicketTypes"
-import { CommandSource, EndingAction, SendMessage, TicketStatus } from "../../utils/Types"
-import { Colors, isTicketable, sendMessage } from "../../utils/Utils"
+import { CommandSource, EndingAction, SendMessage, TicketStatus, VerifierType } from "../../utils/Types"
+import { Colors, isTicketable, sendMessage, verificationTypeName } from "../../utils/Utils"
 
 const Logger = getLogger("verify")
 export default class VerifyTicket extends Command {
@@ -15,25 +15,40 @@ export default class VerifyTicket extends Command {
             help: "Verify a ticket.",
             usage: "verify",
             aliases: [],
-            options: []
+            options: [{
+                name: "type",
+                description: "Type of verification",
+                type: "STRING",
+                choices: [ {
+                    name: "Default",
+                    value: VerifierType.DEFAULT
+                }, {
+                    name: "Guide",
+                    value: VerifierType.GUIDE
+                }, {
+                    name: "Calculations",
+                    value: VerifierType.CALCS
+                }]
+            }]
         })
     }
 
     async runInteraction(source: CommandInteraction): Promise<SendMessage | undefined> {
         await source.deferReply({ ephemeral: true })
-        return this.run(source, source.user)
+        return this.run(source, source.user, source.options.getString("type", false) ?? VerifierType.DEFAULT)
     }
 
     async runButton(source: ButtonInteraction): Promise<void> {
+        const name = source.customId.split("-")[1] ?? VerifierType.DEFAULT
         await source.deferReply({ ephemeral: true })
-        await this.run(source, source.user)
+        await this.run(source, source.user, name)
     }
 
-    async runMessage(source: Message): Promise<SendMessage | undefined> {
-        return await this.run(source, source.author)
+    async runMessage(source: Message, args: string[]): Promise<SendMessage | string | undefined> {
+        return this.run(source, source.author, args[0])
     }
 
-    async run(source: CommandSource, user: User): Promise<SendMessage | undefined> {
+    async run(source: CommandSource, user: User, type: string): Promise<SendMessage | undefined> {
         if (!source.guild) return await sendMessage(source, "Can't open transcripts here", undefined, true)
 
         const member = await source.guild.members.fetch(user.id)
@@ -59,7 +74,7 @@ export default class VerifyTicket extends Command {
         if (ticket == null)
             return await sendMessage(source, "No ticket data associated with this channel!", undefined, true)
 
-        if (ticket.verifications.find(v => v.userId == user.id))
+        if (ticket.verifications.find(v => v.userId == user.id && v.type == type))
             return await sendMessage(source, "You already verified this ticket!", undefined, true)
 
         if (ticket.status == TicketStatus.VERIFIED)
@@ -68,14 +83,30 @@ export default class VerifyTicket extends Command {
             return await sendMessage(source, "This ticket is not yet ready for verification! Ask the owner to close this ticket first", undefined, true)
 
         const ticketType = ticketTypes[ticket.type]
-        if (!(ticketType && member.roles.cache.hasAny(...ticketType.manageRoles, ...(ticketType.verifyRoles ?? []))))
+
+        if (!ticketType?.verifications)
+            return await sendMessage(source, "Couldn't find ticket type / doesn't require verifications", undefined, true)
+
+        const verificationType = ticketType.verifications.find(x => x.type == type)
+        if (!verificationType)
+            return await sendMessage(source, "This ticket / verifier type doesn't have verifiers set up", undefined, true)
+
+        if (!(member.roles.cache.hasAny(...ticketType.manageRoles, ...(verificationType.roles ?? []))))
             return await sendMessage(source, "Only people with verify or management roles can verify tickets", undefined, true)
 
-        const enough = ticketType.verifications && ticket.verifications.length + 1 >= ticketType.verifications
+        let enough = true
+        for (const verification of ticketType.verifications)
+            if (verification.required) {
+                const offset = verification.type == verificationType.type ? 1 : 0
+                if (ticket.verifications.filter(x => x.type == verification.type).length + offset < verification.required) {
+                    enough = false
+                    break
+                }
+            }
 
-        Logger.info(`Verifying ticket ${ticket.id}: ${ticket.name} by ${user.id} (${user.tag})`)
+        Logger.info(`Verifying ticket ${ticket.id}: ${ticket.name} for type ${verificationType.type} (${enough ? "enough!" : "not enough"}) by ${user.id} (${user.tag})`)
         await source.channel.send({
-            embeds: [new MessageEmbed().setDescription(`Ticket verified by <@${member.id}>`)]
+            embeds: [new MessageEmbed().setDescription(`${verificationTypeName[verificationType.type]} verified by <@${member.id}>`)]
         })
 
         if (enough && ticket.status != TicketStatus.VERIFIED) {
@@ -134,6 +165,7 @@ export default class VerifyTicket extends Command {
                         channelName: source.channel.name,
                         server: client.transcriptionManager.getServer(source.guild),
                         verifier: await client.transcriptionManager.connectUser(member, source.guild.id),
+                        type: type,
                     }
                 }
             }

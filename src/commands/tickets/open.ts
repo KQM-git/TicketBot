@@ -3,8 +3,8 @@ import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
 import { buttons, ticketTypes } from "../../utils/TicketTypes"
-import { CommandSource, SendMessage, TicketStatus } from "../../utils/Types"
-import { displayTimestamp, isTicketable, sendMessage } from "../../utils/Utils"
+import { CommandSource, SendMessage, TicketStatus, VerifierType } from "../../utils/Types"
+import { displayTimestamp, isTicketable, sendMessage, verificationTypeName } from "../../utils/Utils"
 
 
 const Logger = getLogger("open")
@@ -78,7 +78,7 @@ export default class OpenTicket extends Command {
             embeds: [
                 new MessageEmbed()
                     .setDescription(`Ticket re-opened by <@${member.id}>`)
-                    .addField("Previous verifications", `${ticket.verifications.map(v => `- <@${v.verifier.discordId}> at ${displayTimestamp(v.createdAt)}`).join("\n") || "Wasn't verified"}`)
+                    .addField("Previous verifications", `${ticket.verifications.map(v => `- ${verificationTypeName[v.type as VerifierType] ?? "Unknown"} <@${v.verifier.discordId}> at ${displayTimestamp(v.createdAt)}`).join("\n") || "Wasn't verified"}`)
             ],
             components: [new MessageActionRow().addComponents(
                 buttons.CLOSE
