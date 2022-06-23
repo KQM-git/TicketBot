@@ -104,8 +104,7 @@ export default class DeleteTicket extends Command {
 
         Logger.info(`${member.id} (@${member.user.tag}) is deleting ticket ${channel.id} (${channel.name} / ${ticket.name})`)
 
-        await client.transcriptionManager.startTranscript(channel, response, undefined, response.id, member, trim(ticketType.randomDefaultSlug ? randomUUID() : channel.name), ticketType.dumpChannel, EndingAction.DELETE)
-
+        await client.transcriptionManager.startTranscript(channel, response, undefined, response.id, member, trim(ticketType.randomDefaultSlug ? randomUUID() : channel.id), ticketType.dumpChannel, EndingAction.DELETE)
 
         return await sendMessage(source, "Queued deletion!", undefined, true)
     }
