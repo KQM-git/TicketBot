@@ -1,5 +1,4 @@
-import { APIInteractionDataResolvedChannel } from "discord-api-types/v9"
-import { CommandInteraction, GuildBasedChannel, Message, MessageEmbed, TextBasedChannel, User } from "discord.js"
+import { CommandInteraction, Message, MessageEmbed, User } from "discord.js"
 import client from "../../main"
 import Command from "../../utils/Command"
 import { ticketTypes } from "../../utils/TicketTypes"
@@ -35,10 +34,10 @@ export default class CreateTicketDirectory extends Command {
     }
 
     async runMessage(source: Message, args: string[]): Promise<SendMessage | undefined> {
-        return this.run(source, source.author, args[0], source.channel)
+        return this.run(source, source.author, args[0], { id: args[1] ?? source.channel })
     }
 
-    async run(source: CommandSource, user: User, type: string, chan: TextBasedChannel | GuildBasedChannel | APIInteractionDataResolvedChannel | null): Promise<SendMessage | undefined> {
+    async run(source: CommandSource, user: User, type: string, chan: { id: string } | null): Promise<SendMessage | undefined> {
         if (!chan) return await sendMessage(source, "Couldn't fetch channel", undefined, true)
         if (!source.guild) return await sendMessage(source, "Can't make ticket directory here", undefined, true)
 
