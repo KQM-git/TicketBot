@@ -331,7 +331,7 @@ export const ticketTypes: Record<string, TicketType> = {
         muteOwnerOnClose: true,
         verifications: [{
             type: VerifierType.DEFAULT,
-            required: 1,
+            required: 2,
             roles: [ROLE.THEORYCRAFTER],
             button: {
                 label: "Verify",
