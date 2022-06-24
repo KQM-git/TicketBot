@@ -33,7 +33,7 @@ const ROLE = config.production ? {
     LIBSUB: "953173415836147792",
     GUIDESUBS: "939413668553179147",
     CONTRIBUTOR: "764838634280845312",
-    THEORYHUNTER: "845508406579691530",
+    WET: "845508406579691530",
     THEORYCRAFTER: "896043474699317259",
     TC_STAFF: [
         "810550138552320010", // Scholar
@@ -59,7 +59,7 @@ const ROLE = config.production ? {
     LIBSUB: "980899762054254593",
     GUIDESUBS: "980899740029956106",
     CONTRIBUTOR: "980899054177374268",
-    THEORYHUNTER: "980899325779537990",
+    WET: "980899325779537990",
     THEORYCRAFTER: "980898982316351578",
     TC_STAFF: [
         "980899103049383936", // Scholar
@@ -340,7 +340,7 @@ export const ticketTypes: Record<string, TicketType> = {
             }
         }],
         verifiedCategory: CATEGORY.PUBLISHING,
-        verifiedRoles: [ROLE.CONTRIBUTOR, ROLE.THEORYHUNTER],
+        verifiedRoles: [ROLE.CONTRIBUTOR, ROLE.WET],
         verifiedChannel: CHANNEL.VERIFIED_TRANSCRIPTS,
         dumpChannel: CHANNEL.TC_TRANSCRIPTS,
         creationChannel: CHANNEL.NEW_TICKETS,
