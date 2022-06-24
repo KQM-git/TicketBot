@@ -63,7 +63,7 @@ export type TicketType = {
         }
     }[]
     verifiedCategory?: string
-    verifiedRole?: string
+    verifiedRoles?: string[]
     verifiedChannel?: string
     dumpChannel?: string
     creationChannel?: string

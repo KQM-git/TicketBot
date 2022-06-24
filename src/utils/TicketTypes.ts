@@ -33,6 +33,7 @@ const ROLE = config.production ? {
     LIBSUB: "953173415836147792",
     GUIDESUBS: "939413668553179147",
     CONTRIBUTOR: "764838634280845312",
+    THEORYHUNTER: "845508406579691530",
     THEORYCRAFTER: "896043474699317259",
     TC_STAFF: [
         "810550138552320010", // Scholar
@@ -58,6 +59,7 @@ const ROLE = config.production ? {
     LIBSUB: "980899762054254593",
     GUIDESUBS: "980899740029956106",
     CONTRIBUTOR: "980899054177374268",
+    THEORYHUNTER: "980899325779537990",
     THEORYCRAFTER: "980898982316351578",
     TC_STAFF: [
         "980899103049383936", // Scholar
@@ -105,7 +107,7 @@ const CHANNEL = config.production ? {
 } : {
     NEW_TICKETS: "981316199185014806",
     TC_TRANSCRIPTS: "980924167648079892",
-    VERIFIED_TRANSCRIPTS: "980837690285109352",
+    VERIFIED_TRANSCRIPTS: "984846200492666880",
     STAFF_TRANSCRIPTS: "986748960041467954",
     FEIYUN_TRANSCRIPTS: "986748960041467954"
 }
@@ -158,7 +160,7 @@ export const ticketTypes: Record<string, TicketType> = {
             }
         }],
         verifiedCategory: CATEGORY.PUBLISHING,
-        verifiedRole: ROLE.CONTRIBUTOR,
+        verifiedRoles: [ROLE.CONTRIBUTOR],
         verifiedChannel: CHANNEL.VERIFIED_TRANSCRIPTS,
         dumpChannel: CHANNEL.TC_TRANSCRIPTS,
         creationChannel: CHANNEL.NEW_TICKETS,
@@ -286,10 +288,66 @@ export const ticketTypes: Record<string, TicketType> = {
             }
         }],
         verifiedCategory: CATEGORY.PUBLISHING,
-        verifiedRole: ROLE.CONTRIBUTOR,
+        verifiedRoles: [ROLE.CONTRIBUTOR],
         verifiedChannel: CHANNEL.VERIFIED_TRANSCRIPTS,
         dumpChannel: CHANNEL.TC_TRANSCRIPTS,
         creationChannel: CHANNEL.NEW_TICKETS
+    },
+    theoryhunt: {
+        id: "theoryhunt",
+        name: "Theoryhunt",
+        emoji: "🔖",
+        style: "PRIMARY",
+        opening: {
+            content: ` - As an author, it is your responsibility to complete the ticket
+
+**Guidelines**
+- You can rename your ticket with \`/rename <ticket name>\` or with the button below
+- If this ticket was created by accident or it can be deleted, you can use \`/delete\` within the first 5 minutes, otherwise ask a Scholar.
+- When you are ready to submit the ticket, compile everything into one message following the format below and pin it. Then type \`/close\` or click the button below; the ticket will automatically be moved to be reviewed.
+- To add contributors to your ticket you can use \`/contributor add <user>\`.
+- The ticket will be scrapped if: no activity >1 week or open for >1 month.`,
+            embeds: [{
+                title: "Write-up Format",
+                description: `**Theory/Finding/Bug:** Title of your submission
+
+**Evidence:** Explanations with calculations and/or YouTube/Imgur proofs
+
+**Significance:** Conclusion`,
+                color: "#A758BF"
+            }],
+            components: [
+                new MessageActionRow().addComponents(
+                    buttons.CLOSE,
+                    buttons.RENAME
+                )
+            ]
+        },
+        creationRoles: [...ROLE.TC_STAFF, ROLE.ADMIN],
+        blacklistRoles: ROLE.BLACKLIST,
+        manageRoles: [...ROLE.TC_STAFF, ROLE.ADMIN],
+        defaultCategory: CATEGORY.OPEN_SUBS,
+        closeCategory: CATEGORY.FOR_REVIEW,
+        muteOwnerOnClose: true,
+        verifications: [{
+            type: VerifierType.DEFAULT,
+            required: 1,
+            roles: [ROLE.THEORYCRAFTER],
+            button: {
+                label: "Verify",
+                emoji: "✅",
+                style: "PRIMARY"
+            }
+        }],
+        verifiedCategory: CATEGORY.PUBLISHING,
+        verifiedRoles: [ROLE.CONTRIBUTOR, ROLE.THEORYHUNTER],
+        verifiedChannel: CHANNEL.VERIFIED_TRANSCRIPTS,
+        dumpChannel: CHANNEL.TC_TRANSCRIPTS,
+        creationChannel: CHANNEL.NEW_TICKETS,
+        dinkDonk: {
+            time: 7 * 24 * 3600 * 1000,
+            message: "<a:dinkdonk:981687794000879696> This channel hasn't been active in the past week!"
+        }
     },
     staff: {
         id: "staff",

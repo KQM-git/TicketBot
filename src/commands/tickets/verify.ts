@@ -1,4 +1,4 @@
-import { BaseGuildTextChannel, ButtonInteraction, CommandInteraction, GuildMember, Message, MessageEmbed, User } from "discord.js"
+import { BaseGuildTextChannel, ButtonInteraction, CommandInteraction, Message, MessageEmbed, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
@@ -115,22 +115,24 @@ export default class VerifyTicket extends Command {
                 await source.channel.setParent(ticketType?.verifiedCategory, { lockPermissions: false })
 
 
-            if (ticketType.verifiedRole) {
-                const givenUser: GuildMember[] = []
+            if (ticketType.verifiedRoles) {
+                const givenUser: string[] = []
 
                 for (const contributor of ticket.contributors) {
                     try {
                         const member = await source.guild.members.fetch(contributor.discordId)
-                        if (member && !member.roles.cache.has(ticketType.verifiedRole)) {
-                            Logger.info(`Giving contribution role for ${member.id} (${member.user.tag}) from ticket ${ticket.id}: ${ticket.name}`)
-                            await member.roles.add(ticketType.verifiedRole)
-                            givenUser.push(member)
+                        if (!member) continue
+                        const roles = ticketType.verifiedRoles.filter(r => !member.roles.cache.has(r))
+                        if (roles.length > 0) {
+                            Logger.info(`Giving contribution role for ${member.id} (${member.user.tag}) from ticket ${ticket.id}: ${ticket.name} (${ticketType.name})`)
+                            await member.roles.add(roles)
+                            givenUser.push(`Given <@${member.id}> the role${roles.length > 1 ? "s" : ""} ${roles.map(x => `<@&${x}>`).join(", ")}`)
 
                             if (givenUser.length > 5)
                                 await source.channel.send({ embeds: [
                                     new MessageEmbed()
                                         .setTitle("Contribution roles")
-                                        .setDescription(givenUser.map(u => `Given <@${u.id}> the role <@${ticketType.verifiedRole}>`).join("\n"))
+                                        .setDescription(givenUser.join("\n"))
                                         .setColor(Colors.AQUA)
                                 ] })
                         }
@@ -143,7 +145,7 @@ export default class VerifyTicket extends Command {
                     await source.channel.send({ embeds: [
                         new MessageEmbed()
                             .setTitle("Contribution roles")
-                            .setDescription(givenUser.map(u => `Given <@${u.id}> the role <@&${ticketType.verifiedRole}>`).join("\n"))
+                            .setDescription(givenUser.join("\n"))
                             .setColor(Colors.AQUA)
                     ] })
             }
