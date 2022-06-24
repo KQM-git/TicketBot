@@ -131,7 +131,11 @@ export default class TimerManager {
                 .setColor(Colors.RED)
             )
 
+        if (msg?.embeds && msg.embeds.length == embeds.length && msg.embeds.every((e, i) => JSON.stringify(e.toJSON()) == JSON.stringify(embeds[i].toJSON())))
+            return
+
         try {
+            Logger.error(`Editing ${td.messageId} for ${td.type} ticket directory`)
             await msg.edit({ embeds })
         } catch (error) {
             Logger.error(`Couldn't edit message ${td.messageId} for ${td.type} ticket directory`)
