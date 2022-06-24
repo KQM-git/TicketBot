@@ -34,8 +34,8 @@ export default class CreateTicketDirectory extends Command {
         return this.run(source, source.user, source.options.getString("type", true), source.options.getChannel("channel", false) ?? source.channel)
     }
 
-    async runMessage(source: Message): Promise<SendMessage | undefined> {
-        return await sendMessage(source, "This command isn't available in text form, please refer to the slash-command")
+    async runMessage(source: Message, args: string[]): Promise<SendMessage | undefined> {
+        return this.run(source, source.author, args[0], source.channel)
     }
 
     async run(source: CommandSource, user: User, type: string, chan: TextBasedChannel | GuildBasedChannel | APIInteractionDataResolvedChannel | null): Promise<SendMessage | undefined> {
