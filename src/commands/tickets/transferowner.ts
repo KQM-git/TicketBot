@@ -75,10 +75,10 @@ export default class TransferOwnerTicket extends Command {
 
         await source.channel.send({
             embeds: [
-                new MessageEmbed().setDescription(`<@${member.id}> transferred owernship of this ticket to <@${targetMember.id}>.`)
+                new MessageEmbed().setDescription(`<@${member.id}> transferred ownership of this ticket to <@${targetMember.id}>.`)
             ]
         })
 
-        return await sendMessage(source, "Closed ticket!")
+        return await sendMessage(source, "Transferred ownership!")
     }
 }
