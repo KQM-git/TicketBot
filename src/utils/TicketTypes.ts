@@ -340,7 +340,7 @@ export const ticketTypes: Record<string, TicketType> = {
             }
         }],
         verifiedCategory: CATEGORY.PUBLISHING,
-        verifiedRoles: [ROLE.CONTRIBUTOR, ROLE.WET],
+        verifiedRoles: [ROLE.WET],
         verifiedChannel: CHANNEL.VERIFIED_TRANSCRIPTS,
         dumpChannel: CHANNEL.TC_TRANSCRIPTS,
         creationChannel: CHANNEL.NEW_TICKETS,
