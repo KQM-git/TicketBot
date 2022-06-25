@@ -43,6 +43,7 @@ const ROLE = config.production ? {
     ],
     STAFF: [
         "953164120952283206", // Pillar Staff
+        "822707646393745409", // Pillar Vice Head
         "819165586889506868", // The Trades
         "810410368622395392", // Keqing's Key
     ],
