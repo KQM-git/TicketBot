@@ -135,7 +135,7 @@ export default class TimerManager {
             return
 
         try {
-            Logger.log(`Editing ${td.messageId} for ${td.type} ticket directory`)
+            Logger.info(`Editing ${td.messageId} for ${td.type} ticket directory`)
             await msg.edit({ embeds })
         } catch (error) {
             Logger.error(`Couldn't edit message ${td.messageId} for ${td.type} ticket directory`, error)
