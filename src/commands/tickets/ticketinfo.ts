@@ -78,6 +78,9 @@ export default class TicketInfo extends Command {
             return await sendMessage(source, converted.join("\n").substring(0, 1900), undefined, true)
         }
 
+        if (!member.permissionsIn(channel.id).has("VIEW_CHANNEL"))
+            return await sendMessage(source, "You can't view this channel", undefined, true)
+
         const ticketInfo = await client.prisma.ticket.findUnique({
             where: {
                 channelId
