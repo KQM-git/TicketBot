@@ -63,19 +63,40 @@ export default class AddUserTicket extends Command {
         if (!(ticketType && member.roles.cache.hasAny(...ticketType.manageRoles)))
             return await sendMessage(source, "Only people with management roles can add/remove groups from tickets", undefined, true)
 
+        if (!(source.channel instanceof BaseGuildTextChannel))
+            return await sendMessage(source, "This isn't a regular channel")
+
         Logger.info(`Adding group ${targetId} ticket ${ticket.id} (${ticket.name}) by ${member.id} (${member.user.tag})`)
 
-        if (source.channel instanceof BaseGuildTextChannel)
-            await source.channel.permissionOverwrites.edit(targetId, { VIEW_CHANNEL: true })
+        const targetRole = await source.guild.roles.fetch(targetId)
+        if (targetRole) {
+            await source.channel.permissionOverwrites.edit(targetRole, { VIEW_CHANNEL: true })
 
-        await source.channel.send({
-            embeds: [
-                new MessageEmbed()
-                    .setDescription(`<@${member.id}> added ${target} to this ticket`)
-                    .setColor(Colors.GREEN)
-            ]
-        })
+            await source.channel.send({
+                embeds: [
+                    new MessageEmbed()
+                        .setDescription(`<@${member.id}> added role ${target} to this ticket`)
+                        .setColor(Colors.GREEN)
+                ]
+            })
+            return await sendMessage(source, `Added ${target} to ticket`)
+        }
 
-        return await sendMessage(source, `Added ${target} to ticket`)
+        const targetUser = await client.users.fetch(targetId)
+        if (targetUser) {
+            await source.channel.permissionOverwrites.edit(targetUser, { VIEW_CHANNEL: true })
+
+            await source.channel.send({
+                embeds: [
+                    new MessageEmbed()
+                        .setDescription(`<@${member.id}> added user ${target} to this ticket`)
+                        .setColor(Colors.GREEN)
+                ]
+            })
+            return await sendMessage(source, `Added ${target} to ticket`)
+        }
+
+
+        return await sendMessage(source, `Couldn't get type of ${target}`)
     }
 }

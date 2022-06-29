@@ -67,8 +67,12 @@ export default class CloseTicket extends Command {
         Logger.info(`Closing ticket ${ticket.id} (${ticket.name}) by ${member.id} (${member.user.tag})`)
 
         if (source.channel instanceof BaseGuildTextChannel) {
-            if (ticketType?.muteOwnerOnClose)
-                await source.channel.permissionOverwrites.edit(ticket.creator.discordId, { SEND_MESSAGES: false })
+            if (ticketType?.muteOwnerOnClose) {
+                const user = await client.users.fetch(ticket.creator.discordId)
+                if (!user)
+                    return await sendMessage(source, `Couldn't fetch ticket owner user profile - ${ticket.creator.discordId}`)
+                await source.channel.permissionOverwrites.edit(user, { SEND_MESSAGES: false })
+            }
             if (ticketType?.closeCategory)
                 await source.channel.setParent(ticketType.closeCategory, { lockPermissions: false })
         }

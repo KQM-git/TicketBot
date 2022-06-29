@@ -69,7 +69,10 @@ export default class OpenTicket extends Command {
 
         Logger.info(`Opening ticket ${source.channel.id} / ${source.channel.id} -> ${ticket.id} by ${user.id} (${user.tag})`)
         if (source.channel instanceof BaseGuildTextChannel) {
-            await source.channel.permissionOverwrites.edit(ticket.creator.discordId, { SEND_MESSAGES: null })
+            const user = await client.users.fetch(ticket.creator.discordId)
+            if (!user)
+                return await sendMessage(source, `Couldn't fetch ticket owner user profile - ${ticket.creator.discordId}`)
+            await source.channel.permissionOverwrites.edit(user, { SEND_MESSAGES: null })
             if (ticketType?.defaultCategory)
                 await source.channel.setParent(ticketType?.defaultCategory, { lockPermissions: false })
         }

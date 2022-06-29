@@ -63,18 +63,40 @@ export default class RemoveUserTicket extends Command {
         if (!(ticketType && member.roles.cache.hasAny(...ticketType.manageRoles)))
             return await sendMessage(source, "Only people with management roles can remove groups from tickets", undefined, true)
 
+        if (!(source.channel instanceof BaseGuildTextChannel))
+            return await sendMessage(source, "This isn't a regular channel")
+
         Logger.info(`Removing group ${targetId} ticket ${ticket.id} (${ticket.name}) by ${member.id} (${member.user.tag})`)
 
-        if (source.channel instanceof BaseGuildTextChannel)
-            await source.channel.permissionOverwrites.edit(targetId, { VIEW_CHANNEL: null })
-        await source.channel.send({
-            embeds: [
-                new MessageEmbed()
-                    .setDescription(`<@${member.id}> removed ${target} from this ticket`)
-                    .setColor(Colors.RED)
-            ]
-        })
+        const targetRole = await source.guild.roles.fetch(targetId)
+        if (targetRole) {
+            await source.channel.permissionOverwrites.edit(targetRole, { VIEW_CHANNEL: null })
 
-        return await sendMessage(source, `Removed ${target} from ticket`)
+            await source.channel.send({
+                embeds: [
+                    new MessageEmbed()
+                        .setDescription(`<@${member.id}> removed role ${target} to this ticket`)
+                        .setColor(Colors.RED)
+                ]
+            })
+            return await sendMessage(source, `Removed ${target} to ticket`)
+        }
+
+        const targetUser = await client.users.fetch(targetId)
+        if (targetUser) {
+            await source.channel.permissionOverwrites.edit(targetUser, { VIEW_CHANNEL: null })
+
+            await source.channel.send({
+                embeds: [
+                    new MessageEmbed()
+                        .setDescription(`<@${member.id}> removed user ${target} to this ticket`)
+                        .setColor(Colors.RED)
+                ]
+            })
+            return await sendMessage(source, `Removed ${target} to ticket`)
+        }
+
+
+        return await sendMessage(source, `Couldn't get type of ${target}`)
     }
 }
