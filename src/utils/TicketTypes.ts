@@ -102,13 +102,11 @@ const CATEGORY = config.production ? {
 const CHANNEL = config.production ? {
     NEW_TICKETS: "988565627943931934",
     TC_TRANSCRIPTS: "945097851195777054",
-    VERIFIED_TRANSCRIPTS: "873920651742814318",
     STAFF_TRANSCRIPTS: "812974281461596221",
     FEIYUN_TRANSCRIPTS: "954151143842398260"
 } : {
     NEW_TICKETS: "981316199185014806",
     TC_TRANSCRIPTS: "980924167648079892",
-    VERIFIED_TRANSCRIPTS: "984846200492666880",
     STAFF_TRANSCRIPTS: "986748960041467954",
     FEIYUN_TRANSCRIPTS: "986748960041467954"
 }
@@ -162,7 +160,6 @@ export const ticketTypes: Record<string, TicketType> = {
         }],
         verifiedCategory: CATEGORY.PUBLISHING,
         verifiedRoles: [ROLE.CONTRIBUTOR],
-        verifiedChannel: CHANNEL.VERIFIED_TRANSCRIPTS,
         dumpChannel: CHANNEL.TC_TRANSCRIPTS,
         creationChannel: CHANNEL.NEW_TICKETS,
         dinkDonk: {
@@ -237,7 +234,6 @@ export const ticketTypes: Record<string, TicketType> = {
                 style: "PRIMARY"
             }
         }],
-        verifiedChannel: CHANNEL.VERIFIED_TRANSCRIPTS,
         dumpChannel: CHANNEL.TC_TRANSCRIPTS,
         creationChannel: CHANNEL.NEW_TICKETS,
         dinkDonk: {
@@ -290,7 +286,6 @@ export const ticketTypes: Record<string, TicketType> = {
         }],
         verifiedCategory: CATEGORY.PUBLISHING,
         verifiedRoles: [ROLE.CONTRIBUTOR],
-        verifiedChannel: CHANNEL.VERIFIED_TRANSCRIPTS,
         dumpChannel: CHANNEL.TC_TRANSCRIPTS,
         creationChannel: CHANNEL.NEW_TICKETS
     },
@@ -342,7 +337,6 @@ export const ticketTypes: Record<string, TicketType> = {
         }],
         verifiedCategory: CATEGORY.PUBLISHING,
         verifiedRoles: [ROLE.WET],
-        verifiedChannel: CHANNEL.VERIFIED_TRANSCRIPTS,
         dumpChannel: CHANNEL.TC_TRANSCRIPTS,
         creationChannel: CHANNEL.NEW_TICKETS,
         dinkDonk: {
