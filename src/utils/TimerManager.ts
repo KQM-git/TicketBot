@@ -151,7 +151,7 @@ export default class TimerManager {
             })
             const open = allTickets.filter(t => t.status == TicketStatus.OPEN)
 
-            Logger.info(`Handling ${open.length} tickets for dink donks and updating ticket directories for ${allTickets.length} tickets`)
+            Logger.debug(`Handling ${open.length} tickets for dink donks and updating ticket directories for ${allTickets.length} tickets`)
 
             try {
                 await this.dinkdonk(open)
@@ -171,7 +171,7 @@ export default class TimerManager {
         const nextCheck = new Date()
         nextCheck.setMinutes(nextCheck.getMinutes() + 15 - nextCheck.getMinutes() % 15, 0, 0)
         const delay = nextCheck.getTime() - Date.now()
-        Logger.info(`Scheduling next check in ${(delay / 1000).toFixed(1)}s at ${nextCheck.toISOString()}`)
+        Logger.debug(`Scheduling next check in ${(delay / 1000).toFixed(1)}s at ${nextCheck.toISOString()}`)
         setTimeout(async () => this.runTask().catch((e) => Logger.error(e)), delay)
     }
 }

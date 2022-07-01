@@ -18,7 +18,7 @@ export async function handle(old: User, user: User): Promise<void> {
             }
         })
         if (response.count > 0)
-            Logger.info(`Updated user ${user.id}: ${old.username}#${old.discriminator} -> ${user.username}#${user.discriminator} / ${user.avatar} -> ${old.avatar}`)
+            Logger.debug(`Updated user ${user.id}: ${old.username}#${old.discriminator} -> ${user.username}#${user.discriminator} / ${user.avatar} -> ${old.avatar}`)
     } catch (error) {
         Logger.error(error)
     }

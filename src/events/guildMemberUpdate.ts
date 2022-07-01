@@ -18,7 +18,7 @@ export async function handle(old: GuildMember, member: GuildMember): Promise<voi
             }
         })
         if (response.count > 0)
-            Logger.info(`Updated member ${member.id}: ${old.nickname} -> ${member.nickname} / ${old.displayHexColor} -> ${member.displayHexColor} in ${member.guild.id}`)
+            Logger.debug(`Updated member ${member.id}: ${old.nickname} -> ${member.nickname} / ${old.displayHexColor} -> ${member.displayHexColor} in ${member.guild.id}`)
     } catch (error) {
         Logger.error(error)
     }
