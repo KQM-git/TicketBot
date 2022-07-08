@@ -148,7 +148,7 @@ export default class TranscriptionManager {
                 attachments: msg.attachments.map(a => this.mapAttachment(a)),
                 reactions: msg.reactions.cache.map(r => this.mapReactions(r)),
                 embeds: msg.embeds.map(e => this.mapEmbeds(e, relevantRoles, relevantUsers, relevantChannels)),
-                content: this.parseText(msg.content, relevantRoles, relevantUsers, relevantChannels),
+                content: this.parseText(msg.content, relevantRoles, relevantUsers, relevantChannels) ?? "",
                 components: msg.components.map(c => this.mapRow(c)),
                 stickers: msg.stickers.toJSON() as unknown as Enumerable<InputJsonValue>,
                 reply: msg.reference?.messageId,
@@ -565,8 +565,10 @@ export default class TranscriptionManager {
             timestamp: e.timestamp ?? undefined,
         }
     }
-    private parseText<T>(text: T, relevantRoles: Set<string>, relevantUsers: Set<string>, relevantChannels: Set<string>): T {
-        if (typeof text !== "string") return text
+
+    private parseText(text: string | null, relevantRoles: Set<string>, relevantUsers: Set<string>, relevantChannels: Set<string>): string | null {
+        if (typeof text !== "string")
+            return text
 
         for (const role of text.matchAll(MessageMentions.ROLES_PATTERN))
             relevantRoles.add(role[1])
@@ -577,7 +579,8 @@ export default class TranscriptionManager {
         for (const channel of text.matchAll(MessageMentions.CHANNELS_PATTERN))
             relevantChannels.add(channel[1])
 
-        return text
+        // eslint-disable-next-line no-control-regex
+        return text.replace(/[\u0000-\u001F]/g, "?")
     }
 
     private mapRow(c: MessageActionRow) {
