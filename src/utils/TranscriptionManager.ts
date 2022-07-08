@@ -224,7 +224,7 @@ export default class TranscriptionManager {
             if (queued.dumpChannelId)
                 try {
                     const channel = await this.client.channels.fetch(queued.dumpChannelId)
-                    const fullTranscript = await this.prisma.transcript.findUnique({
+                    const fullTranscript = fetched > 10000 ? null : await this.prisma.transcript.findUnique({
                         where: { id: queued.transcriptId },
                         include: {
                             messages: {
