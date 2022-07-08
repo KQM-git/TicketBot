@@ -227,7 +227,9 @@ export default class TranscriptionManager {
                     const fullTranscript = await this.prisma.transcript.findUnique({
                         where: { id: queued.transcriptId },
                         include: {
-                            messages: true,
+                            messages: {
+                                take: 10000
+                            },
                             server: true,
                             channel: true,
                             mentionedChannels: true,
