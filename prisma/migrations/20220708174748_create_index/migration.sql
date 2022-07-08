@@ -1,0 +1,1 @@
+CREATE INDEX "transcriptionId" ON "Message" ("transcriptId");
