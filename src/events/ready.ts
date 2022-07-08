@@ -21,19 +21,28 @@ export async function handle(): Promise<void> {
     const cmds: ApplicationCommandData[] = client.commands
         .array()
         .filter(cmd => cmd.category !== "Admin")
-        .map(cmd => {
+        .flatMap(cmd => {
             const help = (cmd.shortHelp ?? cmd.help).split("\n")[0]
             const name = cmd.commandName
 
             if (help.length > 99)
                 Logger.error(`${name}'s description is too long'`)
 
-            return {
+            const cmds: ApplicationCommandData[] = [{
                 name,
                 options: cmd.options,
                 description: help.substring(0, 100),
                 // TODO default permissions?
-            }
+            }]
+
+            if (cmd.onMessage)
+                for (const name of cmd.onMessage)
+                    cmds.push({
+                        name,
+                        type: "MESSAGE"
+                    })
+
+            return cmds
         })
 
     try {

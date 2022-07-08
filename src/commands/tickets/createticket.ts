@@ -56,6 +56,7 @@ export default class CreateTicket extends Command {
             .setLabel("Name")
             .setStyle("SHORT")
             .setPlaceholder("Enter a name for your ticket")
+            .setRequired(true)
 
         const modal = new Modal()
             .setTitle(`Creating a ${ticketType.name}`)

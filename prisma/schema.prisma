@@ -25,6 +25,8 @@ model Ticket {
   creatorId        String
   server           Server         @relation(fields: [serverId], references: [id])
   serverId         String
+  theoryhunt       Theoryhunt?    @relation(fields: [theoryhuntId], references: [id])
+  theoryhuntId     Int?
   verifications    Verification[]
   transcript       Transcript[]
   contributors     User[]         @relation("contributes")
@@ -68,17 +70,17 @@ model QueuedTranscript {
 }
 
 model Verification {
-  id           Int         @id @default(autoincrement())
-  createdAt    DateTime    @default(now())
-  channelId    String
-  channelName  String
-  type         String      @default("DEFAULT")
-  verifier     User        @relation(fields: [userId, serverId], references: [discordId, serverId])
-  userId       String
-  server       Server      @relation(fields: [serverId], references: [id])
-  serverId     String
-  ticket       Ticket      @relation(fields: [ticketsId], references: [id])
-  ticketsId    Int
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  channelId   String
+  channelName String
+  type        String   @default("DEFAULT")
+  verifier    User     @relation(fields: [userId, serverId], references: [discordId, serverId])
+  userId      String
+  server      Server   @relation(fields: [serverId], references: [id])
+  serverId    String
+  ticket      Ticket   @relation(fields: [ticketsId], references: [id])
+  ticketsId   Int
 }
 
 model User {
@@ -101,6 +103,8 @@ model User {
   tickets           Ticket[]           @relation("created")
   contributed       Ticket[]           @relation("contributes")
 
+  Theoryhunt   Theoryhunt? @relation(fields: [theoryhuntId], references: [id])
+  theoryhuntId Int?
   @@unique([discordId, serverId])
 }
 
@@ -149,6 +153,7 @@ model Server {
   ticketDirectory   TicketDirectory[]
   roles             Role[]
   channels          Channel[]
+  Theoryhunt        Theoryhunt[]
 }
 
 model Message {
@@ -181,4 +186,21 @@ model TicketDirectory {
   type      String
 
   @@unique([channelId, serverId, type])
+}
+
+model Theoryhunt {
+  id               Int      @id @default(autoincrement())
+  createdAt        DateTime @default(now())
+  server           Server   @relation(fields: [serverId], references: [id])
+  serverId         String
+  messageId        String   @unique
+  name             String
+  description      String   @default("")
+  difficulty       String
+  difficultyReason String
+  requirements     String
+  details          String
+  state            String
+  commissioner     User[]
+  ticket           Ticket[]
 }

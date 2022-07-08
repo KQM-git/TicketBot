@@ -5,6 +5,7 @@ import Command from "../../utils/Command"
 import { buttons, ticketTypes } from "../../utils/TicketTypes"
 import { CommandSource, SendMessage, TicketStatus } from "../../utils/Types"
 import { sendMessage } from "../../utils/Utils"
+import { thInclude, updateTHMessage } from "./theoryhunt"
 
 const Logger = getLogger("close")
 export default class CloseTicket extends Command {
@@ -105,12 +106,15 @@ export default class CloseTicket extends Command {
             components
         })
 
-        await client.prisma.ticket.update({
+        const updatedTicket = await client.prisma.ticket.update({
             where: { id: ticket.id },
             data: {
                 status: TicketStatus.CLOSED
             },
+            include: { theoryhunt: { include: thInclude } }
         })
+
+        await updateTHMessage(updatedTicket.theoryhunt)
 
         return await sendMessage(source, "Closed ticket!")
     }

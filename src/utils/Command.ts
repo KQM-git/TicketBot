@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionData, AutocompleteInteraction, ButtonInteraction, CommandInteraction, Message, ModalSubmitInteraction } from "discord.js"
+import { ApplicationCommandOptionData, AutocompleteInteraction, ButtonInteraction, CommandInteraction, Message, MessageContextMenuInteraction, ModalSubmitInteraction } from "discord.js"
 
 import config from "../data/config.json"
 import { CommandResponse, CommandSource, SendMessage } from "./Types"
@@ -10,6 +10,7 @@ export interface CommandOptions {
     aliases?: string[]
     help: string
     shortHelp?: string
+    onMessage?: string[]
     usage: false | string
     category: CommandCategory
     options: ApplicationCommandOptionData[]
@@ -17,6 +18,7 @@ export interface CommandOptions {
 
 export default abstract class Command {
     public readonly commandName: string
+    public readonly onMessage?: string[]
     public readonly aliases: string[]
     public readonly usage: string | false
     public readonly help: string
@@ -32,6 +34,7 @@ export default abstract class Command {
         this.category = options.category
         this.shortHelp = options.shortHelp
         this.options = options.options
+        this.onMessage = options.onMessage
     }
 
     abstract runInteraction(source: CommandInteraction, command: string): CommandResponse
@@ -43,6 +46,12 @@ export default abstract class Command {
         })
     }
     async runModalSubmit(source: ModalSubmitInteraction, _command: string): Promise<void> {
+        await source.reply({
+            content: "An error occurred",
+            ephemeral: true
+        })
+    }
+    async runMessageContext(source: MessageContextMenuInteraction, _command: string): Promise<void> {
         await source.reply({
             content: "An error occurred",
             ephemeral: true

@@ -36,7 +36,7 @@ export async function createTicket(ticketType: TicketType, name: string, member:
             type: ticketType.id,
             server: client.transcriptionManager.getServer(guild),
             creator: await client.transcriptionManager.connectUser(member, guild.id),
-            contributors: await client.transcriptionManager.connectUser(member, guild.id),
+            contributors: ticketType.id == "theoryhunt" ? undefined : await client.transcriptionManager.connectUser(member, guild.id),
         },
         select: { id: true }
     })

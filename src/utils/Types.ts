@@ -1,8 +1,9 @@
 import { APIMessage } from "discord-api-types/v9"
-import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButtonStyle, MessageEmbedOptions, ModalSubmitInteraction, NewsChannel, TextChannel, ThreadChannel } from "discord.js"
+import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButtonStyle, MessageContextMenuInteraction, MessageEmbedOptions, ModalSubmitInteraction, NewsChannel, TextChannel, ThreadChannel } from "discord.js"
 
 // Discord shortcuts
-export type CommandSource = Message | CommandInteraction | ModalSubmitInteraction | ButtonInteraction
+export type InteractionSource = CommandInteraction | ButtonInteraction | MessageContextMenuInteraction
+export type CommandSource = Message | InteractionSource | ModalSubmitInteraction
 export type SendMessage = Message | APIMessage
 export type CommandResponse = Promise<unknown> | unknown
 
@@ -117,6 +118,10 @@ export type ChannelInput = {
     type: string
 }
 
+export type UserConnection = {
+    where: { discordId_serverId: { discordId: string, serverId: string } }
+    create: UserInput
+}
 
 export type Enumerable<T> = T | Array<T>
 export type InputJsonValue = string | number | boolean | InputJsonObject | InputJsonArray

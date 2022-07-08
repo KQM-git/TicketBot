@@ -1,10 +1,11 @@
-import { BaseGuildTextChannel, ButtonInteraction, CommandInteraction, Message, MessageEmbed, User } from "discord.js"
+import { BaseGuildTextChannel, ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButton, MessageEmbed, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
 import { ticketTypes } from "../../utils/TicketTypes"
 import { CommandSource, EndingAction, SendMessage, TicketStatus, VerifierType } from "../../utils/Types"
 import { Colors, isTicketable, sendMessage, verificationTypeName } from "../../utils/Utils"
+import { thInclude, updateTHMessage } from "./theoryhunt"
 
 const Logger = getLogger("verify")
 export default class VerifyTicket extends Command {
@@ -151,13 +152,21 @@ export default class VerifyTicket extends Command {
             }
 
             Logger.info(`Giving contribution role for ${member.id} (${member.user.tag}) from ticket ${ticket.id}: ${ticket.name}`)
-            const response = await source.channel.send({ embeds: [ new MessageEmbed().setTitle("Creating transcript...").setColor(Colors.ORANGE) ] })
+            const response = await source.channel.send({
+                embeds: [ new MessageEmbed().setTitle("Creating transcript...").setColor(Colors.ORANGE) ],
+                components: ticket.theoryhuntId ? [new MessageActionRow().addComponents(
+                    new MessageButton()
+                        .setCustomId(`theoryhunt-close-${ticket.theoryhuntId}`)
+                        .setLabel("Mark theoryhunt as done")
+                        .setStyle("SUCCESS")
+                )] : []
+            })
             if (response)
                 await client.transcriptionManager.startTranscript(source.channel, response, undefined, response.id, member, source.channel.name, ticketType.dumpChannel, EndingAction.VERIFIED)
         }
 
 
-        await client.prisma.ticket.update({
+        const updatedTicket = await client.prisma.ticket.update({
             where: { id: ticket.id },
             data: {
                 status: enough ? TicketStatus.VERIFIED : undefined,
@@ -170,8 +179,11 @@ export default class VerifyTicket extends Command {
                         type: type,
                     }
                 }
-            }
+            },
+            include: { theoryhunt: { include: thInclude } }
         })
+
+        await updateTHMessage(updatedTicket.theoryhunt)
 
         Logger.info(`Verified ticket ${ticket.id}: ${ticket.name} by ${user.id} (${user.tag})`)
         return await sendMessage(source, "Verified ticket!")

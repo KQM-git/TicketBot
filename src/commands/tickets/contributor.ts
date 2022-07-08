@@ -5,6 +5,7 @@ import Command from "../../utils/Command"
 import { ticketTypes } from "../../utils/TicketTypes"
 import { CommandSource, SendMessage } from "../../utils/Types"
 import { Colors, sendMessage } from "../../utils/Utils"
+import { thInclude, updateTHMessage } from "./theoryhunt"
 
 const Logger = getLogger("contributor")
 export default class ContributorTicket extends Command {
@@ -88,14 +89,17 @@ export default class ContributorTicket extends Command {
 
 
             Logger.info(`Adding ${target.id} (${target.tag}) as contributor to ${ticket.id} (${ticket.name}) by ${member.id} (${member.user.tag})`)
-            await client.prisma.ticket.update({
+            const updatedTicket = await client.prisma.ticket.update({
                 where: {
                     id: ticket.id
                 },
                 data: {
                     contributors: await client.transcriptionManager.connectUser(targetMember, member.guild.id)
-                }
+                },
+                include: { theoryhunt: { include: thInclude } }
             })
+
+            await updateTHMessage(updatedTicket.theoryhunt)
 
             await source.channel.send({
                 embeds: [
@@ -110,7 +114,7 @@ export default class ContributorTicket extends Command {
                 return await sendMessage(source, "That user isn't listed as a contributor")
 
             Logger.info(`Removing ${target.id} (${target.tag}) as contributor from ${ticket.id} (${ticket.name}) by ${member.id} (${member.user.tag})`)
-            await client.prisma.ticket.update({
+            const updatedTicket = await client.prisma.ticket.update({
                 where: {
                     id: ticket.id
                 },
@@ -120,8 +124,11 @@ export default class ContributorTicket extends Command {
                             id: contributor.id
                         }
                     }
-                }
+                },
+                include: { theoryhunt: { include: thInclude } }
             })
+
+            await updateTHMessage(updatedTicket.theoryhunt)
 
             await source.channel.send({
                 embeds: [

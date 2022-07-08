@@ -150,13 +150,15 @@ export function isTicketable(channel: AnyChannel | GuildChannel | TextBasedChann
 }
 
 
-type Color = "GREEN" | "DARK_GREEN" | "ORANGE" | "RED" | "DARK_RED" | "AQUA" | "PURPLE" | TicketStatus
+type Difficulty = "A" | "B" | "C" | "S"
+export type Color = "GREEN" | "DARK_GREEN" | "ORANGE" | "RED" | "DARK_RED" | "AQUA" | "PURPLE" | "YELLOW" | TicketStatus | "GRAY" | Difficulty
 
 export const Colors: Record<Color, ColorResolvable> = {
     GREEN: "#00EA69",
     DARK_GREEN: "#2EF41F",
 
     ORANGE: "#F49C1F",
+    YELLOW: "#ECF400",
 
     RED: "#F7322E",
     DARK_RED: "#F4231F",
@@ -164,7 +166,14 @@ export const Colors: Record<Color, ColorResolvable> = {
     AQUA: "#07EADB",
     PURPLE: "#6B68B1",
 
+    GRAY: "#C8C8C8",
+
     OPEN: "#F49C1F",
     CLOSED: "#F4231F",
     VERIFIED: "#00EA69",
+
+    S: "#ECF400",
+    A: "#F7322E",
+    B: "#F49C1F",
+    C: "#00EA69",
 }

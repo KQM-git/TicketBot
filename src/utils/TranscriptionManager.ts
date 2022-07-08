@@ -5,7 +5,7 @@ import { EmbedField, EmbedFooterData, Guild, GuildMember, MessageActionRow, Mess
 import { getLogger } from "log4js"
 import TiBotClient from "../TiBotClient"
 import { ticketTypes } from "./TicketTypes"
-import { ChannelInput, EndingAction, Enumerable, InputJsonValue, MessageInput, RoleInput, SendMessage, TicketableChannel, UserInput, VerifierType } from "./Types"
+import { ChannelInput, EndingAction, Enumerable, InputJsonValue, MessageInput, RoleInput, SendMessage, TicketableChannel, UserConnection, UserInput, VerifierType } from "./Types"
 import { Colors, displayTimestamp, isTicketable, trim, updateMessage, verificationTypeName } from "./Utils"
 import { baseUrl } from "../data/config.json"
 
@@ -435,10 +435,7 @@ export default class TranscriptionManager {
     }
 
     public async connectUser(member: GuildMember | User, guildId: string): Promise<{
-        connectOrCreate: {
-            where: { discordId_serverId: { discordId: string, serverId: string } }
-            create: UserInput
-        }
+        connectOrCreate: UserConnection
     }> {
         return {
             connectOrCreate: {

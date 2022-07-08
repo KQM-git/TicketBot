@@ -5,6 +5,7 @@ import Command from "../../utils/Command"
 import { buttons, ticketTypes } from "../../utils/TicketTypes"
 import { CommandSource, SendMessage, TicketStatus, VerifierType } from "../../utils/Types"
 import { displayTimestamp, isTicketable, sendMessage, verificationTypeName } from "../../utils/Utils"
+import { thInclude, updateTHMessage } from "./theoryhunt"
 
 
 const Logger = getLogger("open")
@@ -88,7 +89,7 @@ export default class OpenTicket extends Command {
             )]
         })
 
-        await client.prisma.ticket.update({
+        const updatedTicket = await client.prisma.ticket.update({
             where: { id: ticket.id },
             data: {
                 status: TicketStatus.OPEN,
@@ -97,8 +98,11 @@ export default class OpenTicket extends Command {
                         channelId: source.channel.id
                     }
                 }
-            }
+            },
+            include: { theoryhunt: { include: thInclude } }
         })
+
+        await updateTHMessage(updatedTicket.theoryhunt)
         Logger.info(`Opened ticket ${source.channel.id} / ${source.channel.id} -> ${ticket.id} by ${user.id} (${user.tag})`)
 
         return await sendMessage(source, "Opened ticket!")

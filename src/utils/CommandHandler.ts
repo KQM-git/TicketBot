@@ -1,4 +1,4 @@
-import { AutocompleteInteraction, ButtonInteraction, CommandInteraction, Message, ModalSubmitInteraction } from "discord.js"
+import { AutocompleteInteraction, ButtonInteraction, CommandInteraction, Message, MessageContextMenuInteraction, ModalSubmitInteraction } from "discord.js"
 import log4js from "log4js"
 import client from "../main"
 import Command from "../utils/Command"
@@ -16,7 +16,7 @@ export function getCommand(command: string): ParsedCommand | false {
 
     // If that command doesn't exist, try to find an alias
     if (!cmd) {
-        cmd = client.commands.find((cmd: Command) => cmd.aliases.includes(command))
+        cmd = client.commands.find((cmd: Command) => cmd.aliases.includes(command) || (cmd.onMessage?.includes(command) ?? false))
 
         // If that command doesn't exist, silently exit and do nothing
         if (!cmd)
@@ -64,6 +64,21 @@ export async function handleAutoComplete(cmdInfo: ParsedCommand, interaction: Au
             await response
         const endTime = Date.now()
         Logger.debug(`Autocomplete ${cmdInfo.command} took ${midTime - startTime}ms, sending took ${endTime - midTime}ms, message->start took ${startTime - interaction.createdTimestamp}ms`)
+    } catch (error) {
+        Logger.error(error)
+    }
+}
+
+export async function handleMessageContext(cmdInfo: ParsedCommand, interaction: MessageContextMenuInteraction): Promise<void> {
+    const { command, cmd } = cmdInfo
+    try {
+        const startTime = Date.now()
+        const response = cmd.runMessageContext(interaction, command)
+        const midTime = Date.now()
+        if (response)
+            await response
+        const endTime = Date.now()
+        Logger.debug(`Message context ${cmdInfo.command} took ${midTime - startTime}ms, sending took ${endTime - midTime}ms, message->start took ${startTime - interaction.createdTimestamp}ms`)
     } catch (error) {
         Logger.error(error)
     }
