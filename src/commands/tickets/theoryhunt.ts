@@ -565,9 +565,9 @@ function createEmbed(theoryhunt: IncludedTheoryhunt) {
         .addField("Difficulty", `${theoryhunt.difficulty}${theoryhunt.difficultyReason ? ` (${theoryhunt.difficultyReason})`:""}`)
         .addField("Requirements", theoryhunt.requirements)
         .addField("Details", theoryhunt.details)
-        .addField("Commissioner", theoryhunt.commissioner.length == 0 ? "KQM" : theoryhunt.commissioner.map(c => `<@${c.discordId}>`).sort().join("\n"), true)
+        .addField("Commissioner", theoryhunt.commissioner.length == 0 ? "KQM" : theoryhunt.commissioner.map(c => `<@${c.discordId}>`).sort().join(", "), true)
         .addField("Ticket", theoryhunt.ticket.length == 0 ? "Ask a Scholar to create a ticket for you if you want to work on this." : theoryhunt.ticket.map(t => `<#${t.channelId}> [${t.status}]`).sort().join("\n"), true)
-        .addField("Participants", contributors.length == 0 ? "This could be you!" : contributors.join("\n"), contributors.length < 3)
+        .addField("Participants", contributors.length == 0 ? "This could be you!" : contributors.join(", "), contributors.length < 3)
 
     return embed
 }
