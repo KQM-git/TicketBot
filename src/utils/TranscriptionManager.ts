@@ -228,7 +228,10 @@ export default class TranscriptionManager {
                         where: { id: queued.transcriptId },
                         include: {
                             messages: {
-                                take: 10000
+                                take: 2500,
+                                orderBy: {
+                                    id: "desc"
+                                }
                             },
                             server: true,
                             channel: true,
