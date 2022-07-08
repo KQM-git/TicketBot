@@ -580,7 +580,11 @@ export default class TranscriptionManager {
             relevantChannels.add(channel[1])
 
         // eslint-disable-next-line no-control-regex
-        return text.replace(/[\u0000-\u001F]/g, "?")
+        if (text.match(/[\u0000-\u001F]/))
+            // eslint-disable-next-line no-control-regex
+            return text.replace(/[\u0000-\u001F]/g, "?")
+
+        return text
     }
 
     private mapRow(c: MessageActionRow) {
