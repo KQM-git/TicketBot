@@ -227,12 +227,6 @@ export default class TranscriptionManager {
                     const fullTranscript = fetched > 10000 ? null : await this.prisma.transcript.findUnique({
                         where: { id: queued.transcriptId },
                         include: {
-                            messages: {
-                                take: 2500,
-                                orderBy: {
-                                    id: "desc"
-                                }
-                            },
                             server: true,
                             channel: true,
                             mentionedChannels: true,
@@ -253,14 +247,29 @@ export default class TranscriptionManager {
                             users: true
                         }
                     })
+
                     if (!fullTranscript)
                         if (channel && channel.isText())
-                            await channel.send(`Couldn't fetch full transcript data? Stored stuff over at ${baseUrl}/transcripts/${transcript?.slug}`)
+                            await channel.send(`Couldn't fetch full transcript data/too big? Stored stuff is over at ${baseUrl}/transcripts/${transcript?.slug}`)
                         else Logger.error(`Couldn't send to transcript channel - couldn't fetch full transcript data? Stored stuff over at ${baseUrl}/transcripts/${transcript?.slug}`)
                     else {
                         const { ticket } = fullTranscript
+                        const messages = await this.client.prisma.message.findMany({
+                            where: {
+                                transcriptId: fullTranscript.id
+                            },
+                            take: 2500,
+                            orderBy: {
+                                id: "desc"
+                            }
+                        })
+                        const messageCount = await this.client.prisma.message.count({
+                            where: {
+                                transcriptId: fullTranscript.id
+                            }
+                        })
                         const users: [string, number][] = []
-                        fullTranscript.messages.forEach(m => {
+                        messages.forEach(m => {
                             const ud = users.find(u => u[0] == m.userId)
                             if (ud)
                                 ud[1] = ud[1] + 1
@@ -268,7 +277,7 @@ export default class TranscriptionManager {
                                 users.push([m.userId, 1])
                         })
 
-                        const dump = Buffer.from(JSON.stringify(fullTranscript/* TODO , (k, v) => v === null ? undefined : v*/))
+                        const dump = Buffer.from(JSON.stringify({ ...fullTranscript, messages }))
                         const files = dump.length < 1000 * 1000 * 8 ? [
                             new MessageAttachment(Buffer.from(dump), `transcript-${transcript?.slug}.json`)
                         ] : [
@@ -276,7 +285,7 @@ export default class TranscriptionManager {
                         ]
 
                         const embed = new MessageEmbed()
-                            .setDescription(`[Full transcript](${baseUrl}/transcripts/${transcript?.slug}) (${fullTranscript.messages.length} messages by ${users.length} users) of <#${fullTranscript.channel.discordId}> / ${fullTranscript.channel.name}`)
+                            .setDescription(`[Full transcript](${baseUrl}/transcripts/${transcript?.slug}) (${messageCount} messages by ${users.length} users) of <#${fullTranscript.channel.discordId}> / ${fullTranscript.channel.name}${messages.length < messageCount ? "\n**PARTIAL DUMP**: Due to high message count, only a partial dump is available":""}`)
 
                         if (ticket)
                             embed
