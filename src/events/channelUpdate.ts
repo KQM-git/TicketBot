@@ -7,8 +7,13 @@ const Logger = log4js.getLogger("channelUpdate")
 
 export async function handle(old: DMChannel | GuildChannel, channel: DMChannel | GuildChannel): Promise<void> {
     if (!old) return
-    if (old instanceof GuildChannel && channel instanceof GuildChannel && (old.position != channel.position || old.calculatedPosition != channel.calculatedPosition || old.rawPosition != channel.rawPosition))
-        Logger.info(`Channel move ${channel.id}: ${channel.name} | Pos: ${old.position} -> ${channel.position} / Raw: ${old.rawPosition} -> ${channel.rawPosition} / Calculated: ${old.calculatedPosition} -> ${channel.calculatedPosition}`)
+    if (old instanceof GuildChannel && channel instanceof GuildChannel && (
+        old.position != channel.position ||
+        old.calculatedPosition != channel.calculatedPosition ||
+        old.rawPosition != channel.rawPosition ||
+        old.parentId != channel.parentId
+    ))
+        Logger.info(`Channel move ${channel.id}: ${channel.name} | Pos: ${old.position} -> ${channel.position} / Raw: ${old.rawPosition} -> ${channel.rawPosition} / Calculated: ${old.calculatedPosition} -> ${channel.calculatedPosition} / Parent: ${old.parentId} -> ${channel.parentId}`)
 
     if (!isTicketable(channel) || !isTicketable(old)) return
     if (old.name == channel.name && old.type == channel.type) return
