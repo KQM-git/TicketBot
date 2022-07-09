@@ -224,7 +224,7 @@ export default class TranscriptionManager {
             if (queued.dumpChannelId)
                 try {
                     const channel = await this.client.channels.fetch(queued.dumpChannelId)
-                    const fullTranscript = fetched > 10000 ? null : await this.prisma.transcript.findUnique({
+                    const fullTranscript = fetched > 50000 ? null : await this.prisma.transcript.findUnique({
                         where: { id: queued.transcriptId },
                         include: {
                             server: true,
@@ -258,14 +258,9 @@ export default class TranscriptionManager {
                             where: {
                                 transcriptId: fullTranscript.id
                             },
-                            take: 2500,
+                            take: 10000,
                             orderBy: {
                                 id: "desc"
-                            }
-                        })
-                        const messageCount = await this.client.prisma.message.count({
-                            where: {
-                                transcriptId: fullTranscript.id
                             }
                         })
                         const users: [string, number][] = []
@@ -285,7 +280,9 @@ export default class TranscriptionManager {
                         ]
 
                         const embed = new MessageEmbed()
-                            .setDescription(`[Full transcript](${baseUrl}/transcripts/${transcript?.slug}) (${messageCount} messages by ${users.length} users) of <#${fullTranscript.channel.discordId}> / ${fullTranscript.channel.name}${messages.length < messageCount ? "\n**PARTIAL DUMP**: Due to high message count, only a partial dump is available":""}`)
+                            .setDescription(`[Full transcript](${baseUrl}/transcripts/${transcript?.slug}) (${fetched} messages by ${users.length} users) of <#${fullTranscript.channel.discordId}> / ${fullTranscript.channel.name}${
+                                messages.length < fetched ? "\n**PARTIAL DUMP**: Due to high message count, only a partial dump is available" : ""
+                            }`)
 
                         if (ticket)
                             embed
