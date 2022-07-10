@@ -89,7 +89,8 @@ export default class ChannelOrder extends Command {
 
         const category = [4, "GUILD_CATEGORY"], text = [0, "GUILD_TEXT", 5, "GUILD_NEWS"], voice = [2, "GUILD_VOICE", 13, "GUILD_STAGE_VOICE"]
 
-        const unknown = sorted.filter(x => !text.includes(x.type) && !voice.includes(x.type) && !category.includes(x.type)).map(x => x.type).filter((p, i, a) => a.indexOf(p) == i)
+        const misc = sorted.filter(x => !text.includes(x.type) && !voice.includes(x.type) && !category.includes(x.type))
+        const unknown = misc.map(x => x.type).filter((p, i, a) => a.indexOf(p) == i)
         const response: string[] = []
         if (unknown.length > 0)
             response.push(`Unknown channel types found: ${unknown.join(", ")}. Please contact me to add support and watch out for these when doing stuff!`)
@@ -109,7 +110,10 @@ export default class ChannelOrder extends Command {
                     .map(channelInfo),
                 vc: sorted
                     .filter(c => c.parentId == p.id && voice.includes(c.type))
-                    .map(channelInfo)
+                    .map(channelInfo),
+                unknown: sorted
+                    .filter(c => c.parentId == p.id && misc.find(misc => c.id == misc.id))
+                    .map(channelInfo),
             }))
 
         let lastCategory = -2, lastText = -1, lastVoice = -1
