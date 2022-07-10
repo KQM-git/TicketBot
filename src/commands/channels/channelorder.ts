@@ -107,7 +107,15 @@ export default class ChannelOrder extends Command {
         }
 
         if (command == "status") {
-            return await sendMessage(source, `**Recent moves**:
+            const latest = Math.max(0, ...recent.map(x => x.time))
+
+            return await sendMessage(source, `${
+                latest > Date.now() - 60000 ? `🔴 Recent channel movements detected! Please wait until ${displayTimestamp(new Date(latest + 60000))} and re-run this command.` :
+                    response.length > 0 ? "🟠 Server channel order is in an inconsistent state! Moving a channel might take a while!" :
+                        "🟢 Everything looks okay from here!"
+            }
+
+**Recent moves**:
 ${recent.map(r => `${displayTimestamp(new Date(r.time))}: ${r.msg}`).join("\n") || "*None noticed*"}
 
 **Current order issues**:
