@@ -172,7 +172,7 @@ ${response.join("\n") || "*No inconsistencies found!*"}`.substring(0, 1900), und
 
                 if (dumpCategory == null) {
                     lastText = justAdd(category.text, lastText)
-                    // lastVoice = justAdd(category.vc, lastVoice)
+                    lastVoice = justAdd(category.vc, lastVoice)
                     continue
                 }
 
