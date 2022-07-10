@@ -1,4 +1,5 @@
-import { ChannelPosition, CommandInteraction, Message, MessageAttachment, NonThreadGuildBasedChannel, ThreadChannel, User } from "discord.js"
+import { APIInteractionDataResolvedChannel } from "discord-api-types/v10"
+import { ChannelPosition, CommandInteraction, GuildBasedChannel, Message, MessageAttachment, NonThreadGuildBasedChannel, ThreadChannel, User } from "discord.js"
 import { getLogger } from "log4js"
 import fetch from "node-fetch"
 import client from "../../main"
@@ -16,7 +17,7 @@ export default class ChannelOrder extends Command {
             name,
             category: "Channels",
             help: "Some commands related to channel ordering.",
-            usage: "channelorder <status/dump>",
+            usage: "channelorder <status/dump> [category]",
             aliases: [],
             options: [{
                 name: "status",
@@ -35,6 +36,10 @@ export default class ChannelOrder extends Command {
                     description: "Dump to restore from",
                     type: "ATTACHMENT",
                     required: true
+                }, {
+                    name: "category",
+                    description: "Category to restore, defaults to all channels",
+                    type: "CHANNEL",
                 }]
             }]
         })
@@ -42,7 +47,7 @@ export default class ChannelOrder extends Command {
 
     async runInteraction(source: CommandInteraction): Promise<SendMessage | undefined> {
         await source.deferReply({ ephemeral: true })
-        return this.run(source, source.user, source.options.getSubcommand(true), source.options.getAttachment("data", false))
+        return this.run(source, source.user, source.options.getSubcommand(true), source.options.getAttachment("data", false), source.options.getChannel("category", false))
     }
 
     async runMessage(source: Message, args: string[]): Promise<SendMessage | undefined> {
@@ -52,7 +57,7 @@ export default class ChannelOrder extends Command {
         return this.run(source, source.author, args[0].toLowerCase())
     }
 
-    async run(source: CommandSource, user: User, command: string, attachment?: MessageAttachment | null): Promise<SendMessage | undefined> {
+    async run(source: CommandSource, user: User, command: string, attachment?: MessageAttachment | null, onlyMove?: APIInteractionDataResolvedChannel | GuildBasedChannel | null): Promise<SendMessage | undefined> {
         if (!source.guild) return await sendMessage(source, "Couldn't get guild data", undefined, true)
 
         const member = await source.guild.members.fetch(user.id)
@@ -83,7 +88,7 @@ export default class ChannelOrder extends Command {
         const unknown = sorted.filter(x => !text.includes(x.type) && !voice.includes(x.type) && !category.includes(x.type)).map(x => x.type).filter((p, i, a) => a.indexOf(p) == i)
         const response: string[] = []
         if (unknown.length > 0)
-            response.push(`Unknown channel types found: ${unknown.join(", ")}`)
+            response.push(`Unknown channel types found: ${unknown.join(", ")}. Please contact me to add support and watch out for these when doing stuff!`)
 
         const categories = sorted.filter(c => category.includes(c.type))
         const data = [
@@ -124,11 +129,15 @@ export default class ChannelOrder extends Command {
             }
         }
 
+        function shouldMove(channel: { id: string }, category: { id: string | null }) {
+            return !onlyMove || onlyMove.id == channel.id || onlyMove.id == category.id
+        }
+
         const latest = channelUpdates[source.guild.id] ? Math.max(0, ...(channelUpdates[source.guild.id]?.map(x => x.time) ?? [])) : 0
-        const hasRecentMove = latest > Date.now() - 60000
+        const hasRecentMove = latest > Date.now() - 30000
         if (command == "status") {
             return await sendMessage(source, `${
-                hasRecentMove ? `🔴 Recent channel movements detected! Please wait until ${displayTimestamp(new Date(latest + 60000))} and re-run this command.` :
+                hasRecentMove ? `🔴 Recent channel movements detected! Please wait until ${displayTimestamp(new Date(latest + 35000))} and re-run this command.` :
                     response.length > 0 ? "🟠 Server channel order is in an inconsistent state! Moving a channel might take a while!" :
                         "🟢 Everything looks okay from here!"
             }
@@ -166,7 +175,7 @@ ${response.join("\n") || "*No inconsistencies found!*"}`.substring(0, 1900), und
                 // eslint-disable-next-line no-inner-declarations
                 function justAdd(channels: typeof category.text, position: number) {
                     for (const channel of channels) {
-                        if (channel.position != position)
+                        if (channel.position != position && shouldMove(channel, category))
                             if (channel.canMove)
                                 movement.push({ channel: channel.id, position })
                             else
@@ -215,7 +224,7 @@ ${response.join("\n") || "*No inconsistencies found!*"}`.substring(0, 1900), und
                     */
 
                     for (const channel of newOrder) {
-                        if (channel.position != position)
+                        if (channel.position != position && shouldMove(channel, category))
                             if (channel.canMove)
                                 movement.push({ channel: channel.id, position })
                             else
