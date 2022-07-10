@@ -1,6 +1,6 @@
 import { DMChannel, GuildChannel } from "discord.js"
 import log4js from "log4js"
-import { recent } from "../commands/channels/channelorder"
+import { channelUpdates } from "../commands/channels/channelorder"
 import client from "../main"
 import { isTicketable } from "../utils/Utils"
 
@@ -14,6 +14,9 @@ export async function handle(old: DMChannel | GuildChannel, channel: DMChannel |
         old.parentId != channel.parentId
     )) {
         Logger.info(`Channel moved: ${channel.name} (${channel.type} / ${channel.id}) | Raw position: ${old.rawPosition} -> ${channel.rawPosition} / Parent: ${old.parentId} -> ${channel.parentId}`)
+
+        const recent = channelUpdates[channel.guild.id] ?? []
+        channelUpdates[channel.guild.id] = recent
 
         while (recent.length > 5)
             recent.shift()

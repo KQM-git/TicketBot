@@ -4,7 +4,7 @@ import { ROLE } from "../../utils/TicketTypes"
 import { CommandSource, SendMessage } from "../../utils/Types"
 import { displayTimestamp, sendMessage } from "../../utils/Utils"
 
-export const recent: {time: number, msg: string}[] = []
+export const channelUpdates: Record<string, {time: number, msg: string}[] | undefined> = {}
 
 export default class ChannelOrder extends Command {
     constructor(name: string) {
@@ -108,7 +108,7 @@ export default class ChannelOrder extends Command {
         }
 
         if (command == "status") {
-            const latest = Math.max(0, ...recent.map(x => x.time))
+            const latest = channelUpdates[source.guild.id] ? Math.max(0, ...(channelUpdates[source.guild.id]?.map(x => x.time) ?? [])) : 0
 
             return await sendMessage(source, `${
                 latest > Date.now() - 60000 ? `🔴 Recent channel movements detected! Please wait until ${displayTimestamp(new Date(latest + 60000))} and re-run this command.` :
@@ -117,7 +117,7 @@ export default class ChannelOrder extends Command {
             }
 
 **Recent moves**:
-${recent.map(r => `${displayTimestamp(new Date(r.time))}: ${r.msg}`).join("\n") || "*None noticed*"}
+${channelUpdates[source.guild.id]?.map(r => `${displayTimestamp(new Date(r.time))}: ${r.msg}`).join("\n") || "*None noticed*"}
 
 **Current order issues**:
 ${response.join("\n") || "*No inconsistencies found!*"}`.substring(0, 1900), undefined, true)
