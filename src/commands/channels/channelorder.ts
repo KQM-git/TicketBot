@@ -144,6 +144,9 @@ ${response.join("\n") || "*No inconsistencies found!*"}`.substring(0, 1900), und
             })
             return await sendMessage(source, "Send in DMs!", undefined, true)
         } else if (command == "restore" && attachment) {
+            if (!member.roles.cache.hasAny(...ROLE.ADMIN_LIKE) || !member.permissions.has("ADMINISTRATOR"))
+                return await sendMessage(source, "You are not an admin", undefined, true)
+
             if (!attachment.contentType?.startsWith("application/json"))
                 return await sendMessage(source, `Invalid content type ${attachment.contentType}, expected application/json`, undefined, true)
 
