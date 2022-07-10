@@ -124,11 +124,11 @@ export default class ChannelOrder extends Command {
             }
         }
 
+        const latest = channelUpdates[source.guild.id] ? Math.max(0, ...(channelUpdates[source.guild.id]?.map(x => x.time) ?? [])) : 0
+        const hasRecentMove = latest > Date.now() - 60000
         if (command == "status") {
-            const latest = channelUpdates[source.guild.id] ? Math.max(0, ...(channelUpdates[source.guild.id]?.map(x => x.time) ?? [])) : 0
-
             return await sendMessage(source, `${
-                latest > Date.now() - 60000 ? `🔴 Recent channel movements detected! Please wait until ${displayTimestamp(new Date(latest + 60000))} and re-run this command.` :
+                hasRecentMove ? `🔴 Recent channel movements detected! Please wait until ${displayTimestamp(new Date(latest + 60000))} and re-run this command.` :
                     response.length > 0 ? "🟠 Server channel order is in an inconsistent state! Moving a channel might take a while!" :
                         "🟢 Everything looks okay from here!"
             }
@@ -142,13 +142,16 @@ ${response.join("\n") || "*No inconsistencies found!*"}`.substring(0, 1900), und
             await member.send({
                 files: [new MessageAttachment(Buffer.from(JSON.stringify(data, undefined, 4)), `channels-${source.guild.id}-${new Date().toISOString().replace(/:|T/g, "-").replace("Z", "")}.json`)]
             })
-            return await sendMessage(source, "Send in DMs!", undefined, true)
+            return await sendMessage(source, hasRecentMove ? "🔴 Recent channel movements detected! Data send might not be correct! (Refer to /channelorder status for more info)" : "Send in DMs!", undefined, true)
         } else if (command == "restore" && attachment) {
             if (!member.roles.cache.hasAny(...ROLE.ADMIN_LIKE) || !member.permissions.has("ADMINISTRATOR"))
                 return await sendMessage(source, "You are not an admin", undefined, true)
 
             if (!attachment.contentType?.startsWith("application/json"))
                 return await sendMessage(source, `Invalid content type ${attachment.contentType}, expected application/json`, undefined, true)
+
+            if (hasRecentMove)
+                return await sendMessage(source, "🔴 Recent channel movements detected! Please wait a bit and try again. (Refer to /channelorder status for more info)", undefined, true)
 
             const dump = await (await fetch(attachment.url)).json() as typeof data
 
