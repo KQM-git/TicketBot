@@ -27,6 +27,7 @@ export default class ChannelOrder extends Command {
     }
 
     async runInteraction(source: CommandInteraction): Promise<SendMessage | undefined> {
+        await source.deferReply({ ephemeral: true })
         return this.run(source, source.user, source.options.getSubcommand(true))
     }
 
