@@ -28,6 +28,10 @@ export default class ChannelOrder extends Command {
                 description: "Dump current channel positions",
                 type: "SUB_COMMAND"
             }, {
+                name: "stabilize",
+                description: "Force re-ordering to prepare for human movement",
+                type: "SUB_COMMAND"
+            }, {
                 name: "restore",
                 description: "Restore channel positions from data file",
                 type: "SUB_COMMAND",
@@ -151,18 +155,23 @@ ${response.join("\n") || "*No inconsistencies found!*"}`.substring(0, 1900), und
             await member.send({
                 files: [new MessageAttachment(Buffer.from(JSON.stringify(data, undefined, 4)), `channels-${source.guild.id}-${new Date().toISOString().replace(/:|T/g, "-").replace("Z", "")}.json`)]
             })
-            return await sendMessage(source, hasRecentMove ? "🔴 Recent channel movements detected! Data send might not be correct! (Refer to /channelorder status for more info)" : "Send in DMs!", undefined, true)
-        } else if (command == "restore" && attachment) {
+            return await sendMessage(source, hasRecentMove ? "🔴 Recent channel movements detected! Data send might not be correct! (Refer to `/channelorder status` for more info)" : "Send in DMs!", undefined, true)
+        } else if (command == "restore" || command == "stabilize") {
             if (!member.roles.cache.hasAny(...ROLE.ADMIN_LIKE) || !member.permissions.has("ADMINISTRATOR"))
                 return await sendMessage(source, "You are not an admin", undefined, true)
 
-            if (!attachment.contentType?.startsWith("application/json"))
-                return await sendMessage(source, `Invalid content type ${attachment.contentType}, expected application/json`, undefined, true)
-
+            if (unknown.length > 0)
+                return await sendMessage(source, `Unknown channel types found: ${unknown.join(", ")}. Please contact me to add support and watch out for these when doing stuff!`, undefined, true)
             if (hasRecentMove)
-                return await sendMessage(source, "🔴 Recent channel movements detected! Please wait a bit and try again. (Refer to /channelorder status for more info)", undefined, true)
+                return await sendMessage(source, "🔴 Recent channel movements detected! Please wait a bit and try again. (Refer to `/channelorder status` for more info)", undefined, true)
 
-            const dump = await (await fetch(attachment.url)).json() as typeof data
+            let dump: typeof data = []
+            if (attachment) {
+                if (!attachment.contentType?.startsWith("application/json"))
+                    return await sendMessage(source, `Invalid content type ${attachment.contentType}, expected application/json`, undefined, true)
+
+                dump = await (await fetch(attachment.url)).json()
+            }
 
             const movement: ChannelPosition[] = []
             const cantMove: ChannelPosition[] = []
