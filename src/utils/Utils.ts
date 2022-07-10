@@ -1,4 +1,4 @@
-import { AnyChannel, ColorResolvable, GuildChannel, Message, MessageActionRow, MessageEmbed, TextBasedChannel } from "discord.js"
+import { AnyChannel, ColorResolvable, GuildChannel, Message, MessageActionRow, MessageAttachment, MessageEmbed, TextBasedChannel } from "discord.js"
 import log4js from "log4js"
 import client from "../main"
 import { CommandSource, SendMessage, TicketableChannel, TicketStatus, VerifierType } from "./Types"
@@ -39,7 +39,7 @@ export const verificationTypeName: Record<VerifierType, string> = {
     GUIDE: "Guide"
 }
 
-export async function sendMessage(source: CommandSource, response: string | MessageEmbed, components?: (MessageActionRow)[], ephemeral?: boolean): Promise<SendMessage | undefined> {
+export async function sendMessage(source: CommandSource, response: string | MessageEmbed, components?: (MessageActionRow)[], ephemeral?: boolean, files?: MessageAttachment[]): Promise<SendMessage | undefined> {
     let embeds: (MessageEmbed)[] | undefined
     let content: string | undefined
 
@@ -50,16 +50,16 @@ export async function sendMessage(source: CommandSource, response: string | Mess
 
     try {
         if (source instanceof Message)
-            return await source.reply({ content, embeds, components, allowedMentions: {
+            return await source.reply({ content, embeds, components, files, allowedMentions: {
                 parse: [],
                 repliedUser: false,
                 roles: [],
                 users: []
             } })
         else if (source.deferred)
-            return await source.editReply({ content, embeds, components })
+            return await source.editReply({ content, embeds, components, files })
         else
-            return await source.reply({ content, embeds, components, fetchReply: true, ephemeral, allowedMentions: {
+            return await source.reply({ content, embeds, components, files, fetchReply: true, ephemeral, allowedMentions: {
                 parse: [],
                 repliedUser: false,
                 roles: [],

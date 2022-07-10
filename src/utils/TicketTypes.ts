@@ -29,7 +29,7 @@ export const buttons = {
         .setStyle("LINK")
 }
 
-const ROLE = config.production ? {
+export const ROLE = config.production ? {
     LIBSUB: "953173415836147792",
     GUIDESUBS: "939413668553179147",
     CONTRIBUTOR: "764838634280845312",
@@ -77,7 +77,7 @@ const ROLE = config.production ? {
     FEIYUN_ADMIN: "980899219235807302" // SAME AS STAFF
 }
 
-const CATEGORY = config.production ? {
+export const CATEGORY = config.production ? {
     GUIDES: "953147741415018526",
     TC_PROJECT: "953342753557868604",
     OPEN_SUBS: "953155656125411419",
@@ -99,7 +99,7 @@ const CATEGORY = config.production ? {
     FEIYUN_CLOSED: "982768252033835058",
 }
 
-const CHANNEL = config.production ? {
+export const CHANNEL = config.production ? {
     NEW_TICKETS: "988565627943931934",
     TC_TRANSCRIPTS: "945097851195777054",
     THEORYHUNT: "782067573276672061",
