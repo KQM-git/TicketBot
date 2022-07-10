@@ -94,6 +94,11 @@ export default class CreateTicket extends Command {
         if (!member.roles.cache.hasAny(...ticketType.creationRoles))
             return await sendMessage(source, "You don't have one of the roles required to create this type of ticket", undefined, true)
 
+        if (ticketType.blacklistNames)
+            for (const blacklist of ticketType.blacklistNames)
+                if ((!blacklist.until || blacklist.until.getTime() > Date.now())  && blacklist.regex.test(name))
+                    return await sendMessage(source, blacklist.message, undefined, true)
+
         try {
             const id = await createTicket(ticketType, name, member, source.guild)
             return await sendMessage(source, `Created ${ticketType.name}: ${name} over at <#${id}>!`, undefined, true)

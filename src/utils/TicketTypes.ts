@@ -49,6 +49,7 @@ export const ROLE = config.production ? {
     ],
     ADMIN: "810410368622395392",
     ADMIN_LIKE: [
+        "953166494789926962", // Pillar Head
         "822707646393745409", // Pillar Vice Head
         "810410368622395392", // Keqing's Key
         "995096399983149078", // Emissary
@@ -206,6 +207,11 @@ export const ticketTypes: Record<string, TicketType> = {
         },
         creationRoles: [ROLE.GUIDESUBS, ROLE.ADMIN],
         blacklistRoles: ROLE.BLACKLIST,
+        blacklistNames: [{
+            regex: /Shikanoin|Heizou/i,
+            message: "Guide Submissions for new characters are banned in the first week of the characters release.",
+            until: new Date("2022-07-20T03:00:00Z")
+        }],
         manageRoles: [...ROLE.TC_STAFF, ROLE.ADMIN],
         defaultCategory: CATEGORY.GUIDES,
         verifications: [{

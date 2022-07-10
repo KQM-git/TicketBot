@@ -47,6 +47,11 @@ export type TicketType = {
     }
     creationRoles: string[]
     blacklistRoles?: string[]
+    blacklistNames?: {
+        regex: RegExp
+        until?: Date
+        message: string
+    }[]
     manageRoles: string[]
     defaultCategory: string
     closeCategory?: string
