@@ -176,6 +176,7 @@ ${response.join("\n") || "*No inconsistencies found!*"}`.substring(0, 1900), und
 
                 dump = await (await fetch(attachment.url)).json()
             }
+            logger.debug(`Dump: ${JSON.stringify(dump)}`)
 
             const movement: ChannelPosition[] = []
             const cantMove: ChannelPosition[] = []
