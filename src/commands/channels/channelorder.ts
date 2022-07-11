@@ -257,7 +257,7 @@ ${response.join("\n") || "*No inconsistencies found!*"}`.substring(0, 1900), und
             logger.info(`Moving ${movement.length} channels on request by ${member.user.tag}`)
 
             try {
-                await source.guild.channels.setPositions(movement)
+                await source.guild.channels.setPositions(movement.reverse())
 
                 return await sendMessage(source, `**Unable to move (due to permissions)**
 ${cantMove.map(m => `<#${m.channel}> to #${m.position}`).join("\n")}
