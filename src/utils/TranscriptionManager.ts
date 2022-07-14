@@ -591,9 +591,9 @@ export default class TranscriptionManager {
             relevantChannels.add(channel[1])
 
         // eslint-disable-next-line no-control-regex
-        if (text.match(/[\u0000-\u001F]/))
+        if (text.match(/\u0000/))
             // eslint-disable-next-line no-control-regex
-            return text.replace(/[\u0000-\u001F]/g, "?")
+            return text.replace(/\u0000/g, "?")
 
         return text
     }
