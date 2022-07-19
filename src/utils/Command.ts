@@ -4,7 +4,7 @@ import config from "../data/config.json"
 import { CommandResponse, CommandSource, SendMessage } from "./Types"
 import { sendMessage } from "./Utils"
 
-export type CommandCategory = "Tickets" | "Channels" | "Admin" | "Hidden"
+export type CommandCategory = "Tickets" | "Channels" | "Misc" | "Admin" | "Hidden"
 export interface CommandOptions {
     name: string
     aliases?: string[]
