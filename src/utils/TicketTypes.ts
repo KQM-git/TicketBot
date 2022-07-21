@@ -93,7 +93,7 @@ export const CATEGORY = config.production ? {
     STAFF_TICKETS: "953156640604041216",
     STAFF_CLOSED: "953416056549015552",
     FEIYUN_PROJECTS: "946636283667681331",
-    FEIYUN_CLOSED: "844652678591152128",
+    FEIYUN_DONE: "999767676924735568"
 } : {
     GUIDES: "980838140099039272",
     TC_PROJECT: "980837799076958310",
@@ -103,7 +103,7 @@ export const CATEGORY = config.production ? {
     STAFF_TICKETS: "980926469737963530",
     STAFF_CLOSED: "982768252033835058",
     FEIYUN_PROJECTS: "980926469737963530",
-    FEIYUN_CLOSED: "982768252033835058",
+    FEIYUN_DONE: "980838078300164096"
 }
 
 export const CHANNEL = config.production ? {
@@ -402,12 +402,21 @@ export const ticketTypes: Record<string, TicketType> = {
         creationRoles: [ROLE.FEIYUN],
         manageRoles: [ROLE.FEIYUN_ADMIN],
         defaultCategory: CATEGORY.FEIYUN_PROJECTS,
-        closeCategory: CATEGORY.FEIYUN_CLOSED,
+        verifications: [{
+            type: VerifierType.DEFAULT,
+            required: 1,
+            roles: [ROLE.FEIYUN_ADMIN],
+            button: {
+                label: "Verify",
+                emoji: "✅",
+                style: "PRIMARY"
+            }
+        }],
+        verifiedCategory: CATEGORY.FEIYUN_DONE,
         opening: {
             content: " - Welcome. Please use this channel to work on your project and ping the relevant QC roles when done.",
             components: [
                 new MessageActionRow().addComponents(
-                    buttons.CLOSE,
                     buttons.RENAME
                 )
             ]
