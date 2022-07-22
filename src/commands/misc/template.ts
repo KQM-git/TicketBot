@@ -69,8 +69,9 @@ const templates: Record<string, {
             id: "misc",
             modalTitle: "Misc",
             embedTitle: "Other details",
-            modalPlaceholder: "Leave 'n/a' if not applicable.",
-            modalDefault: `- Rotation (required if team calc)
+            modalPlaceholder: "At least purpose is required",
+            modalDefault: `- Purpose of calc (for guide, compendium, etc.)
+- Rotation (required if team calc)
 - Rotation video (required if team calc), links can be formatted like [this](https://youtu.be/dQw4w9WgXcQ)
 - Additional details (if necessary)`,
             type: "PARAGRAPH"
