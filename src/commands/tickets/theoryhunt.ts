@@ -241,11 +241,6 @@ export default class Theoryhunt extends Command {
             return
         }
 
-        if (!member.roles.cache.hasAny(...TheoryhuntSettings.manageRoles) || theoryhunt?.commissioner.some(c => c.discordId == member.id)) {
-            await sendMessage(source, "Only people with management roles can manage theoryhunts", undefined, true)
-            return
-        }
-
         const description = new TextInputComponent()
             .setCustomId("description")
             .setLabel("Description")
@@ -307,13 +302,13 @@ export default class Theoryhunt extends Command {
             include: thInclude
         })
 
-        if (await this.checkPerms(source, false, th) !== true)
-            return
-
         if (!th) {
             await sendMessage(source, "Couldn't find theoryhunt", undefined, true)
             return
         }
+
+        if (await this.checkPerms(source, false, th) !== true)
+            return
 
         if (type == "close")
             await this.close(source, th)
@@ -334,10 +329,8 @@ export default class Theoryhunt extends Command {
             return
         }
 
-        if (!member.roles.cache.hasAny(...TheoryhuntSettings.manageRoles)) {
-            await sendMessage(source, "Only people with management roles can manage theoryhunts", undefined, true)
+        if (await this.checkPerms(source, true) !== true)
             return
-        }
 
         const creationChannel = await guild.channels.fetch(TheoryhuntSettings.channel)
         if (!creationChannel?.isText()) return await sendMessage(source, "Theoryhunt channel might not be configured correctly", undefined, true)
@@ -490,13 +483,6 @@ export default class Theoryhunt extends Command {
         if (await this.checkPerms(source, true) !== true)
             return
 
-        const member = await source.guild?.members.fetch(source.user.id)
-        if (!member)
-            return await sendMessage(source, "Couldn't fetch your roles", undefined, true)
-
-        if (!member.roles.cache.hasAny(...TheoryhuntSettings.manageRoles) || theoryhunt?.commissioner.some(c => c.discordId == member.id))
-            return await sendMessage(source, "Only people with management roles can manage theoryhunts", undefined, true)
-
         const channel = await client.channels.fetch(TheoryhuntSettings.channel)
         if (!channel || !channel.isText())
             return await sendMessage(source, "Theoryhunt channel might not be configured correctly", undefined, true)
@@ -531,12 +517,8 @@ export default class Theoryhunt extends Command {
         if (!channel || !channel.isText())
             return await sendMessage(source, "Theoryhunt channel might not be configured correctly", undefined, true)
 
-        const member = await source.guild?.members.fetch(source.user.id)
-        if (!member)
-            return await sendMessage(source, "Couldn't fetch your roles", undefined, true)
-
-        if (!member.roles.cache.hasAny(...TheoryhuntSettings.manageRoles) || theoryhunt?.commissioner.some(c => c.discordId == member.id))
-            return await sendMessage(source, "Only people with management roles can manage theoryhunts", undefined, true)
+        if (await this.checkPerms(source, false, theoryhunt) !== true)
+            return
 
         await client.prisma.theoryhunt.update({
             where: { id: theoryhunt.id },
@@ -568,7 +550,7 @@ export default class Theoryhunt extends Command {
         if (theoryhunt.ticket.filter(t => t.deleted == false).length > 0)
             return await sendMessage(source, "This ticket already has a ticket attached!", undefined, true)
 
-        if (!(member.roles.cache.hasAny(...TheoryhuntSettings.manageRoles) || theoryhunt.commissioner.some(c => c.discordId == user.id)))
+        if (!(member.roles.cache.hasAny(...TheoryhuntSettings.manageRoles) || !theoryhunt.commissioner.some(c => c.discordId == user.id)))
             return await sendMessage(source, "Only people with management roles can create tickets for theoryhunts", undefined, true)
 
         const id = await createTicket(ticketTypes.theoryhunt, "TH " + theoryhunt.name, member, source.guild)
