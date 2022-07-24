@@ -235,12 +235,6 @@ export default class Theoryhunt extends Command {
         if (await this.checkPerms(source, false, theoryhunt) !== true)
             return
 
-        const member = await source.guild?.members.fetch(source.user.id)
-        if (!member) {
-            await sendMessage(source, "Couldn't fetch your roles", undefined, true)
-            return
-        }
-
         const description = new TextInputComponent()
             .setCustomId("description")
             .setLabel("Description")
@@ -517,9 +511,6 @@ export default class Theoryhunt extends Command {
         if (!channel || !channel.isText())
             return await sendMessage(source, "Theoryhunt channel might not be configured correctly", undefined, true)
 
-        if (await this.checkPerms(source, false, theoryhunt) !== true)
-            return
-
         await client.prisma.theoryhunt.update({
             where: { id: theoryhunt.id },
             data: {
@@ -574,7 +565,7 @@ export default class Theoryhunt extends Command {
         const member = await source.guild.members.fetch(source.user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
 
-        if (!member.roles.cache.hasAny(...TheoryhuntSettings.manageRoles) || !(!requireManage && theoryhunt?.commissioner.some(c => c.discordId == member.id))) {
+        if (!(member.roles.cache.hasAny(...TheoryhuntSettings.manageRoles) || (!requireManage && theoryhunt?.commissioner.some(c => c.discordId == member.id)))) {
             await sendMessage(source, "Only people with management roles can manage theoryhunts", undefined, true)
             return
         }
