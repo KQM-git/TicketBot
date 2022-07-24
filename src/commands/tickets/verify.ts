@@ -117,7 +117,7 @@ export default class VerifyTicket extends Command {
 
 
             if (ticketType.verifiedRoles) {
-                const givenUser: string[] = []
+                let givenUser: string[] = []
 
                 for (const contributor of ticket.contributors) {
                     try {
@@ -129,13 +129,15 @@ export default class VerifyTicket extends Command {
                             await member.roles.add(roles)
                             givenUser.push(`Given <@${member.id}> the role${roles.length > 1 ? "s" : ""} ${roles.map(x => `<@&${x}>`).join(", ")}`)
 
-                            if (givenUser.length > 5)
+                            if (givenUser.length > 5) {
                                 await source.channel.send({ embeds: [
                                     new MessageEmbed()
                                         .setTitle("Contribution roles")
                                         .setDescription(givenUser.join("\n"))
                                         .setColor(Colors.AQUA)
                                 ] })
+                                givenUser = []
+                            }
                         }
                     } catch (error) {
                         Logger.error(`Couldn't give role to ${contributor.discordId}`)
