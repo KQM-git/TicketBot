@@ -150,8 +150,8 @@ export default class Theoryhunt extends Command {
             await this.createTicket(source, source.user, theoryhunt)
     }
 
-    async runMainModal(source: InteractionSource, theoryhunt?: StoredTheoryhunt): Promise<undefined> {
-        if (await this.checkPerms(source) !== true)
+    async runMainModal(source: InteractionSource, theoryhunt?: IncludedTheoryhunt): Promise<undefined> {
+        if (await this.checkPerms(source,  false, theoryhunt) !== true)
             return
 
         const member = await source.guild?.members.fetch(source.user.id)
@@ -232,8 +232,19 @@ export default class Theoryhunt extends Command {
     }
 
     async runSecondaryModal(source: InteractionSource, theoryhunt: IncludedTheoryhunt): Promise<undefined> {
-        if (await this.checkPerms(source) !== true)
+        if (await this.checkPerms(source, false, theoryhunt) !== true)
             return
+
+        const member = await source.guild?.members.fetch(source.user.id)
+        if (!member) {
+            await sendMessage(source, "Couldn't fetch your roles", undefined, true)
+            return
+        }
+
+        if (!member.roles.cache.hasAny(...TheoryhuntSettings.manageRoles) || theoryhunt?.commissioner.some(c => c.discordId == member.id)) {
+            await sendMessage(source, "Only people with management roles can manage theoryhunts", undefined, true)
+            return
+        }
 
         const description = new TextInputComponent()
             .setCustomId("description")
@@ -277,9 +288,6 @@ export default class Theoryhunt extends Command {
     }
 
     async runModalSubmit(source: ModalSubmitInteraction): Promise<void> {
-        if (await this.checkPerms(source) !== true)
-            return
-
         const type = source.customId.split("-")[1]
         if (type == "create")
             await this.runCreateTheoryhunt(source)
@@ -290,9 +298,6 @@ export default class Theoryhunt extends Command {
     }
 
     async runButton(source: ButtonInteraction): Promise<void> {
-        if (await this.checkPerms(source) !== true)
-            return
-
         const type = source.customId.split("-")[1]
 
         const th = await client.prisma.theoryhunt.findUnique({
@@ -301,6 +306,9 @@ export default class Theoryhunt extends Command {
             },
             include: thInclude
         })
+
+        if (await this.checkPerms(source, false, th) !== true)
+            return
 
         if (!th) {
             await sendMessage(source, "Couldn't find theoryhunt", undefined, true)
@@ -312,13 +320,24 @@ export default class Theoryhunt extends Command {
     }
 
     async runCreateTheoryhunt(source: ModalSubmitInteraction): Promise<SendMessage | undefined> {
-        if (await this.checkPerms(source) !== true)
+        if (await this.checkPerms(source, false) !== true)
             return
 
         const guild = source.guild
         if (!guild) return await sendMessage(source, "Can't manage theoryhunts here", undefined, true)
         const member = await source.guild.members.fetch(source.user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
+
+        const ticketType = ticketTypes.theoryhunt
+        if (!ticketType || !member.roles.cache.hasAny(...ticketType.creationRoles)) {
+            await sendMessage(source, "You don't have one of the roles required to create this type of ticket", undefined, true)
+            return
+        }
+
+        if (!member.roles.cache.hasAny(...TheoryhuntSettings.manageRoles)) {
+            await sendMessage(source, "Only people with management roles can manage theoryhunts", undefined, true)
+            return
+        }
 
         const creationChannel = await guild.channels.fetch(TheoryhuntSettings.channel)
         if (!creationChannel?.isText()) return await sendMessage(source, "Theoryhunt channel might not be configured correctly", undefined, true)
@@ -352,12 +371,17 @@ export default class Theoryhunt extends Command {
     }
 
     async runEditTheoryhunt(source: ModalSubmitInteraction, id: number): Promise<SendMessage | undefined> {
-        if (await this.checkPerms(source) !== true)
-            return
-
         const channel = await client.channels.fetch(TheoryhuntSettings.channel)
         if (!channel || !channel.isText())
             return await sendMessage(source, "Theoryhunt channel might not be configured correctly", undefined, true)
+
+        const oldTh = await client.prisma.theoryhunt.findUnique({
+            where: { id },
+            include: thInclude
+        })
+
+        if (await this.checkPerms(source, false, oldTh) !== true)
+            return
 
         Logger.info(`Updating TH #${id} for ${source.user.id} / ${source.user.tag}`)
 
@@ -389,14 +413,19 @@ export default class Theoryhunt extends Command {
     }
 
     async runEdit2Theoryhunt(source: ModalSubmitInteraction, id: number): Promise<SendMessage | undefined> {
-        if (await this.checkPerms(source) !== true)
-            return
-
         const guild = source.guild
         if (!guild) return await sendMessage(source, "Can't manage theoryhunts here", undefined, true)
         const channel = await client.channels.fetch(TheoryhuntSettings.channel)
         if (!channel || !channel.isText())
             return await sendMessage(source, "Theoryhunt channel might not be configured correctly", undefined, true)
+
+        const oldTh = await client.prisma.theoryhunt.findUnique({
+            where: { id },
+            include: thInclude
+        })
+
+        if (await this.checkPerms(source, false, oldTh) !== true)
+            return
 
         Logger.info(`Updating TH #${id} for ${source.user.id} / ${source.user.tag}`)
 
@@ -458,8 +487,15 @@ export default class Theoryhunt extends Command {
     }
 
     async reopen(source: InteractionSource | ModalSubmitInteraction, theoryhunt: IncludedTheoryhunt): Promise<SendMessage | undefined> {
-        if (await this.checkPerms(source) !== true)
+        if (await this.checkPerms(source, true) !== true)
             return
+
+        const member = await source.guild?.members.fetch(source.user.id)
+        if (!member)
+            return await sendMessage(source, "Couldn't fetch your roles", undefined, true)
+
+        if (!member.roles.cache.hasAny(...TheoryhuntSettings.manageRoles) || theoryhunt?.commissioner.some(c => c.discordId == member.id))
+            return await sendMessage(source, "Only people with management roles can manage theoryhunts", undefined, true)
 
         const channel = await client.channels.fetch(TheoryhuntSettings.channel)
         if (!channel || !channel.isText())
@@ -488,12 +524,19 @@ export default class Theoryhunt extends Command {
     }
 
     async close(source: InteractionSource | ModalSubmitInteraction, theoryhunt: IncludedTheoryhunt): Promise<SendMessage | undefined> {
-        if (await this.checkPerms(source) !== true)
+        if (await this.checkPerms(source, false, theoryhunt) !== true)
             return
 
         const channel = await client.channels.fetch(TheoryhuntSettings.channel)
         if (!channel || !channel.isText())
             return await sendMessage(source, "Theoryhunt channel might not be configured correctly", undefined, true)
+
+        const member = await source.guild?.members.fetch(source.user.id)
+        if (!member)
+            return await sendMessage(source, "Couldn't fetch your roles", undefined, true)
+
+        if (!member.roles.cache.hasAny(...TheoryhuntSettings.manageRoles) || theoryhunt?.commissioner.some(c => c.discordId == member.id))
+            return await sendMessage(source, "Only people with management roles can manage theoryhunts", undefined, true)
 
         await client.prisma.theoryhunt.update({
             where: { id: theoryhunt.id },
@@ -543,14 +586,16 @@ export default class Theoryhunt extends Command {
         return await sendMessage(source, `Created Theoryhunt: ${theoryhunt.name} over at <#${id}>!`, undefined, true)
     }
 
-    async checkPerms(source: InteractionSource | ModalSubmitInteraction): Promise<SendMessage | undefined | true> {
+    async checkPerms(source: InteractionSource | ModalSubmitInteraction, requireManage: boolean, theoryhunt?: IncludedTheoryhunt | null): Promise<SendMessage | undefined | true> {
         if (!source.guild) return await sendMessage(source, "Can't manage theoryhunts here", undefined, true)
 
         const member = await source.guild.members.fetch(source.user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
 
-        if (!member.roles.cache.hasAny(...TheoryhuntSettings.manageRoles))
-            return await sendMessage(source, "Only people with management roles can manage theoryhunts", undefined, true)
+        if (!member.roles.cache.hasAny(...TheoryhuntSettings.manageRoles) || !(!requireManage && theoryhunt?.commissioner.some(c => c.discordId == member.id))) {
+            await sendMessage(source, "Only people with management roles can manage theoryhunts", undefined, true)
+            return
+        }
 
         return true
     }
