@@ -78,6 +78,12 @@ export default class VerifyTicket extends Command {
         if (ticket.verifications.find(v => v.userId == user.id && v.type == type))
             return await sendMessage(source, "You already verified this ticket!", undefined, true)
 
+        if (ticket.creator.discordId == user.id)
+            return await sendMessage(source, "You are the owner of this and therefore you can't verify!", undefined, true)
+
+        if (ticket.contributors.find(c => c.discordId == user.id))
+            return await sendMessage(source, "You are a contributor in this ticket and therefore you can't verify!", undefined, true)
+
         if (ticket.status == TicketStatus.VERIFIED)
             return await sendMessage(source, "This ticket is already marked as verified!", undefined, true)
         else if (ticket.status == TicketStatus.OPEN)
