@@ -256,7 +256,7 @@ export default class Template extends Command {
         }
 
         const msg = await sendMessage(source, embed)
-        if (msg && source.channel?.type == "GUILD_TEXT") {
+        if (msg && source.channel?.type == "GUILD_TEXT" && template.createThreads?.includes(source.channel.id)) {
             const thread = await source.channel.threads.create({
                 name: source.fields.getTextInputValue(template.fields[0].id).substring(0, 100),
                 startMessage: msg.id,
