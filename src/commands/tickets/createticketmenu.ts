@@ -68,7 +68,7 @@ export default class CreateTicketMenu extends Command {
             ],
             components: [new MessageActionRow().setComponents(
                 set.ticketTypes.map(b => new MessageButton()
-                    .setCustomId(`createticket-${b.id}`)
+                    .setCustomId(b.customId ?? `createticket-${b.id}`)
                     .setLabel(b.name)
                     .setEmoji(b.emoji)
                     .setStyle(b.style)

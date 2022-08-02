@@ -1,13 +1,14 @@
-import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageContextMenuInteraction, MessageEmbed, Modal, ModalSubmitInteraction, TextInputComponent, TextInputStyleResolvable } from "discord.js"
+import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageContextMenuInteraction, MessageEmbed, Modal, ModalSubmitInteraction, Snowflake, TextInputComponent, TextInputStyleResolvable } from "discord.js"
 import client from "../../main"
 import Command from "../../utils/Command"
-import { ROLE } from "../../utils/TicketTypes"
+import { CHANNEL, ROLE } from "../../utils/TicketTypes"
 import { InteractionSource, SendMessage } from "../../utils/Types"
 import { Colors, sendMessage } from "../../utils/Utils"
 
 const templates: Record<string, {
     name: string
     embedTitle: string
+    createThreads?: Snowflake[]
     fields: {
         id: string
         inline?: true
@@ -50,6 +51,7 @@ const templates: Record<string, {
     reqcalc: {
         name: "Calculation Request",
         embedTitle: "Calculation Request",
+        createThreads: [CHANNEL.CALC_REQUEST],
         fields: [{
             id: "type",
             embedTitle: "Type of Calculation",
@@ -253,7 +255,19 @@ export default class Template extends Command {
             return
         }
 
-        await sendMessage(source, embed)
+        const msg = await sendMessage(source, embed)
+        if (msg && source.channel?.type == "GUILD_TEXT") {
+            const thread = await source.channel.threads.create({
+                name: source.fields.getTextInputValue(template.fields[0].id).substring(0, 100),
+                startMessage: msg.id,
+            })
+            await thread.send({
+                content: `Feel free to further discuss the topic in this thread <@${source.user.id}>`,
+                allowedMentions: {
+                    users: [source.user.id]
+                }
+            })
+        }
     }
 
     async runMessage(source: Message): Promise<SendMessage | undefined> {

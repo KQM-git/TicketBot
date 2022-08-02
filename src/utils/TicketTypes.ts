@@ -1,6 +1,6 @@
-import { MessageActionRow, MessageButton } from "discord.js"
-import { TicketType, VerifierType } from "./Types"
+import { MessageActionRow, MessageButton, MessageButtonStyle } from "discord.js"
 import config from "../data/config.json"
+import { TicketType, VerifierType } from "./Types"
 
 export const buttons = {
     CLOSE: new MessageButton()
@@ -112,7 +112,8 @@ export const CHANNEL = config.production ? {
     THEORYHUNT: "782067573276672061",
     STAFF_TRANSCRIPTS: "812974281461596221",
     FEIYUN_TRANSCRIPTS: "954151143842398260",
-    FEIYUN_FEED: "999763136984924211"
+    FEIYUN_FEED: "999763136984924211",
+    CALC_REQUEST: "1001597332716003548"
 } : {
     NEW_TICKETS: "981316199185014806",
     TC_TRANSCRIPTS: "980924167648079892",
@@ -120,6 +121,7 @@ export const CHANNEL = config.production ? {
     STAFF_TRANSCRIPTS: "986748960041467954",
     FEIYUN_TRANSCRIPTS: "986748960041467954",
     FEIYUN_FEED: "981316199185014806",
+    CALC_REQUEST: "994320734308552775"
 }
 
 export const TheoryhuntSettings = {
@@ -433,7 +435,13 @@ export const menus: {
     content?: string
     title: string
     desc: string
-    ticketTypes: TicketType[]
+    ticketTypes: {
+        customId?: string
+        id?: string
+        name: string
+        emoji: string
+        style: MessageButtonStyle
+    }[]
 }[] = [{
     name: "Theorycrafting Tickets",
     value: "TC",
@@ -466,4 +474,15 @@ For anyone else you want to add in, you can use \`/add <person or role>\` in the
     title: "Projects",
     desc: "Click below to create a new project",
     ticketTypes: [ticketTypes.feiyun]
+}, {
+    name: "Calculation Requests",
+    value: "CR",
+    title: "Calculation Requests",
+    desc: "Click below to create a new calculation request",
+    ticketTypes: [{
+        emoji: "📋",
+        name: "Calculation Request",
+        style: "SUCCESS",
+        customId: "template-reqcalc",
+    }]
 }]
