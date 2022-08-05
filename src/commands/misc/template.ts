@@ -18,7 +18,6 @@ const templates: Record<string, {
         modalDefault?: string
         type: TextInputStyleResolvable
     }[]
-    threadMsg?: string
     threadPing?: string[]
 }> = {
     proposal: {
@@ -54,7 +53,6 @@ const templates: Record<string, {
         name: "Calculation Request",
         embedTitle: "Calculation Request",
         createThreads: [CHANNEL.CALC_REQUEST],
-        threadMsg: "-",
         threadPing: ["975990552812204032"],
         fields: [{
             id: "type",
@@ -266,7 +264,7 @@ export default class Template extends Command {
                 startMessage: msg.id,
             })
             await thread.send({
-                content: `Feel free to further discuss the topic in this thread ${[`<@${source.user.id}>`, ...(template.threadPing??[]).map(x => `, <@&${x}>`)].join(", ")}`,
+                content: `Feel free to further discuss the topic in this thread ${[`<@${source.user.id}>`, ...(template.threadPing??[]).map(x => `<@&${x}>`)].join(", ")}`,
                 allowedMentions: {
                     users: [source.user.id],
                     roles: template.threadPing
