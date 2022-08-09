@@ -1,4 +1,4 @@
-import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageContextMenuInteraction, MessageEmbed, Modal, ModalSubmitInteraction, Snowflake, TextInputComponent, TextInputStyleResolvable } from "discord.js"
+import { ActionRowBuilder, ApplicationCommandOptionType, ButtonInteraction, ChannelType, ChatInputCommandInteraction, EmbedBuilder, Message, MessageContextMenuCommandInteraction, ModalActionRowComponentBuilder, ModalBuilder, ModalSubmitInteraction, Snowflake, TextInputBuilder, TextInputStyle } from "discord.js"
 import client from "../../main"
 import Command from "../../utils/Command"
 import { CHANNEL, ROLE } from "../../utils/TicketTypes"
@@ -16,7 +16,7 @@ const templates: Record<string, {
         embedTitle: string
         modalPlaceholder?: string
         modalDefault?: string
-        type: TextInputStyleResolvable
+        type: TextInputStyle
     }[]
     threadPing?: string[]
 }> = {
@@ -28,25 +28,25 @@ const templates: Record<string, {
             modalTitle: "Proposal",
             embedTitle: "Proposal",
             modalPlaceholder: "What is the idea that you want to explore?",
-            type: "SHORT"
+            type: TextInputStyle.Short
         }, {
             id: "motivation",
             modalTitle: "Motivation",
             embedTitle: "Why are you TC'ing this?",
             modalPlaceholder: "<I like X unit> <Meta/Value Analysis>",
-            type: "SHORT"
+            type: TextInputStyle.Short
         }, {
             id: "idea",
             modalTitle: "Reasoning",
             embedTitle: "Why would this idea work? What is it competing against? What are some substitutes and alternatives that we already use?",
             modalPlaceholder: "The shield from Xinyan provides small defense but has Pyro application.",
-            type: "PARAGRAPH"
+            type: TextInputStyle.Paragraph
         }, {
             id: "what",
             modalTitle: "What do you need",
             embedTitle: "Did you want to try to calc this? What is the end goal?",
             modalPlaceholder: "<TheoryHunt> <Calc Guide> <GCsim>",
-            type: "PARAGRAPH"
+            type: TextInputStyle.Paragraph
         }]
     },
     reqcalc: {
@@ -59,7 +59,7 @@ const templates: Record<string, {
             embedTitle: "Type of Calculation",
             modalTitle: "Calculation Type",
             modalPlaceholder: "Weapon / Team / etc.",
-            type: "SHORT"
+            type: TextInputStyle.Short
         }, {
             id: "composition",
             modalTitle: "Team / Character(s)",
@@ -68,7 +68,7 @@ const templates: Record<string, {
             modalDefault: `- Team member 1 + Weapon + Artifact Set/Stats 
 (repeat for all team members)
 (if anything is not included, up to calcer's discretion)`,
-            type: "PARAGRAPH"
+            type: TextInputStyle.Paragraph
         }, {
             id: "misc",
             modalTitle: "Misc",
@@ -78,7 +78,7 @@ const templates: Record<string, {
 - Rotation (required if team calc)
 - Rotation video (required if team calc), links can be formatted like [this](https://youtu.be/dQw4w9WgXcQ)
 - Additional details (if necessary)`,
-            type: "PARAGRAPH"
+            type: TextInputStyle.Paragraph
         }, {
             id: "status",
             inline: true,
@@ -86,7 +86,7 @@ const templates: Record<string, {
             embedTitle: "Status",
             modalPlaceholder: "Open / Under verification / etc.",
             modalDefault: "Open",
-            type: "SHORT"
+            type: TextInputStyle.Short
         }, {
             id: "participants",
             inline: true,
@@ -94,7 +94,7 @@ const templates: Record<string, {
             embedTitle: "Participants",
             modalPlaceholder: "Participants",
             modalDefault: "This can be you!",
-            type: "PARAGRAPH"
+            type: TextInputStyle.Paragraph
         }]
     }
 }
@@ -110,7 +110,7 @@ export default class Template extends Command {
             options: [{
                 name: "template",
                 description: "Template to use",
-                type: "STRING",
+                type: ApplicationCommandOptionType.String,
                 choices: Object.entries(templates).map(([value, { name }]) => ({
                     name, value
                 })),
@@ -122,7 +122,7 @@ export default class Template extends Command {
         })
     }
 
-    async runInteraction(source: CommandInteraction): Promise<SendMessage | undefined> {
+    async runInteraction(source: ChatInputCommandInteraction): Promise<SendMessage | undefined> {
         return this.createModal(source, source.options.getString("template", true))
     }
 
@@ -130,7 +130,7 @@ export default class Template extends Command {
         await this.createModal(source, source.customId.split("-")[1])
     }
 
-    async runMessageContext(source: MessageContextMenuInteraction, _command: string): Promise<void> {
+    async runMessageContext(source: MessageContextMenuCommandInteraction, _command: string): Promise<void> {
         const msg = source.targetMessage
         if (msg.author.id !== client.user?.id || msg.embeds.length != 1) return
         const embed = msg.embeds[0]
@@ -158,12 +158,10 @@ export default class Template extends Command {
         }
 
         const template = templates[templateName]
-        const modal = new Modal()
+        const modal = new ModalBuilder()
             .setTitle(`Editing a ${template.name}`)
             .setCustomId(`template-${templateName}-${msg.id}`)
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            .setComponents(...template.fields.map(p => new MessageActionRow().addComponents(new TextInputComponent()
+            .setComponents(...template.fields.map(p => new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(new TextInputBuilder()
                 .setCustomId(p.id)
                 .setLabel(p.modalTitle)
                 .setStyle(p.type)
@@ -190,12 +188,10 @@ export default class Template extends Command {
         if (!template)
             return await sendMessage(source, "Could not find a template by that name!", undefined, true)
 
-        const modal = new Modal()
+        const modal = new ModalBuilder()
             .setTitle(`Creating a ${template.name}`)
             .setCustomId(`template-${templateName}`)
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            .setComponents(...template.fields.map(p => new MessageActionRow().addComponents(new TextInputComponent()
+            .setComponents(...template.fields.map(p => new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(new TextInputBuilder()
                 .setCustomId(p.id)
                 .setLabel(p.modalTitle)
                 .setStyle(p.type)
@@ -228,7 +224,7 @@ export default class Template extends Command {
             return
         }
 
-        const embed = new MessageEmbed()
+        const embed = new EmbedBuilder()
             .setAuthor({
                 name: source.user.tag,
                 iconURL: source.user.avatarURL() ?? undefined
@@ -258,7 +254,7 @@ export default class Template extends Command {
         }
 
         const msg = await sendMessage(source, embed)
-        if (msg && source.channel?.type == "GUILD_TEXT" && template.createThreads?.includes(source.channel.id)) {
+        if (msg && source.channel?.type == ChannelType.GuildText && template.createThreads?.includes(source.channel.id)) {
             const thread = await source.channel.threads.create({
                 name: source.fields.getTextInputValue(template.fields[0].id).substring(0, 100),
                 startMessage: msg.id,

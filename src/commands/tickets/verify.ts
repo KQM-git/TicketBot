@@ -1,4 +1,4 @@
-import { BaseGuildTextChannel, ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButton, MessageEmbed, User } from "discord.js"
+import { ActionRowBuilder, ApplicationCommandOptionType, BaseGuildTextChannel, ButtonBuilder, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, EmbedBuilder, Message, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
@@ -19,7 +19,7 @@ export default class VerifyTicket extends Command {
             options: [{
                 name: "type",
                 description: "Type of verification",
-                type: "STRING",
+                type: ApplicationCommandOptionType.String,
                 choices: [ {
                     name: "Default",
                     value: VerifierType.DEFAULT
@@ -34,7 +34,7 @@ export default class VerifyTicket extends Command {
         })
     }
 
-    async runInteraction(source: CommandInteraction): Promise<SendMessage | undefined> {
+    async runInteraction(source: ChatInputCommandInteraction): Promise<SendMessage | undefined> {
         await source.deferReply({ ephemeral: true })
         return this.run(source, source.user, source.options.getString("type", false) ?? VerifierType.DEFAULT)
     }
@@ -113,7 +113,7 @@ export default class VerifyTicket extends Command {
 
         Logger.info(`Verifying ticket ${ticket.id}: ${ticket.name} for type ${verificationType.type} (${enough ? "enough!" : "not enough"}) by ${user.id} (${user.tag})`)
         await source.channel.send({
-            embeds: [new MessageEmbed().setDescription(`${verificationTypeName[verificationType.type]} verified by <@${member.id}>`)]
+            embeds: [new EmbedBuilder().setDescription(`${verificationTypeName[verificationType.type]} verified by <@${member.id}>`)]
         })
 
         if (enough && ticket.status != TicketStatus.VERIFIED) {
@@ -137,7 +137,7 @@ export default class VerifyTicket extends Command {
 
                             if (givenUser.length > 5) {
                                 await source.channel.send({ embeds: [
-                                    new MessageEmbed()
+                                    new EmbedBuilder()
                                         .setTitle("Contribution roles")
                                         .setDescription(givenUser.join("\n"))
                                         .setColor(Colors.AQUA)
@@ -152,7 +152,7 @@ export default class VerifyTicket extends Command {
 
                 if (givenUser.length > 0)
                     await source.channel.send({ embeds: [
-                        new MessageEmbed()
+                        new EmbedBuilder()
                             .setTitle("Contribution roles")
                             .setDescription(givenUser.join("\n"))
                             .setColor(Colors.AQUA)
@@ -161,12 +161,12 @@ export default class VerifyTicket extends Command {
 
             Logger.info(`Giving contribution role for ${member.id} (${member.user.tag}) from ticket ${ticket.id}: ${ticket.name}`)
             const response = await source.channel.send({
-                embeds: [ new MessageEmbed().setTitle("Creating transcript...").setColor(Colors.ORANGE) ],
-                components: ticket.theoryhuntId ? [new MessageActionRow().addComponents(
-                    new MessageButton()
+                embeds: [new EmbedBuilder().setTitle("Creating transcript...").setColor(Colors.ORANGE) ],
+                components: ticket.theoryhuntId ? [new ActionRowBuilder<ButtonBuilder>().addComponents(
+                    new ButtonBuilder()
                         .setCustomId(`theoryhunt-close-${ticket.theoryhuntId}`)
                         .setLabel("Mark theoryhunt as done")
-                        .setStyle("SUCCESS")
+                        .setStyle(ButtonStyle.Success)
                 )] : []
             })
             if (response)

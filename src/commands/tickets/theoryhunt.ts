@@ -1,5 +1,5 @@
 import { Theoryhunt as StoredTheoryhunt, Ticket, User } from "@prisma/client"
-import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageContextMenuInteraction, MessageEmbed, Modal, ModalSubmitInteraction, TextInputComponent, User as DiscordUser } from "discord.js"
+import { ActionRowBuilder, ApplicationCommandOptionType, ButtonInteraction, ChatInputCommandInteraction, EmbedBuilder, Message, MessageContextMenuCommandInteraction, ModalActionRowComponentBuilder, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle, User as DiscordUser } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
@@ -40,55 +40,55 @@ export default class Theoryhunt extends Command {
             options: [{
                 name: "create",
                 description: "Create a theoryhunt",
-                type: "SUB_COMMAND"
+                type: ApplicationCommandOptionType.Subcommand
             }, {
                 name: "edit",
                 description: "Edit a theoryhunt",
-                type: "SUB_COMMAND",
+                type: ApplicationCommandOptionType.Subcommand,
                 options: [{
                     name: "id",
                     description: "ID to edit",
-                    type: "INTEGER",
+                    type: ApplicationCommandOptionType.Integer,
                     required: true
                 }]
             }, {
                 name: "edit2",
                 description: "Edit more special stuff of a theoryhunt",
-                type: "SUB_COMMAND",
+                type: ApplicationCommandOptionType.Subcommand,
                 options: [{
                     name: "id",
                     description: "ID to edit",
-                    type: "INTEGER",
+                    type: ApplicationCommandOptionType.Integer,
                     required: true
                 }]
             }, {
                 name: "reopen",
                 description: "Reopen a theoryhunt (Double check ID using edit)",
-                type: "SUB_COMMAND",
+                type: ApplicationCommandOptionType.Subcommand,
                 options: [{
                     name: "id",
                     description: "ID to reopen",
-                    type: "INTEGER",
+                    type: ApplicationCommandOptionType.Integer,
                     required: true
                 }]
             }, {
                 name: "close",
                 description: "Close a theoryhunt (Double check ID using edit)",
-                type: "SUB_COMMAND",
+                type: ApplicationCommandOptionType.Subcommand,
                 options: [{
                     name: "id",
                     description: "ID to close",
-                    type: "INTEGER",
+                    type: ApplicationCommandOptionType.Integer,
                     required: true
                 }]
             }, {
                 name: "createticket",
                 description: "Create a ticket for a theoryhunt (Double check ID using edit)",
-                type: "SUB_COMMAND",
+                type: ApplicationCommandOptionType.Subcommand,
                 options: [{
                     name: "id",
                     description: "ID to create ticket for",
-                    type: "INTEGER",
+                    type: ApplicationCommandOptionType.Integer,
                     required: true
                 }]
             }],
@@ -96,7 +96,7 @@ export default class Theoryhunt extends Command {
         })
     }
 
-    async runInteraction(source: CommandInteraction): Promise<SendMessage | undefined> {
+    async runInteraction(source: ChatInputCommandInteraction): Promise<SendMessage | undefined> {
         const sub = source.options.getSubcommand(true)
         if (sub == "create")
             return await this.runMainModal(source)
@@ -128,7 +128,7 @@ export default class Theoryhunt extends Command {
         return await sendMessage(source, "This command isn't available in text form, please refer to the slash-command")
     }
 
-    async runMessageContext(source: MessageContextMenuInteraction): Promise<void> {
+    async runMessageContext(source: MessageContextMenuCommandInteraction): Promise<void> {
         const targetId = source.targetMessage.id
         const theoryhunt = await client.prisma.theoryhunt.findUnique({
             where: {
@@ -166,64 +166,59 @@ export default class Theoryhunt extends Command {
             return
         }
 
-        const name = new TextInputComponent()
+        const name = new TextInputBuilder()
             .setCustomId("name")
             .setLabel("Name")
-            .setStyle("SHORT")
+            .setStyle(TextInputStyle.Short)
             .setMaxLength(100)
             .setPlaceholder("Enter a name for the theoryhunt")
             .setValue(theoryhunt?.name ?? "")
             .setRequired(true)
 
-        const difficulty = new TextInputComponent()
+        const difficulty = new TextInputBuilder()
             .setCustomId("difficulty")
             .setLabel("Difficulty")
-            .setStyle("SHORT")
+            .setStyle(TextInputStyle.Short)
             .setMaxLength(1)
             .setPlaceholder("S/A/B/C/D")
             .setValue(theoryhunt?.difficulty ?? "")
             .setRequired(true)
 
-        const difficultyReason = new TextInputComponent()
+        const difficultyReason = new TextInputBuilder()
             .setCustomId("difficultyreason")
             .setLabel("Difficulty reasoning")
-            .setStyle("SHORT")
+            .setStyle(TextInputStyle.Short)
             .setMaxLength(50)
             .setPlaceholder("Optional reason explaining difficulty")
             .setValue(theoryhunt?.difficultyReason ?? "")
 
-        const req = new TextInputComponent()
+        const req = new TextInputBuilder()
             .setCustomId("req")
             .setLabel("Requirements")
-            .setStyle("PARAGRAPH")
+            .setStyle(TextInputStyle.Paragraph)
             .setMaxLength(500)
             .setPlaceholder("Enter requirements for the theoryhunt")
             .setRequired(true)
             .setValue(theoryhunt?.requirements ?? "")
 
-        const details = new TextInputComponent()
+        const details = new TextInputBuilder()
             .setCustomId("details")
             .setLabel("Details")
-            .setStyle("PARAGRAPH")
+            .setStyle(TextInputStyle.Paragraph)
             .setMaxLength(1000)
             .setPlaceholder("Enter details for the theoryhunt")
             .setRequired(true)
             .setValue(theoryhunt?.details ?? "")
 
-        const modal = new Modal()
+        const modal = new ModalBuilder()
             .setTitle(theoryhunt ? `Editing ${ticketType.name} #${theoryhunt.id}` : `Creating a ${ticketType.name}`)
             .setCustomId(theoryhunt ? `theoryhunt-edit-${theoryhunt.id}` : "theoryhunt-create")
             .setComponents(
-                // @ts-expect-error Need row for components but they aren't message interactions
-                new MessageActionRow().addComponents(name),
-                // @ts-expect-error Need row for components but they aren't message interactions
-                new MessageActionRow().addComponents(difficulty),
-                // @ts-expect-error Need row for components but they aren't message interactions
-                new MessageActionRow().addComponents(difficultyReason),
-                // @ts-expect-error Need row for components but they aren't message interactions
-                new MessageActionRow().addComponents(req),
-                // @ts-expect-error Need row for components but they aren't message interactions
-                new MessageActionRow().addComponents(details),
+                new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(name),
+                new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(difficulty),
+                new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(difficultyReason),
+                new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(req),
+                new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(details),
             )
 
         await source.showModal(modal)
@@ -235,40 +230,37 @@ export default class Theoryhunt extends Command {
         if (await this.checkPerms(source, false, theoryhunt) !== true)
             return
 
-        const description = new TextInputComponent()
+        const description = new TextInputBuilder()
             .setCustomId("description")
             .setLabel("Description")
-            .setStyle("PARAGRAPH")
+            .setStyle(TextInputStyle.Paragraph)
             .setMaxLength(1000)
             .setPlaceholder("Enter description for the theoryhunt")
             .setValue(theoryhunt.description ?? "")
 
-        const commissioner = new TextInputComponent()
+        const commissioner = new TextInputBuilder()
             .setCustomId("commissioners")
             .setLabel("Commissioners")
-            .setStyle("PARAGRAPH")
+            .setStyle(TextInputStyle.Paragraph)
             .setMaxLength(1000)
             .setPlaceholder("Enter line separated list of Discord IDs")
             .setValue(theoryhunt.commissioner.map(c => c.discordId).join("\n"))
 
-        const tickets = new TextInputComponent()
+        const tickets = new TextInputBuilder()
             .setCustomId("tickets")
             .setLabel("Tickets")
-            .setStyle("PARAGRAPH")
+            .setStyle(TextInputStyle.Paragraph)
             .setMaxLength(1000)
             .setPlaceholder("Enter line separated list of Ticket IDs")
             .setValue(theoryhunt.ticket.map(c => c.id).join("\n"))
 
-        const modal = new Modal()
+        const modal = new ModalBuilder()
             .setTitle(`Editing Theoryhunt #${theoryhunt.id}`)
             .setCustomId(`theoryhunt-edit2-${theoryhunt.id}`)
             .setComponents(
-                // @ts-expect-error Need row for components but they aren't message interactions
-                new MessageActionRow().addComponents(description),
-                // @ts-expect-error Need row for components but they aren't message interactions
-                new MessageActionRow().addComponents(commissioner),
-                // @ts-expect-error Need row for components but they aren't message interactions
-                new MessageActionRow().addComponents(tickets),
+                new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(description),
+                new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(commissioner),
+                new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(tickets),
             )
 
         await source.showModal(modal)
@@ -327,12 +319,12 @@ export default class Theoryhunt extends Command {
             return
 
         const creationChannel = await guild.channels.fetch(TheoryhuntSettings.channel)
-        if (!creationChannel?.isText()) return await sendMessage(source, "Theoryhunt channel might not be configured correctly", undefined, true)
+        if (!creationChannel?.isTextBased()) return await sendMessage(source, "Theoryhunt channel might not be configured correctly", undefined, true)
 
         Logger.info(`Creating TH ${source.fields.getTextInputValue("name")} for ${member.id} / ${member.user.tag}`)
 
         const msg = await creationChannel.send({
-            embeds: [new MessageEmbed().setTitle("Loading...")]
+            embeds: [new EmbedBuilder().setTitle("Loading...")]
         })
 
         const theoryhunt = await client.prisma.theoryhunt.create({
@@ -359,7 +351,7 @@ export default class Theoryhunt extends Command {
 
     async runEditTheoryhunt(source: ModalSubmitInteraction, id: number): Promise<SendMessage | undefined> {
         const channel = await client.channels.fetch(TheoryhuntSettings.channel)
-        if (!channel || !channel.isText())
+        if (!channel || !channel.isTextBased())
             return await sendMessage(source, "Theoryhunt channel might not be configured correctly", undefined, true)
 
         const oldTh = await client.prisma.theoryhunt.findUnique({
@@ -403,7 +395,7 @@ export default class Theoryhunt extends Command {
         const guild = source.guild
         if (!guild) return await sendMessage(source, "Can't manage theoryhunts here", undefined, true)
         const channel = await client.channels.fetch(TheoryhuntSettings.channel)
-        if (!channel || !channel.isText())
+        if (!channel || !channel.isTextBased())
             return await sendMessage(source, "Theoryhunt channel might not be configured correctly", undefined, true)
 
         const oldTh = await client.prisma.theoryhunt.findUnique({
@@ -478,7 +470,7 @@ export default class Theoryhunt extends Command {
             return
 
         const channel = await client.channels.fetch(TheoryhuntSettings.channel)
-        if (!channel || !channel.isText())
+        if (!channel || !channel.isTextBased())
             return await sendMessage(source, "Theoryhunt channel might not be configured correctly", undefined, true)
 
         const newMsg = await channel.send({
@@ -508,7 +500,7 @@ export default class Theoryhunt extends Command {
             return
 
         const channel = await client.channels.fetch(TheoryhuntSettings.channel)
-        if (!channel || !channel.isText())
+        if (!channel || !channel.isTextBased())
             return await sendMessage(source, "Theoryhunt channel might not be configured correctly", undefined, true)
 
         await client.prisma.theoryhunt.update({
@@ -535,7 +527,7 @@ export default class Theoryhunt extends Command {
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
 
         const channel = await client.channels.fetch(TheoryhuntSettings.channel)
-        if (!channel || !channel.isText())
+        if (!channel || !channel.isTextBased())
             return await sendMessage(source, "Theoryhunt channel might not be configured correctly", undefined, true)
 
         if (theoryhunt.ticket.filter(t => t.deleted == false).length > 0)
@@ -576,17 +568,32 @@ export default class Theoryhunt extends Command {
 
 function createEmbed(theoryhunt: IncludedTheoryhunt) {
     const contributors = theoryhunt.ticket.flatMap(t => t.contributors.map(c => `<@${c.discordId}>`)).filter((v, i, a) => a.indexOf(v) == i)
-    const embed = new MessageEmbed()
+    const embed =new EmbedBuilder()
         .setColor(Colors[theoryhunt.difficulty as Color] ?? Colors.GRAY)
         .setTitle(theoryhunt.name)
-        .setDescription(theoryhunt.description)
-        .addField("Difficulty", `${theoryhunt.difficulty}${theoryhunt.difficultyReason ? ` (${theoryhunt.difficultyReason})`:""}`)
-        .addField("Requirements", theoryhunt.requirements)
-        .addField("Details", theoryhunt.details)
-        .addField("Commissioner", theoryhunt.commissioner.length == 0 ? "KQM" : theoryhunt.commissioner.map(c => `<@${c.discordId}>`).sort().join(", "), true)
-        .addField("Ticket", theoryhunt.ticket.length == 0 ? "Ask a Scholar to create a ticket for you if you want to work on this." : theoryhunt.ticket.map(t => `<#${t.channelId}> [${t.status}]`).sort().join("\n"), true)
-        .addField("Participants", contributors.length == 0 ? "This could be you!" : contributors.join(", "), contributors.length < 3)
-
+        .setDescription(theoryhunt.description || null)
+        .addFields([{
+            name: "Difficulty",
+            value:  `${theoryhunt.difficulty}${theoryhunt.difficultyReason ? ` (${theoryhunt.difficultyReason})`:""}`
+        }, {
+            name: "Requirements",
+            value:  theoryhunt.requirements
+        }, {
+            name: "Details",
+            value:  theoryhunt.details
+        }, {
+            name: "Commissioner",
+            value:  theoryhunt.commissioner.length == 0 ? "KQM" : theoryhunt.commissioner.map(c => `<@${c.discordId}>`).sort().join(", "),
+            inline: true
+        }, {
+            name: "Ticket",
+            value:  theoryhunt.ticket.length == 0 ? "Ask a Scholar to create a ticket for you if you want to work on this." : theoryhunt.ticket.map(t => `<#${t.channelId}> [${t.status}]`).sort().join("\n"),
+            inline: true
+        }, {
+            name: "Participants",
+            value:  contributors.length == 0 ? "This could be you!" : contributors.join(", "),
+            inline: contributors.length < 3
+        }])
     return embed
 }
 
@@ -594,7 +601,7 @@ export async function updateTHMessage(theoryhunt: IncludedTheoryhunt|null) {
     if (theoryhunt == null) return
 
     const channel = await client.channels.fetch(TheoryhuntSettings.channel)
-    if (!channel || !channel.isText()) return
+    if (!channel || !channel.isTextBased()) return
 
     try {
         const msg = await channel.messages.fetch(theoryhunt.messageId)

@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, MessageEmbed, User } from "discord.js"
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder, Message, PermissionFlagsBits, User } from "discord.js"
 import client from "../../main"
 import Command from "../../utils/Command"
 import { ticketTypes } from "../../utils/TicketTypes"
@@ -17,19 +17,19 @@ export default class CreateTicketDirectory extends Command {
             options: [{
                 name: "type",
                 description: "Ticket types to display",
-                type: "STRING",
+                type: ApplicationCommandOptionType.String,
                 choices: Object.values(ticketTypes).map(a => ({ name: a.name, value: a.id })),
                 required: true
             }, {
                 name: "channel",
                 description: "Which channel to post in (defaults to current)",
-                type: "CHANNEL",
+                type: ApplicationCommandOptionType.Channel,
                 required: false
             }]
         })
     }
 
-    async runInteraction(source: CommandInteraction): Promise<SendMessage | undefined> {
+    async runInteraction(source: ChatInputCommandInteraction): Promise<SendMessage | undefined> {
         return this.run(source, source.user, source.options.getString("type", true), source.options.getChannel("channel", false) ?? source.channel)
     }
 
@@ -50,7 +50,7 @@ export default class CreateTicketDirectory extends Command {
         const member = await source.guild.members.fetch(user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
 
-        if (!member.permissionsIn(channel.id).has("MANAGE_CHANNELS"))
+        if (!member.permissionsIn(channel.id).has(PermissionFlagsBits.ManageChannels))
             return await sendMessage(source, "Only people who can manage the target channel can create a ticket directory", undefined, true)
 
         const ticketType = ticketTypes[type]
@@ -62,7 +62,7 @@ export default class CreateTicketDirectory extends Command {
             return await sendMessage(source, `You can't make a ticket directory of ${ticketType.name} here`, undefined, true)
 
         const response = await channel.send({
-            embeds: [new MessageEmbed()
+            embeds: [new EmbedBuilder()
                 .setTitle(`List of currently open ${ticketType.name}`)
                 .setDescription("Loading...")
                 .setColor(Colors.ORANGE)

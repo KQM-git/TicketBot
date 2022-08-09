@@ -40,7 +40,7 @@ export async function handle(old: DMChannel | GuildChannel, channel: DMChannel |
             },
             data: {
                 name: channel.name ?? undefined,
-                type: channel.type
+                type: channel.type.toString()
             }
         })
     } catch (error) {

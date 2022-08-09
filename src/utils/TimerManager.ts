@@ -1,5 +1,5 @@
 import { PrismaClient, Ticket, TicketDirectory } from "@prisma/client"
-import { MessageEmbed } from "discord.js"
+import { EmbedBuilder } from "discord.js"
 import { getLogger } from "log4js"
 import TiBotClient from "../TiBotClient"
 import { ticketTypes } from "./TicketTypes"
@@ -30,7 +30,7 @@ export default class TimerManager {
             if (lastTime > minTime) continue
 
             const channel = await this.client.channels.fetch(ticket.channelId)
-            if (!channel || !channel.isText()) {
+            if (!channel || !channel.isTextBased()) {
                 Logger.error(`Unable to check time for ticket #${ticket.id}: Channel ${ticket.channelId} in ${ticket.serverId} isn't available - ${ticket.type}: ${ticket.name}`)
                 continue
             }
@@ -50,7 +50,7 @@ export default class TimerManager {
                 Logger.info(`Sending a dinkdonk message to ${ticket.id} - ${ticket.name} - last message was at ${new Date(lastTime)}`)
                 try {
                     await channel.send({
-                        embeds: [new MessageEmbed().setDescription(ticketType.dinkDonk.message)]
+                        embeds: [new EmbedBuilder().setDescription(ticketType.dinkDonk.message)]
                     })
                     lastTime = Date.now()
                 } catch (error) {
@@ -78,7 +78,7 @@ export default class TimerManager {
 
     public async updateTicketDirectory(td: TicketDirectory, allTickets: Ticket[]) {
         const channel = await this.client.channels.fetch(td.channelId)
-        if (!channel || !channel.isText()) {
+        if (!channel || !channel.isTextBased()) {
             Logger.error(`Unable to update ${td.type} ticket directory in channel ${td.channelId} in ${td.serverId} or isn't available (channel not found)`)
             return
         }
@@ -103,30 +103,30 @@ export default class TimerManager {
             .sort((a, b) => trim(a.name).localeCompare(trim(b.name)))
             .forEach(t => stats[t.status as TicketStatus]?.push(t))
 
-        const embeds: MessageEmbed[] = []
+        const embeds: EmbedBuilder[] = []
         if (stats.OPEN.length > 0)
-            embeds.push(new MessageEmbed()
+            embeds.push(new EmbedBuilder()
                 .setTitle(`Open ${ticketType?.name ?? td.type}`)
                 .setColor(Colors.ORANGE)
                 .setDescription(stats.OPEN.map(t => `<#${t.channelId}>`).join("\n"))
             )
 
         if (stats.CLOSED.length > 0)
-            embeds.push(new MessageEmbed()
+            embeds.push(new EmbedBuilder()
                 .setTitle(`Closed ${ticketType?.name ?? td.type}`)
                 .setColor(Colors.GREEN)
                 .setDescription(stats.CLOSED.map(t => `<#${t.channelId}>`).join("\n"))
             )
 
         if (stats.VERIFIED.length > 0)
-            embeds.push(new MessageEmbed()
+            embeds.push(new EmbedBuilder()
                 .setTitle(`Verified ${ticketType?.name ?? td.type}`)
                 .setColor(Colors.DARK_GREEN)
                 .setDescription(stats.VERIFIED.map(t => `<#${t.channelId}>`).join("\n"))
             )
 
         if (embeds.length == 0)
-            embeds.push(new MessageEmbed()
+            embeds.push(new EmbedBuilder()
                 .setTitle(`There are currently no ${ticketType?.name ?? td.type} open`)
                 .setColor(Colors.RED)
             )

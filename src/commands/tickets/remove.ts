@@ -1,5 +1,5 @@
 import { APIInteractionDataResolvedGuildMember, APIRole } from "discord-api-types/v9"
-import { BaseGuildTextChannel, CommandInteraction, GuildMember, Message, MessageEmbed, Role, User } from "discord.js"
+import { ApplicationCommandOptionType, BaseGuildTextChannel, ChatInputCommandInteraction, EmbedBuilder, GuildMember, Message, Role, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
@@ -18,14 +18,14 @@ export default class RemoveUserTicket extends Command {
             aliases: [],
             options: [{
                 name: "target",
-                type: "MENTIONABLE",
+                type: ApplicationCommandOptionType.Mentionable,
                 description: "User/group to remove",
                 required: true
             }]
         })
     }
 
-    async runInteraction(source: CommandInteraction): Promise<SendMessage | undefined> {
+    async runInteraction(source: ChatInputCommandInteraction): Promise<SendMessage | undefined> {
         await source.deferReply({ ephemeral: true })
         return this.run(source, source.user, source.options.getMentionable("target", true))
     }
@@ -70,11 +70,11 @@ export default class RemoveUserTicket extends Command {
 
         const targetRole = await source.guild.roles.fetch(targetId)
         if (targetRole) {
-            await source.channel.permissionOverwrites.edit(targetRole, { VIEW_CHANNEL: null })
+            await source.channel.permissionOverwrites.edit(targetRole, { ViewChannel: null })
 
             await source.channel.send({
                 embeds: [
-                    new MessageEmbed()
+                    new EmbedBuilder()
                         .setDescription(`<@${member.id}> removed role ${target} to this ticket`)
                         .setColor(Colors.RED)
                 ]
@@ -84,11 +84,11 @@ export default class RemoveUserTicket extends Command {
 
         const targetUser = await client.users.fetch(targetId)
         if (targetUser) {
-            await source.channel.permissionOverwrites.edit(targetUser, { VIEW_CHANNEL: null })
+            await source.channel.permissionOverwrites.edit(targetUser, { ViewChannel: null })
 
             await source.channel.send({
                 embeds: [
-                    new MessageEmbed()
+                    new EmbedBuilder()
                         .setDescription(`<@${member.id}> removed user ${target} to this ticket`)
                         .setColor(Colors.RED)
                 ]

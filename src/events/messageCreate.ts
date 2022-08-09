@@ -1,4 +1,4 @@
-import { DMChannel, Message } from "discord.js"
+import { Message, MessageType } from "discord.js"
 import log4js from "log4js"
 import config from "../data/config.json"
 import client from "../main"
@@ -9,7 +9,7 @@ const Logger = log4js.getLogger("message")
 
 export async function handle(message: Message): Promise<void> {
     if (message.author.bot) {
-        if (message.type == "CHANNEL_PINNED_MESSAGE" && message.author.id == client.user?.id)
+        if (message.type == MessageType.ChannelPinnedMessage && message.author.id == client.user?.id)
             try {
                 await message.delete()
             } catch (a) {
@@ -26,14 +26,14 @@ export async function handle(message: Message): Promise<void> {
     const cmdInfo = getCommand(command)
 
     if (cmdInfo && cmdInfo.cmd) {
-        if (message.channel instanceof DMChannel)
-            Logger.info(`${message.author.id} (${message.author.tag}) executes command in ${message.channel.recipient.tag}: ${message.content}`)
+        if (message.channel.isDMBased())
+            Logger.info(`${message.author.id} (${message.author.tag}) executes command in ${message.channel.recipient?.tag}: ${message.content}`)
         else
-            Logger.info(`${message.author.id} (${message.author.tag}) executes command in ${isTicketable(message.channel) ? message.channel.name : message.channel.type} (guild ${message.guild ? message.guild.id : "NaN"}): ${message.content}`)
+            Logger.info(`${message.author.id} (${message.author.tag}) executes command in ${isTicketable(message.channel) ? message.channel.name : message.channelId} (guild ${message.guild ? message.guild.id : "NaN"}): ${message.content}`)
 
         // TODO add stat?
         await handleLegacyCommand(cmdInfo, message, args)
-    } else if (message.channel.type === "DM") {
+    } else if (message.channel.isDMBased()) {
         Logger.info(`${message.author.id} (${message.author.tag}) sends message ${message.type} in dm: ${message.content}`)
     }
 }

@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto"
-import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButton, MessageEmbed, User } from "discord.js"
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, EmbedBuilder, Message, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
@@ -20,7 +20,7 @@ export default class DeleteTicket extends Command {
         })
     }
 
-    async runInteraction(source: CommandInteraction): Promise<SendMessage | string | undefined> {
+    async runInteraction(source: ChatInputCommandInteraction): Promise<SendMessage | string | undefined> {
         await source.deferReply({ ephemeral: true })
         return this.run(source, source.user)
     }
@@ -47,9 +47,9 @@ export default class DeleteTicket extends Command {
         if (d != true) return d
 
         return sendMessage(source, "Are you sure you want to delete this ticket and **channel**?", [
-            new MessageActionRow().addComponents(
-                new MessageButton()
-                    .setStyle("DANGER")
+            new ActionRowBuilder<ButtonBuilder>().addComponents(
+                new ButtonBuilder()
+                    .setStyle(ButtonStyle.Danger)
                     .setLabel("YES")
                     .setEmoji("✖️")
                     .setCustomId("delete-yes")
@@ -96,7 +96,7 @@ export default class DeleteTicket extends Command {
         const channel = source.channel
         const response = await channel.send({
             embeds: [
-                new MessageEmbed()
+                new EmbedBuilder()
                     .setDescription(`This ticket will shortly be deleted - by <@${member.id}>`)
                     .setColor(Colors.DARK_RED)
             ],

@@ -1,5 +1,5 @@
 import { APIInteractionDataResolvedChannel } from "discord-api-types/v10"
-import { ChannelPosition, CommandInteraction, GuildBasedChannel, Message, MessageAttachment, NonThreadGuildBasedChannel, ThreadChannel, User } from "discord.js"
+import { ApplicationCommandOptionType, Attachment, AttachmentBuilder, ChannelPosition, ChatInputCommandInteraction, GuildBasedChannel, Message, NonThreadGuildBasedChannel, PermissionFlagsBits, ThreadChannel, User } from "discord.js"
 import { getLogger } from "log4js"
 import fetch from "node-fetch"
 import client from "../../main"
@@ -22,34 +22,34 @@ export default class ChannelOrder extends Command {
             options: [{
                 name: "status",
                 description: "Check the status about the current channel positions",
-                type: "SUB_COMMAND"
+                type: ApplicationCommandOptionType.Subcommand
             }, {
                 name: "dump",
                 description: "Dump current channel positions",
-                type: "SUB_COMMAND"
+                type: ApplicationCommandOptionType.Subcommand
             }, {
                 name: "stabilize",
                 description: "Force re-ordering to prepare for human movement",
-                type: "SUB_COMMAND"
+                type: ApplicationCommandOptionType.Subcommand
             }, {
                 name: "restore",
                 description: "Restore channel positions from data file",
-                type: "SUB_COMMAND",
+                type: ApplicationCommandOptionType.Subcommand,
                 options: [{
                     name: "data",
                     description: "Dump to restore from",
-                    type: "ATTACHMENT",
+                    type: ApplicationCommandOptionType.Attachment,
                     required: true
                 }, {
                     name: "category",
                     description: "Category to restore, defaults to all channels",
-                    type: "CHANNEL",
+                    type: ApplicationCommandOptionType.Channel,
                 }]
             }]
         })
     }
 
-    async runInteraction(source: CommandInteraction): Promise<SendMessage | undefined> {
+    async runInteraction(source: ChatInputCommandInteraction): Promise<SendMessage | undefined> {
         await source.deferReply({ ephemeral: true })
         return this.run(source, source.user, source.options.getSubcommand(true), source.options.getAttachment("data", false), source.options.getChannel("category", false))
     }
@@ -61,7 +61,7 @@ export default class ChannelOrder extends Command {
         return this.run(source, source.author, args[0].toLowerCase())
     }
 
-    async run(source: CommandSource, user: User, command: string, attachment?: MessageAttachment | null, onlyMove?: APIInteractionDataResolvedChannel | GuildBasedChannel | null): Promise<SendMessage | undefined> {
+    async run(source: CommandSource, user: User, command: string, attachment?: Attachment | null, onlyMove?: APIInteractionDataResolvedChannel | GuildBasedChannel | null): Promise<SendMessage | undefined> {
         if (!source.guild) return await sendMessage(source, "Couldn't get guild data", undefined, true)
 
         const member = await source.guild.members.fetch(user.id)
@@ -83,7 +83,7 @@ export default class ChannelOrder extends Command {
             position: x.rawPosition,
             name: x.name,
             type: x.type,
-            canMove: x.permissionsFor(me).has("MANAGE_CHANNELS")
+            canMove: x.permissionsFor(me).has(PermissionFlagsBits.ManageChannels)
         })
 
 
@@ -157,11 +157,13 @@ ${channelUpdates[source.guild.id]?.map(r => `${displayTimestamp(new Date(r.time)
 ${response.join("\n") || "*No inconsistencies found!*"}`.substring(0, 1900), undefined, true)
         } else if (command == "dump") {
             await member.send({
-                files: [new MessageAttachment(Buffer.from(JSON.stringify(data, undefined, 4)), `channels-${source.guild.id}-${new Date().toISOString().replace(/:|T/g, "-").replace("Z", "")}.json`)]
+                files: [new AttachmentBuilder(Buffer.from(JSON.stringify(data, undefined, 4)), {
+                    name: `channels-${source.guild.id}-${new Date().toISOString().replace(/:|T/g, "-").replace("Z", "")}.json`
+                })]
             })
             return await sendMessage(source, hasRecentMove ? "🔴 Recent channel movements detected! Data send might not be correct! (Refer to `/channelorder status` for more info)" : "Send in DMs!", undefined, true)
         } else if (command == "restore" || command == "stabilize") {
-            if (!member.roles.cache.hasAny(...ROLE.ADMIN_LIKE) || !member.permissions.has("ADMINISTRATOR"))
+            if (!member.roles.cache.hasAny(...ROLE.ADMIN_LIKE) || !member.permissions.has(PermissionFlagsBits.Administrator))
                 return await sendMessage(source, "You are not an admin", undefined, true)
 
             if (unknown.length > 0)

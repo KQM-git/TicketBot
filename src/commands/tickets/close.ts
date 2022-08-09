@@ -1,4 +1,4 @@
-import { BaseGuildTextChannel, ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButton, MessageEmbed, User } from "discord.js"
+import { ActionRowBuilder, BaseGuildTextChannel, ButtonBuilder, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, EmbedBuilder, Message, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
@@ -20,7 +20,7 @@ export default class CloseTicket extends Command {
         })
     }
 
-    async runInteraction(source: CommandInteraction): Promise<SendMessage | undefined> {
+    async runInteraction(source: ChatInputCommandInteraction): Promise<SendMessage | undefined> {
         await source.deferReply({ ephemeral: true })
         return this.run(source, source.user)
     }
@@ -40,7 +40,7 @@ export default class CloseTicket extends Command {
         const member = await source.guild.members.fetch(user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
 
-        if (!source.channel || !source.channel.isText()) return await sendMessage(source, "Couldn't get channel ID / not a text channel", undefined, true)
+        if (!source.channel || !source.channel.isTextBased()) return await sendMessage(source, "Couldn't get channel ID / not a text channel", undefined, true)
 
         const ticket = await client.prisma.ticket.findUnique({
             where: {
@@ -72,14 +72,14 @@ export default class CloseTicket extends Command {
                 const user = await client.users.fetch(ticket.creator.discordId)
                 if (!user)
                     return await sendMessage(source, `Couldn't fetch ticket owner user profile - ${ticket.creator.discordId}`)
-                await source.channel.permissionOverwrites.edit(user, { SEND_MESSAGES: false })
+                await source.channel.permissionOverwrites.edit(user, { SendMessages: false })
             }
             if (ticketType?.closeCategory)
                 await source.channel.setParent(ticketType.closeCategory, { lockPermissions: false })
         }
 
-        const components = [new MessageActionRow().addComponents(
-            ...(ticketType?.verifications?.map(v => new MessageButton()
+        const components = [new ActionRowBuilder<ButtonBuilder>().addComponents(
+            ...(ticketType?.verifications?.map(v => new ButtonBuilder()
                 .setCustomId(`verify-${v.type}`)
                 .setLabel(v.button.label)
                 .setEmoji(v.button.emoji)
@@ -91,16 +91,16 @@ export default class CloseTicket extends Command {
 
         const dinkDonks = ticketType.verifications?.filter(x => x.dinkDonk)
         if (dinkDonks && dinkDonks.length > 0)
-            components.push(new MessageActionRow().addComponents(...dinkDonks.map(v => new MessageButton()
+            components.push(new ActionRowBuilder<ButtonBuilder>().addComponents(...dinkDonks.map(v => new ButtonBuilder()
                 .setCustomId(`pingverifiers-${v.type}`)
                 .setLabel(v.dinkDonk?.button.label ?? "Remind verifiers")
                 .setEmoji(v.dinkDonk?.button.emoji ?? "<a:dinkdonk:981687794000879696>")
-                .setStyle(v.dinkDonk?.button.style ?? "DANGER")
+                .setStyle(v.dinkDonk?.button.style ?? ButtonStyle.Danger)
             )))
 
         await source.channel.send({
             embeds: [
-                new MessageEmbed()
+                new EmbedBuilder()
                     .setDescription(`Ticket closed by <@${member.id}>. If there are any issues with it - it can be reopened by the owner or staff by using the buttons below or \`/open\`.`)
             ],
             components

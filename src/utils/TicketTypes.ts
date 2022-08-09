@@ -1,32 +1,32 @@
-import { MessageActionRow, MessageButton, MessageButtonStyle } from "discord.js"
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from "discord.js"
 import config from "../data/config.json"
 import { TicketType, VerifierType } from "./Types"
 
 export const buttons = {
-    CLOSE: new MessageButton()
+    CLOSE: new ButtonBuilder()
         .setLabel("Close")
         .setCustomId("close")
         .setEmoji("🔒")
-        .setStyle("DANGER"),
-    OPEN: new MessageButton()
+        .setStyle(ButtonStyle.Danger),
+    OPEN: new ButtonBuilder()
         .setCustomId("open")
         .setLabel("Open")
         .setEmoji("🔓")
-        .setStyle("SECONDARY"),
-    TRANSCRIPT: new MessageButton()
+        .setStyle(ButtonStyle.Secondary),
+    TRANSCRIPT: new ButtonBuilder()
         .setCustomId("transcript")
         .setLabel("Transcript")
         .setEmoji("📑")
-        .setStyle("SECONDARY"),
-    RENAME: new MessageButton()
+        .setStyle(ButtonStyle.Secondary),
+    RENAME: new ButtonBuilder()
         .setLabel("Rename")
         .setCustomId("rename")
         .setEmoji("✏️")
-        .setStyle("SECONDARY"),
-    GUIDE_LINK: new MessageButton()
+        .setStyle(ButtonStyle.Secondary),
+    GUIDE_LINK: new ButtonBuilder()
         .setLabel("Guide Guidelines")
         .setURL("https://docs.google.com/document/d/1hZ0bNmMy1t5R8TOF1v8mcuzQpR0BgJD5pKY2T_t6uh0/edit?usp=sharing")
-        .setStyle("LINK")
+        .setStyle(ButtonStyle.Link)
 }
 
 export const ROLE = config.production ? {
@@ -74,7 +74,7 @@ export const ROLE = config.production ? {
     ],
     STAFF: ["980899219235807302"],
     ADMIN: "980899219235807302",
-    ADMIN_LIKE: [ "980899219235807302" ],
+    ADMIN_LIKE: ["980899219235807302"],
     GUIDE_VERIFICATION_PING: "984490976817066046",
     CALCS_VERIFICATION_PING: "984490976817066046",
     BLACKLIST: [
@@ -134,7 +134,7 @@ export const ticketTypes: Record<string, TicketType> = {
         id: "libsubs",
         name: "Library Submission",
         emoji: "🔖",
-        style: "PRIMARY",
+        style: ButtonStyle.Primary,
         opening: {
             content: ` - As an author, it is your responsibility to complete the ticket
 
@@ -144,17 +144,17 @@ export const ticketTypes: Record<string, TicketType> = {
 - When you are ready to submit the ticket, compile everything into one message following the format below and pin it. Then type \`/close\` or click the button below; the ticket will automatically be moved to be reviewed.
 - To add contributors to your ticket you can use \`/contributor add <user>\`.
 - The ticket will be scrapped if: no activity >1 week or open for >1 month.`,
-            embeds: [{
-                title: "Write-up Format",
-                description: `**Theory/Finding/Bug:** Title of your submission
+            embeds: [new EmbedBuilder()
+                .setTitle("Write-up Format")
+                .setDescription(`**Theory/Finding/Bug:** Title of your submission
 
 **Evidence:** Explanations with calculations and/or YouTube/Imgur proofs
 
-**Significance:** Conclusion`,
-                color: "#A758BF"
-            }],
+**Significance:** Conclusion`)
+                .setColor("#A758BF")
+            ],
             components: [
-                new MessageActionRow().addComponents(
+                new ActionRowBuilder<ButtonBuilder>().addComponents(
                     buttons.CLOSE,
                     buttons.RENAME
                 )
@@ -173,7 +173,7 @@ export const ticketTypes: Record<string, TicketType> = {
             button: {
                 label: "Verify",
                 emoji: "✅",
-                style: "PRIMARY"
+                style: ButtonStyle.Primary
             }
         }],
         verifiedCategory: CATEGORY.PUBLISHING,
@@ -189,21 +189,21 @@ export const ticketTypes: Record<string, TicketType> = {
         id: "guide",
         name: "Guide Submission",
         emoji: "📔",
-        style: "SUCCESS",
+        style: ButtonStyle.Success,
         opening: {
             content: ` - As an author, it is your responsibility to complete the ticket
 
 **Guidelines**
 - Name it appropriately with \`/rename <ticket name>\`
 - When done ping <@235719068726853632> to begin the review process.`,
-            embeds: [{
-                title: "Guide Guidelines",
-                description: "Here are the KQM Guide standards if you are interested. These are not enforced at the moment but it is heavily encouraged you follow them.",
-                color: "#A758BF"
-            }],
+            embeds: [new EmbedBuilder()
+                .setTitle("Guide Guidelines")
+                .setDescription("Here are the KQM Guide standards if you are interested. These are not enforced at the moment but it is heavily encouraged you follow them.")
+                .setColor("#A758BF")
+            ],
             pingUsers: ["235719068726853632"],
             components: [
-                new MessageActionRow().addComponents(
+                new ActionRowBuilder<ButtonBuilder>().addComponents(
                     buttons.GUIDE_LINK,
                     buttons.CLOSE
                 )
@@ -233,13 +233,13 @@ export const ticketTypes: Record<string, TicketType> = {
                 button: {
                     emoji: "<a:dinkdonk:981687794000879696>",
                     label: "Ping guide verifiers",
-                    style: "DANGER"
+                    style: ButtonStyle.Danger
                 }
             },
             button: {
                 label: "Verify guide",
                 emoji: "✅",
-                style: "PRIMARY"
+                style: ButtonStyle.Primary
             }
         }, {
             type: VerifierType.CALCS,
@@ -252,13 +252,13 @@ export const ticketTypes: Record<string, TicketType> = {
                 button: {
                     emoji: "<a:dinkdonk:981687794000879696>",
                     label: "Ping calc verifiers",
-                    style: "DANGER"
+                    style: ButtonStyle.Danger
                 }
             },
             button: {
                 label: "Verify calcs",
                 emoji: "✅",
-                style: "PRIMARY"
+                style: ButtonStyle.Primary
             }
         }],
         dumpChannel: CHANNEL.TC_TRANSCRIPTS,
@@ -272,7 +272,7 @@ export const ticketTypes: Record<string, TicketType> = {
         id: "tcproject",
         name: "TC Project",
         emoji: "🔖",
-        style: "PRIMARY",
+        style: ButtonStyle.Primary,
         opening: {
             content: ` - As an author, it is your responsibility to complete the ticket
 
@@ -281,17 +281,17 @@ export const ticketTypes: Record<string, TicketType> = {
 - If this ticket was created by accident or it can be deleted, you can use \`/delete\` within the first 5 minutes, otherwise ask a Scholar.
 - When you are ready to submit the ticket, compile everything into one message following the format below and pin it. Then type \`/close\` or click the button below; the ticket will automatically be moved to be reviewed.
 - To add contributors to your ticket you can use \`/contributor add <user>\`.`,
-            embeds: [{
-                title: "Write-up Format",
-                description: `**Theory/Finding/Bug:** Title of your submission
+            embeds: [new EmbedBuilder()
+                .setTitle("Write-up Format")
+                .setDescription(`**Theory/Finding/Bug:** Title of your submission
 
 **Evidence:** Explanations with calculations and/or YouTube/Imgur proofs
 
-**Significance:** Conclusion`,
-                color: "#A758BF"
-            }],
+**Significance:** Conclusion`)
+                .setColor("#A758BF")
+            ],
             components: [
-                new MessageActionRow().addComponents(
+                new ActionRowBuilder<ButtonBuilder>().addComponents(
                     buttons.CLOSE,
                     buttons.RENAME
                 )
@@ -308,7 +308,7 @@ export const ticketTypes: Record<string, TicketType> = {
             button: {
                 label: "Verify",
                 emoji: "✅",
-                style: "PRIMARY"
+                style: ButtonStyle.Primary
             }
         }],
         verifiedCategory: CATEGORY.PUBLISHING,
@@ -320,7 +320,7 @@ export const ticketTypes: Record<string, TicketType> = {
         id: "theoryhunt",
         name: "Theoryhunt",
         emoji: "🔖",
-        style: "PRIMARY",
+        style: ButtonStyle.Primary,
         opening: {
             content: ` - As an author, it is your responsibility to complete the ticket
 
@@ -330,17 +330,17 @@ export const ticketTypes: Record<string, TicketType> = {
 - When you are ready to submit the ticket, compile everything into one message following the format below and pin it. Then type \`/close\` or click the button below; the ticket will automatically be moved to be reviewed.
 - To add contributors to your ticket you can use \`/contributor add <user>\`.
 - The ticket will be scrapped if: no activity >1 week or open for >1 month.`,
-            embeds: [{
-                title: "Write-up Format",
-                description: `**Theory/Finding/Bug:** Title of your submission
+            embeds: [new EmbedBuilder()
+                .setTitle("Write-up Format")
+                .setDescription(`**Theory/Finding/Bug:** Title of your submission
 
 **Evidence:** Explanations with calculations and/or YouTube/Imgur proofs
 
-**Significance:** Conclusion`,
-                color: "#A758BF"
-            }],
+**Significance:** Conclusion`)
+                .setColor("#A758BF")
+            ],
             components: [
-                new MessageActionRow().addComponents(
+                new ActionRowBuilder<ButtonBuilder>().addComponents(
                     buttons.CLOSE,
                     buttons.RENAME
                 )
@@ -359,7 +359,7 @@ export const ticketTypes: Record<string, TicketType> = {
             button: {
                 label: "Verify",
                 emoji: "✅",
-                style: "PRIMARY"
+                style: ButtonStyle.Primary
             }
         }],
         verifiedCategory: CATEGORY.PUBLISHING,
@@ -375,7 +375,7 @@ export const ticketTypes: Record<string, TicketType> = {
         id: "staff",
         name: "Staff Ticket",
         emoji: "🐒",
-        style: "SECONDARY",
+        style: ButtonStyle.Secondary,
         creationRoles: ROLE.STAFF,
         manageRoles: ROLE.STAFF,
         defaultCategory: CATEGORY.STAFF_TICKETS,
@@ -387,7 +387,7 @@ export const ticketTypes: Record<string, TicketType> = {
 - You can rename your ticket with \`/rename <ticket name>\` or with the button below
 - If you are done with this ticket, type \`/close\` or click the button below.`,
             components: [
-                new MessageActionRow().addComponents(
+                new ActionRowBuilder<ButtonBuilder>().addComponents(
                     buttons.CLOSE,
                     buttons.RENAME
                 )
@@ -400,7 +400,7 @@ export const ticketTypes: Record<string, TicketType> = {
         id: "feiyun",
         name: "Feiyun Ticket",
         emoji: "📹",
-        style: "PRIMARY",
+        style: ButtonStyle.Primary,
         creationRoles: [ROLE.FEIYUN],
         manageRoles: [ROLE.FEIYUN_ADMIN],
         defaultCategory: CATEGORY.FEIYUN_PROJECTS,
@@ -411,14 +411,14 @@ export const ticketTypes: Record<string, TicketType> = {
             button: {
                 label: "Verify",
                 emoji: "✅",
-                style: "PRIMARY"
+                style: ButtonStyle.Primary
             }
         }],
         verifiedCategory: CATEGORY.FEIYUN_DONE,
         opening: {
             content: " - Welcome. Please use this channel to work on your project and ping the relevant QC roles when done.",
             components: [
-                new MessageActionRow().addComponents(
+                new ActionRowBuilder<ButtonBuilder>().addComponents(
                     buttons.RENAME
                 )
             ]
@@ -440,7 +440,7 @@ export const menus: {
         id?: string
         name: string
         emoji: string
-        style: MessageButtonStyle
+        style: ButtonStyle
     }[]
 }[] = [{
     name: "Theorycrafting Tickets",
@@ -482,7 +482,7 @@ For anyone else you want to add in, you can use \`/add <person or role>\` in the
     ticketTypes: [{
         emoji: "📋",
         name: "Calculation Request",
-        style: "SUCCESS",
+        style: ButtonStyle.Success,
         customId: "template-reqcalc",
     }]
 }]

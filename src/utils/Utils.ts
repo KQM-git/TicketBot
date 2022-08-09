@@ -1,4 +1,4 @@
-import { AnyChannel, ColorResolvable, GuildChannel, Message, MessageActionRow, MessageAttachment, MessageEmbed, TextBasedChannel } from "discord.js"
+import { ActionRow, APIActionRowComponent, APIMessageActionRowComponent, Attachment, Channel, ColorResolvable, EmbedBuilder, GuildChannel, JSONEncodable, Message, MessageActionRowComponent } from "discord.js"
 import log4js from "log4js"
 import client from "../main"
 import { CommandSource, SendMessage, TicketableChannel, TicketStatus, VerifierType } from "./Types"
@@ -12,8 +12,8 @@ export function displayTimestamp(time: Date, display = "R"): string {
 export function isMessage(msg: SendMessage | CommandSource | undefined): msg is Message {
     return msg instanceof Message
 }
-export async function updateMessage(channelId: string, replyId: string, response: string | MessageEmbed, components?: (MessageActionRow)[]): Promise<SendMessage | undefined> {
-    let embeds: (MessageEmbed)[] | undefined
+export async function updateMessage(channelId: string, replyId: string, response: string | EmbedBuilder, components?: ActionRow<MessageActionRowComponent>[]): Promise<SendMessage | undefined> {
+    let embeds: EmbedBuilder[] | undefined
     let content: string | undefined
 
     if (typeof response == "string")
@@ -39,8 +39,10 @@ export const verificationTypeName: Record<VerifierType, string> = {
     GUIDE: "Guide"
 }
 
-export async function sendMessage(source: CommandSource, response: string | MessageEmbed, components?: (MessageActionRow)[], ephemeral?: boolean, files?: MessageAttachment[]): Promise<SendMessage | undefined> {
-    let embeds: (MessageEmbed)[] | undefined
+export async function sendMessage(source: CommandSource, response: string | EmbedBuilder, components?: (
+    | JSONEncodable<APIActionRowComponent<APIMessageActionRowComponent>>
+)[], ephemeral?: boolean, files?: Attachment[]): Promise<SendMessage | undefined> {
+    let embeds: EmbedBuilder[] | undefined
     let content: string | undefined
 
     if (typeof response == "string")
@@ -144,9 +146,9 @@ export function findFuzzyBestCandidates(target: string[], search: string, amount
         .map(e => e.t)
 }
 
-export function isTicketable(channel: AnyChannel | GuildChannel | TextBasedChannel | null): channel is TicketableChannel {
+export function isTicketable(channel: Channel | GuildChannel | null): channel is TicketableChannel {
     if (!channel) return false
-    return channel.type == "GUILD_TEXT" || channel.type == "GUILD_PUBLIC_THREAD" || channel.type == "GUILD_PRIVATE_THREAD" || channel.type == "GUILD_NEWS" || channel.type == "GUILD_NEWS_THREAD"
+    return channel.isTextBased() && !channel.isDMBased()
 }
 
 

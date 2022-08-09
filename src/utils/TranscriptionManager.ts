@@ -1,13 +1,13 @@
 import { PrismaClient, QueuedTranscript } from "@prisma/client"
 import AdmZip from "adm-zip"
 import { randomUUID } from "crypto"
-import { EmbedField, EmbedFooterData, Guild, GuildMember, MessageActionRow, MessageActionRowComponent, MessageAttachment, MessageEmbed, MessageEmbedImage, MessageEmbedThumbnail, MessageEmbedVideo, MessageMentions, MessageReaction, User } from "discord.js"
+import { ActionRow, APIEmbedField, Attachment, AttachmentBuilder, ComponentType, Embed, EmbedAssetData, EmbedBuilder, EmbedFooterData, Guild, GuildMember, MessageActionRowComponent, MessageMentions, MessageReaction, User, UserFlagsBitField } from "discord.js"
 import { getLogger } from "log4js"
+import { baseUrl } from "../data/config.json"
 import TiBotClient from "../TiBotClient"
 import { ticketTypes } from "./TicketTypes"
 import { ChannelInput, EndingAction, Enumerable, InputJsonValue, MessageInput, RoleInput, SendMessage, TicketableChannel, UserConnection, UserInput, VerifierType } from "./Types"
 import { Colors, displayTimestamp, isTicketable, trim, updateMessage, verificationTypeName } from "./Utils"
-import { baseUrl } from "../data/config.json"
 
 const Logger = getLogger("transcriber")
 export default class TranscriptionManager {
@@ -88,7 +88,7 @@ export default class TranscriptionManager {
             connectOrCreate: {
                 create: {
                     name: channel.name,
-                    type: channel.type,
+                    type: channel.type.toString(),
                     server: this.getServer(channel.guild),
                     discordId: channel.id,
                 },
@@ -209,7 +209,7 @@ export default class TranscriptionManager {
                                 discordId: uid,
                                 serverId: guild.id,
                                 name: channel.name,
-                                type: channel.type,
+                                type: channel.type.toString(),
                             })
                     } catch (error) {
                         void 0
@@ -249,7 +249,7 @@ export default class TranscriptionManager {
                     })
 
                     if (!fullTranscript)
-                        if (channel && channel.isText())
+                        if (channel && channel.isTextBased())
                             await channel.send(`Couldn't fetch full transcript data/too big? Stored stuff is over at ${baseUrl}/transcripts/${transcript?.slug}`)
                         else Logger.error(`Couldn't send to transcript channel - couldn't fetch full transcript data? Stored stuff over at ${baseUrl}/transcripts/${transcript?.slug}`)
                     else {
@@ -274,12 +274,12 @@ export default class TranscriptionManager {
 
                         const dump = Buffer.from(JSON.stringify({ ...fullTranscript, messages }))
                         const files = dump.length < 1000 * 1000 * 8 ? [
-                            new MessageAttachment(Buffer.from(dump), `transcript-${transcript?.slug}.json`)
+                            new AttachmentBuilder(Buffer.from(dump), { name: `transcript-${transcript?.slug}.json` })
                         ] : [
-                            new MessageAttachment(this.createZip(dump, `transcript-${transcript?.slug}.json`), `transcript-${transcript?.slug}.zip`)
+                            new AttachmentBuilder(this.createZip(dump, `transcript-${transcript?.slug}.json`), { name: `transcript-${transcript?.slug}.zip` })
                         ]
 
-                        const embed = new MessageEmbed()
+                        const embed =new EmbedBuilder()
                             .setDescription(`[Full transcript](${baseUrl}/transcripts/${transcript?.slug}) (${fetched} messages by ${users.length} users) of <#${fullTranscript.channel.discordId}> / ${fullTranscript.channel.name}${
                                 messages.length < fetched ? "\n**PARTIAL DUMP**: Due to high message count, only a partial dump is available" : ""
                             }`)
@@ -290,23 +290,33 @@ export default class TranscriptionManager {
                                     name: `${ticket.creator.username}#${ticket.creator.tag}`,
                                     iconURL: (ticket.creator.avatar && `https://cdn.discordapp.com/avatars/${ticket.creator.discordId}/${ticket.creator.avatar}.png`) || "https://cdn.discordapp.com/attachments/247122362942619649/980958465566572604/unknown.png"
                                 })
-                                .addField("Ticket Name", ticket.name, true)
-                                .addField("Type", ticketTypes[ticket.type]?.name ?? ticket.type, true)
-                                .addField("Status", ticket.status, true)
+                                .addFields([
+                                    { name: "Ticket Name", value: ticket.name, inline: true },
+                                    { name: "Type", value: ticketTypes[ticket.type]?.name ?? ticket.type, inline: true },
+                                    { name: "Status", value: ticket.status, inline: true },
+                                ])
 
-                        embed.addField(
-                            "Top users in transcript",
-                            users
+                        embed.addFields([{
+                            name: "Top users in transcript",
+                            value: users
                                 .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
                                 .slice(0, 10)
                                 .map(r => `${r[1]} - <@${r[0]}>`)
-                                .join("\n"), true
-                        )
+                                .join("\n"),
+                            inline: true
+                        }])
 
                         if (ticket)
                             embed
-                                .addField("Verifications", ticket.verifications.map(v => `${verificationTypeName[v.type as VerifierType] ?? "Unknown"} <@${v.verifier.discordId}> ${displayTimestamp(v.createdAt)}`).join("\n") || "Wasn't verified", true)
-                                .addField("Contributors", ticket.contributors.map(c => `<@${c.discordId}>`).join(", ") || "No contributors added", true)
+                                .addFields([{
+                                    name: "Verifications",
+                                    value: ticket.verifications.map(v => `${verificationTypeName[v.type as VerifierType] ?? "Unknown"} <@${v.verifier.discordId}> ${displayTimestamp(v.createdAt)}`).join("\n") || "Wasn't verified",
+                                    inline: true
+                                }, {
+                                    name: "Contributors",
+                                    value: ticket.contributors.map(c => `<@${c.discordId}>`).join(", ") || "No contributors added",
+                                    inline: true
+                                }])
 
 
                         try {
@@ -314,7 +324,7 @@ export default class TranscriptionManager {
                                 const id = ticketTypes[ticket.type].verifiedChannel
                                 if (id) {
                                     const verifiedChannel = await this.client.channels.fetch(id)
-                                    if (verifiedChannel && verifiedChannel.isText())
+                                    if (verifiedChannel && verifiedChannel.isTextBased())
                                         await verifiedChannel.send({
                                             embeds: [embed]
                                         })
@@ -327,7 +337,7 @@ export default class TranscriptionManager {
                         }
 
                         try {
-                            if (channel && channel.isText())
+                            if (channel && channel.isTextBased())
                                 await channel.send({
                                     content: `Transcript for ${fullTranscript.channel.name}: <${baseUrl}/transcripts/${transcript?.slug}>`,
                                     embeds: [embed],
@@ -338,7 +348,7 @@ export default class TranscriptionManager {
                         } catch (error) {
                             Logger.error("Error while sending transcription message", error)
 
-                            if (channel && channel.isText())
+                            if (channel && channel.isTextBased())
                                 await channel.send(`Error occurred while sending transcript details for ${baseUrl}/transcripts/${transcript?.slug}`)
                         }
 
@@ -354,7 +364,7 @@ export default class TranscriptionManager {
                 })
                 await channel.delete(`Deleted with transcript - ${transcript?.slug}`)
             } else {
-                await updateMessage(queued.botChannelId, queued.botReplyId, new MessageEmbed()
+                await updateMessage(queued.botChannelId, queued.botReplyId, new EmbedBuilder()
                     .setTitle("Created transcript!")
                     .setDescription(`<a:hellawicked:982029314285514793> Transcription has been made and is available on ${baseUrl}/transcripts/${transcript?.slug} - Fetched a total of ${fetched} messages!`)
                     .setColor(Colors.GREEN))
@@ -428,7 +438,7 @@ export default class TranscriptionManager {
 
         Logger.info(`Queue #${queued.id} - transcript #${queued.transcriptId} (${queued.channelId} - ${channel.name}): from ${fetched} msgs; ${messages.length} messages and ${users.length} users fetched, pushed!`)
         if (newFetched % 1000 == 0)
-            await updateMessage(queued.botChannelId, queued.botReplyId, new MessageEmbed()
+            await updateMessage(queued.botChannelId, queued.botReplyId, new EmbedBuilder()
                 .setTitle("Creating transcript...")
                 .setDescription(`Fetched ${newFetched} messages...`)
                 .setColor(Colors.ORANGE))
@@ -470,7 +480,7 @@ export default class TranscriptionManager {
             tag: member.user.discriminator,
             avatar: member.user.avatar,
             bot: member.user.bot,
-            verified: (await member.user.fetchFlags()).has("VERIFIED_BOT"),
+            verified: (await member.user.fetchFlags()).has(UserFlagsBitField.Flags.VerifiedBot),
             serverId: member.guild.id
         }
     }
@@ -484,7 +494,7 @@ export default class TranscriptionManager {
             tag: user.discriminator,
             avatar: user.avatar,
             bot: user.bot,
-            verified: (await user.fetchFlags()).has("VERIFIED_BOT"),
+            verified: (await user.fetchFlags()).has(UserFlagsBitField.Flags.VerifiedBot),
             serverId: guildId
         }
     }
@@ -513,7 +523,7 @@ export default class TranscriptionManager {
         }
     }
 
-    private mapAttachment(a: MessageAttachment) {
+    private mapAttachment(a: Attachment) {
         return {
             name: a.name ?? undefined,
             desc: a.description ?? undefined,
@@ -536,7 +546,7 @@ export default class TranscriptionManager {
         }
     }
 
-    private mapEmbeds(e: MessageEmbed, relevantRoles: Set<string>, relevantUsers: Set<string>, relevantChannels: Set<string>) {
+    private mapEmbeds(e: Embed, relevantRoles: Set<string>, relevantUsers: Set<string>, relevantChannels: Set<string>) {
         function mapFooter(f: EmbedFooterData | null) {
             if (!f) return undefined
             return {
@@ -544,7 +554,7 @@ export default class TranscriptionManager {
                 url: f.iconURL ?? undefined,
             }
         }
-        function mapImage(i: MessageEmbedImage| MessageEmbedThumbnail | MessageEmbedVideo | null) {
+        function mapImage(i: EmbedAssetData | null) {
             if (!i) return undefined
             return {
                 url: i.url,
@@ -552,7 +562,7 @@ export default class TranscriptionManager {
                 height: i.height
             }
         }
-        function mapField(f: EmbedField) {
+        function mapField(f: APIEmbedField) {
             return {
                 name: f.name,
                 value: f.value,
@@ -581,13 +591,13 @@ export default class TranscriptionManager {
         if (typeof text !== "string")
             return text
 
-        for (const role of text.matchAll(MessageMentions.ROLES_PATTERN))
+        for (const role of text.matchAll(new RegExp(MessageMentions.RolesPattern, "g")))
             relevantRoles.add(role[1])
 
-        for (const user of text.matchAll(MessageMentions.USERS_PATTERN))
+        for (const user of text.matchAll(new RegExp(MessageMentions.UsersPattern, "g")))
             relevantUsers.add(user[1])
 
-        for (const channel of text.matchAll(MessageMentions.CHANNELS_PATTERN))
+        for (const channel of text.matchAll(new RegExp(MessageMentions.ChannelsPattern, "g")))
             relevantChannels.add(channel[1])
 
         // eslint-disable-next-line no-control-regex
@@ -598,9 +608,9 @@ export default class TranscriptionManager {
         return text
     }
 
-    private mapRow(c: MessageActionRow) {
+    private mapRow(c: ActionRow<MessageActionRowComponent>) {
         function mapComponent(d: MessageActionRowComponent) {
-            if (d.type == "BUTTON")
+            if (d.type == ComponentType.Button)
                 return {
                     type: d.type,
                     disabled: d.disabled,
@@ -610,7 +620,7 @@ export default class TranscriptionManager {
                     url: d.url ?? undefined
                 }
 
-            if (d.type == "SELECT_MENU")
+            if (d.type == ComponentType.SelectMenu)
                 return {
                     type: d.type,
                     disabled: d.disabled,

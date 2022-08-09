@@ -1,5 +1,5 @@
 import { APIInteractionDataResolvedChannel } from "discord-api-types/v9"
-import { CommandInteraction, GuildBasedChannel, Message, User } from "discord.js"
+import { ApplicationCommandOptionType, ChannelType, ChatInputCommandInteraction, GuildBasedChannel, Message, PermissionFlagsBits, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
@@ -21,18 +21,18 @@ export default class ConvertTicket extends Command {
             options: [{
                 name: "channel",
                 description: "Channel / category to convert",
-                type: "CHANNEL",
+                type: ApplicationCommandOptionType.Channel,
                 required: true
             }, {
                 name: "type",
                 description: "Ticket type to use",
-                type: "STRING",
+                type: ApplicationCommandOptionType.String,
                 choices: Object.values(ticketTypes).map(a => ({ name: a.name, value: a.id })),
                 required: true
             }, {
                 name: "status",
                 description: "Ticket status",
-                type: "STRING",
+                type: ApplicationCommandOptionType.String,
                 choices: [{
                     name: "Open",
                     value: TicketStatus.OPEN
@@ -48,7 +48,7 @@ export default class ConvertTicket extends Command {
         })
     }
 
-    async runInteraction(source: CommandInteraction): Promise<SendMessage | undefined> {
+    async runInteraction(source: ChatInputCommandInteraction): Promise<SendMessage | undefined> {
         await source.deferReply({ ephemeral: true })
         return this.run(source, source.user, source.options.getString("type", true), source.options.getChannel("channel", true), source.options.getString("status", true))
     }
@@ -75,16 +75,16 @@ export default class ConvertTicket extends Command {
         if (!member.roles.cache.hasAny(...ticketType.manageRoles))
             return await sendMessage(source, `You can't make transcripts of ${ticketType.name} here`, undefined, true)
 
-        if (!member.permissionsIn(channel.id).has("MANAGE_CHANNELS"))
+        if (!member.permissionsIn(channel.id).has(PermissionFlagsBits.ManageChannels))
             return await sendMessage(source, "You can only convert tickets where you have manage channel permission", undefined, true)
 
         try {
-            if (channel.type == "GUILD_CATEGORY") {
-                const children = channel.children.map(x => x)
+            if (channel.type == ChannelType.GuildCategory) {
+                const children = channel.children.cache
                 const converted: string[] = []
                 for (const child of children) {
-                    if (child.isText())
-                        converted.push(await convertTicket(ticketType, child, member, status, source.guild))
+                    if (child[1].isTextBased())
+                        converted.push(await convertTicket(ticketType, child[1], member, status, source.guild))
                 }
                 return await sendMessage(source, converted.join("\n").substring(0, 1900), undefined)
             } else if (isTicketable(channel)) {

@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto"
-import { ButtonInteraction, CommandInteraction, Message, MessageEmbed, Snowflake, TextBasedChannel } from "discord.js"
+import { ApplicationCommandOptionType, ButtonInteraction, ChatInputCommandInteraction, EmbedBuilder, Message, Snowflake, TextBasedChannel } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
@@ -20,23 +20,23 @@ export default class Transcript extends Command {
             options: [{
                 name: "oldest",
                 description: "Link to message or message ID up to which to fetch messages (defaults to entire channel)",
-                type: "STRING",
+                type: ApplicationCommandOptionType.String,
                 required: false
             }, {
                 name: "newest",
                 description: "Link to message or message ID to start from (defaults to start from current)",
-                type: "STRING",
+                type: ApplicationCommandOptionType.String,
                 required: false
             }, {
                 name: "slug",
                 description: "Slug to use (defaults to channel or UUID, appends channel ID or timestamp if already used)",
-                type: "STRING",
+                type: ApplicationCommandOptionType.String,
                 required: false
             }]
         })
     }
 
-    async runInteraction(source: CommandInteraction): Promise<SendMessage | undefined> {
+    async runInteraction(source: ChatInputCommandInteraction): Promise<SendMessage | undefined> {
         return this.run(source, source.user.id, source.channel, source.options.getString("oldest", false), source.options.getString("newest", false), source.options.getString("slug", false))
     }
 
@@ -84,7 +84,7 @@ export default class Transcript extends Command {
         }
 
 
-        const response = await sendMessage(source, new MessageEmbed()
+        const response = await sendMessage(source, new EmbedBuilder()
             .setTitle("Creating transcript...")
             .setColor(Colors.ORANGE)
         )

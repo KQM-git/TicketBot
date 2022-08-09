@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client"
-import Discord, { ClientEvents, Intents } from "discord.js"
+import Discord, { ActivityType, ClientEvents, IntentsBitField, Partials } from "discord.js"
 import Enmap from "enmap"
 import fs from "fs"
 import log4js from "log4js"
@@ -11,16 +11,16 @@ import TranscriptionManager from "./utils/TranscriptionManager"
 
 
 const Logger = log4js.getLogger("main")
-const intents = new Intents()
+const intents = new IntentsBitField()
 intents.add(
     // For handling commands in DMs
-    "DIRECT_MESSAGES",
+    IntentsBitField.Flags.DirectMessages,
     // For follow stuff, also required for guild messages for some reason?
-    "GUILDS",
-    // For handling commands in guilds
-    "GUILD_MESSAGES",
+    IntentsBitField.Flags.Guilds,
+    // For handling commands/archiving messages in guilds
+    IntentsBitField.Flags.GuildMessages,
     // Updating members
-    "GUILD_MEMBERS",
+    IntentsBitField.Flags.GuildMembers,
 )
 
 export default class TiBotClient extends Discord.Client {
@@ -33,13 +33,13 @@ export default class TiBotClient extends Discord.Client {
     constructor() {
         super({
             intents,
-            partials: ["CHANNEL", "GUILD_MEMBER", "REACTION", "MESSAGE"],
+            partials: [Partials.Channel, Partials.GuildMember, Partials.Reaction, Partials.Message],
             shards: "auto",
             presence: {
                 status: "idle",
                 activities: [{
                     name: config.activity,
-                    type: "COMPETING"
+                    type: ActivityType.Competing
                 }]
             },
             allowedMentions: {

@@ -1,13 +1,13 @@
 import { APIMessage } from "discord-api-types/v9"
-import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButtonStyle, MessageContextMenuInteraction, MessageEmbedOptions, ModalSubmitInteraction, NewsChannel, TextChannel, ThreadChannel } from "discord.js"
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, CommandInteraction, EmbedBuilder, Message, MessageContextMenuCommandInteraction, ModalSubmitInteraction, NewsChannel, PrivateThreadChannel, PublicThreadChannel, TextChannel, VoiceChannel } from "discord.js"
 
 // Discord shortcuts
-export type InteractionSource = CommandInteraction | ButtonInteraction | MessageContextMenuInteraction
+export type InteractionSource = CommandInteraction | ButtonInteraction | MessageContextMenuCommandInteraction
 export type CommandSource = Message | InteractionSource | ModalSubmitInteraction
 export type SendMessage = Message | APIMessage
 export type CommandResponse = Promise<unknown> | unknown
 
-export type TicketableChannel = NewsChannel | TextChannel | ThreadChannel
+export type TicketableChannel = NewsChannel | TextChannel | PublicThreadChannel | PrivateThreadChannel | VoiceChannel
 
 // Ticket data
 export enum TicketStatus {
@@ -31,18 +31,18 @@ export enum VerifierType {
 type ButtonStyling = {
     label: string
     emoji: string
-    style: MessageButtonStyle
+    style: ButtonStyle
 }
 
 export type TicketType = {
     id: string
     name: string
     emoji: string
-    style: MessageButtonStyle
+    style: ButtonStyle
     opening: {
         content: string
-        embeds?: [MessageEmbedOptions]
-        components?: [MessageActionRow]
+        embeds?: [EmbedBuilder]
+        components?: [ActionRowBuilder<ButtonBuilder>]
         pingUsers?: string[]
     }
     creationRoles: string[]

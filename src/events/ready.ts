@@ -1,6 +1,6 @@
 import client from "../main"
 import log4js from "log4js"
-import { ApplicationCommandData } from "discord.js"
+import { ApplicationCommandData, ApplicationCommandType } from "discord.js"
 import config from "../data/config.json"
 
 const Logger = log4js.getLogger("ready")
@@ -39,7 +39,7 @@ export async function handle(): Promise<void> {
                 for (const name of cmd.onMessage)
                     cmds.push({
                         name,
-                        type: "MESSAGE"
+                        type: ApplicationCommandType.Message
                     })
 
             return cmds

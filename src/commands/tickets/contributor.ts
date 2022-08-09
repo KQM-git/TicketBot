@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, MessageEmbed, User } from "discord.js"
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder, Message, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
@@ -19,28 +19,28 @@ export default class ContributorTicket extends Command {
             options: [{
                 name: "add",
                 description: "Add a contributor",
-                type: "SUB_COMMAND",
+                type: ApplicationCommandOptionType.Subcommand,
                 options: [{
                     name: "user",
                     description: "User to add as contributor",
-                    type: "USER",
+                    type: ApplicationCommandOptionType.User,
                     required: true
                 }]
             }, {
                 name: "remove",
                 description: "Remove a contributor",
-                type: "SUB_COMMAND",
+                type: ApplicationCommandOptionType.Subcommand,
                 options: [{
                     name: "user",
                     description: "User to remove from contributors",
-                    type: "USER",
+                    type: ApplicationCommandOptionType.User,
                     required: true
                 }]
             }]
         })
     }
 
-    async runInteraction(source: CommandInteraction): Promise<SendMessage | undefined> {
+    async runInteraction(source: ChatInputCommandInteraction): Promise<SendMessage | undefined> {
         await source.deferReply({ ephemeral: true })
         return this.run(source, source.user, source.options.getSubcommand(true), source.options.getUser("user", true))
     }
@@ -55,7 +55,7 @@ export default class ContributorTicket extends Command {
         const member = await source.guild.members.fetch(user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
 
-        if (!source.channel || !source.channel.isText()) return await sendMessage(source, "Couldn't get channel ID / not a text channel", undefined, true)
+        if (!source.channel || !source.channel.isTextBased()) return await sendMessage(source, "Couldn't get channel ID / not a text channel", undefined, true)
 
         const ticket = await client.prisma.ticket.findUnique({
             where: {
@@ -103,7 +103,7 @@ export default class ContributorTicket extends Command {
 
             await source.channel.send({
                 embeds: [
-                    new MessageEmbed()
+                    new EmbedBuilder()
                         .setDescription(`<@${member.id}> added <@${target.id}> as contributor`)
                         .setColor(Colors.GREEN)
                 ]
@@ -132,7 +132,7 @@ export default class ContributorTicket extends Command {
 
             await source.channel.send({
                 embeds: [
-                    new MessageEmbed()
+                    new EmbedBuilder()
                         .setDescription(`<@${member.id}> removed <@${target.id}> as contributor`)
                         .setColor(Colors.RED)
                 ]

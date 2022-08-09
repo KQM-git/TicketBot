@@ -1,5 +1,5 @@
 import { APIInteractionDataResolvedChannel } from "discord-api-types/v9"
-import { CommandInteraction, GuildBasedChannel, Message, MessageActionRow, MessageButton, MessageEmbed, TextBasedChannel, User } from "discord.js"
+import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ChatInputCommandInteraction, EmbedBuilder, GuildBasedChannel, Message, PermissionFlagsBits, TextBasedChannel, User } from "discord.js"
 import client from "../../main"
 import Command from "../../utils/Command"
 import { menus } from "../../utils/TicketTypes"
@@ -18,19 +18,19 @@ export default class CreateTicketMenu extends Command {
             options: [{
                 name: "preset",
                 description: "Preset to use",
-                type: "STRING",
+                type: ApplicationCommandOptionType.String,
                 choices: menus.map(a => ({ name: a.name, value: a.value })),
                 required: true
             }, {
                 name: "channel",
                 description: "Which channel to post in (defaults to current)",
-                type: "CHANNEL",
+                type: ApplicationCommandOptionType.Channel,
                 required: false
             }]
         })
     }
 
-    async runInteraction(source: CommandInteraction): Promise<SendMessage | undefined> {
+    async runInteraction(source: ChatInputCommandInteraction): Promise<SendMessage | undefined> {
         return this.run(source, source.user, source.options.getString("preset", true), source.options.getChannel("channel", false) ?? source.channel)
     }
 
@@ -51,7 +51,7 @@ export default class CreateTicketMenu extends Command {
         const member = await source.guild.members.fetch(user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
 
-        if (!member.permissionsIn(channel.id).has("MANAGE_CHANNELS"))
+        if (!member.permissionsIn(channel.id).has(PermissionFlagsBits.ManageChannels))
             return await sendMessage(source, "Only people who can manage the target channel can create ticket menu", undefined, true)
 
         const set = menus.find(p => p.value == preset)
@@ -61,13 +61,13 @@ export default class CreateTicketMenu extends Command {
 
         await channel.send({
             content: set.content,
-            embeds: [new MessageEmbed()
+            embeds: [new EmbedBuilder()
                 .setTitle(set.title)
                 .setDescription(set.desc)
                 .setColor(Colors.GREEN)
             ],
-            components: [new MessageActionRow().setComponents(
-                set.ticketTypes.map(b => new MessageButton()
+            components: [new ActionRowBuilder<ButtonBuilder>().setComponents(
+                set.ticketTypes.map(b => new ButtonBuilder()
                     .setCustomId(b.customId ?? `createticket-${b.id}`)
                     .setLabel(b.name)
                     .setEmoji(b.emoji)

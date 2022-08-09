@@ -1,4 +1,4 @@
-import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageEmbed, Modal, ModalSubmitInteraction, TextInputComponent, User } from "discord.js"
+import { ActionRowBuilder, ApplicationCommandOptionType, ButtonInteraction, ChatInputCommandInteraction, EmbedBuilder, Message, ModalActionRowComponentBuilder, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
@@ -18,13 +18,13 @@ export default class RenameTicket extends Command {
             options: [{
                 name: "name",
                 description: "Rename the current ticket",
-                type: "STRING",
+                type: ApplicationCommandOptionType.String,
                 required: true
             }]
         })
     }
 
-    async runInteraction(source: CommandInteraction): Promise<SendMessage | string | undefined> {
+    async runInteraction(source: ChatInputCommandInteraction): Promise<SendMessage | string | undefined> {
         await source.deferReply({ ephemeral: true })
         return this.run(source, source.user, source.options.getString("name", true))
     }
@@ -34,20 +34,18 @@ export default class RenameTicket extends Command {
         if (typeof currentName != "string")
             return
 
-        const input = new TextInputComponent()
+        const input = new TextInputBuilder()
             .setCustomId("name")
             .setLabel("Name")
-            .setStyle("SHORT")
+            .setStyle(TextInputStyle.Short)
             .setValue(currentName)
             .setPlaceholder("Enter new ticket name")
             .setRequired(true)
 
-        const modal = new Modal()
+        const modal = new ModalBuilder()
             .setTitle("Renaming ticket")
             .setCustomId(source.customId)
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            .setComponents(new MessageActionRow().addComponents(input))
+            .setComponents(new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(input))
 
         await source.showModal(modal)
     }
@@ -111,7 +109,7 @@ export default class RenameTicket extends Command {
             await source.channel.setName(trim(name), `Rename by ${user.id} (${user.tag})`)
             await source.channel.send({
                 embeds: [
-                    new MessageEmbed()
+                    new EmbedBuilder()
                         .setDescription(`This ticket has been renamed to \`${name.replace(/`/g, "")}\` by <@${member.id}>`)
                         .setColor(Colors.GREEN)
                 ],

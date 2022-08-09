@@ -19,17 +19,17 @@ export async function handle(interaction: Interaction): Promise<void> {
                 await handleModalSubmit(cmdInfo, interaction)
             }
         }
-    } else if (interaction.isCommand() || interaction.isAutocomplete() || interaction.isMessageContextMenu()) {
+    } else if (interaction.isChatInputCommand() || interaction.isAutocomplete() || interaction.isMessageContextMenuCommand()) {
         const cmdInfo = getCommand(interaction.commandName)
 
         if (cmdInfo && cmdInfo.cmd) {
-            if (interaction.isCommand()) {
+            if (interaction.isChatInputCommand()) {
                 Logger.info(`${interaction.user.id} (${interaction.user.tag}) executes slash command in ${isTicketable(interaction.channel) ? interaction.channel.name : interaction.channel?.type} (guild ${interaction.guild ? interaction.guild.id : "NaN"}): ${interaction.commandName} ${interaction.options.data.map(x => `${x.name}->${x.value??"/"}`)}`)
                 await handleCommand(cmdInfo, interaction)
             } else if (interaction.isAutocomplete()) {
                 Logger.info(`${interaction.user.id} (${interaction.user.tag}) autocompletes in ${isTicketable(interaction.channel) ? interaction.channel.name : interaction.channel?.type} (guild ${interaction.guild ? interaction.guild.id : "NaN"}): ${interaction.commandName} ${interaction.options.data.map(x => `${x.name}->${x.value??"/"}`)}`)
                 await handleAutoComplete(cmdInfo, interaction)
-            } else if (interaction.isMessageContextMenu()) {
+            } else if (interaction.isMessageContextMenuCommand()) {
                 Logger.info(`${interaction.user.id} (${interaction.user.tag}) clicked on a message in ${isTicketable(interaction.channel) ? interaction.channel.name : interaction.channel?.type} (guild ${interaction.guild ? interaction.guild.id : "NaN"}): ${interaction.commandName} ${interaction.options.data.map(x => `${x.name}->${x.value??"/"}`)}`)
                 await handleMessageContext(cmdInfo, interaction)
             }

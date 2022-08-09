@@ -1,4 +1,4 @@
-import { BaseGuildTextChannel, ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageEmbed, User } from "discord.js"
+import { ActionRowBuilder, BaseGuildTextChannel, ButtonBuilder, ButtonInteraction, ChatInputCommandInteraction, EmbedBuilder, Message, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
@@ -21,7 +21,7 @@ export default class OpenTicket extends Command {
         })
     }
 
-    async runInteraction(source: CommandInteraction): Promise<SendMessage | undefined> {
+    async runInteraction(source: ChatInputCommandInteraction): Promise<SendMessage | undefined> {
         await source.deferReply({ ephemeral: true })
         return this.run(source, source.user)
     }
@@ -73,18 +73,21 @@ export default class OpenTicket extends Command {
             const user = await client.users.fetch(ticket.creator.discordId)
             if (!user)
                 return await sendMessage(source, `Couldn't fetch ticket owner user profile - ${ticket.creator.discordId}`)
-            await source.channel.permissionOverwrites.edit(user, { SEND_MESSAGES: null })
+            await source.channel.permissionOverwrites.edit(user, { SendMessages: null })
             if (ticketType?.defaultCategory)
                 await source.channel.setParent(ticketType?.defaultCategory, { lockPermissions: false })
         }
 
         await source.channel.send({
             embeds: [
-                new MessageEmbed()
+                new EmbedBuilder()
                     .setDescription(`Ticket re-opened by <@${member.id}>`)
-                    .addField("Previous verifications", `${ticket.verifications.map(v => `- ${verificationTypeName[v.type as VerifierType] ?? "Unknown"} <@${v.verifier.discordId}> at ${displayTimestamp(v.createdAt)}`).join("\n") || "Wasn't verified"}`)
+                    .addFields([{
+                        name: "Previous verifications",
+                        value: `${ticket.verifications.map(v => `- ${verificationTypeName[v.type as VerifierType] ?? "Unknown"} <@${v.verifier.discordId}> at ${displayTimestamp(v.createdAt)}`).join("\n") || "Wasn't verified"}`
+                    }])
             ],
-            components: [new MessageActionRow().addComponents(
+            components: [new ActionRowBuilder<ButtonBuilder>().addComponents(
                 buttons.CLOSE
             )]
         })

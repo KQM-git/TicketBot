@@ -1,4 +1,4 @@
-import { AutocompleteInteraction, ButtonInteraction, CommandInteraction, Message, MessageContextMenuInteraction, ModalSubmitInteraction } from "discord.js"
+import { AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, Message, MessageContextMenuCommandInteraction, ModalSubmitInteraction } from "discord.js"
 import log4js from "log4js"
 import client from "../main"
 import Command from "../utils/Command"
@@ -25,13 +25,13 @@ export function getCommand(command: string): ParsedCommand | false {
     return { command, cmd }
 }
 
-export async function handleCommand(cmdInfo: ParsedCommand, interaction: CommandInteraction): Promise<void> {
+export async function handleCommand(cmdInfo: ParsedCommand, interaction: ChatInputCommandInteraction): Promise<void> {
     const { command, cmd } = cmdInfo
     try {
         const startTime = Date.now()
         const msg = cmd.runInteraction(interaction, command)
         const midTime = Date.now()
-        if (msg && interaction.channel?.type !== "DM")
+        if (msg)
             await msg
         const endTime = Date.now()
         Logger.debug(`${cmdInfo.command} took ${midTime - startTime}ms, sending took ${endTime - midTime}ms, message->start took ${startTime - interaction.createdTimestamp}ms`)
@@ -69,7 +69,7 @@ export async function handleAutoComplete(cmdInfo: ParsedCommand, interaction: Au
     }
 }
 
-export async function handleMessageContext(cmdInfo: ParsedCommand, interaction: MessageContextMenuInteraction): Promise<void> {
+export async function handleMessageContext(cmdInfo: ParsedCommand, interaction: MessageContextMenuCommandInteraction): Promise<void> {
     const { command, cmd } = cmdInfo
     try {
         const startTime = Date.now()
@@ -90,7 +90,7 @@ export async function handleButton(cmdInfo: ParsedCommand, interaction: ButtonIn
         const startTime = Date.now()
         const msg = cmd.runButton(interaction, command)
         const midTime = Date.now()
-        if (msg && interaction.channel?.type !== "DM")
+        if (msg)
             await msg
         const endTime = Date.now()
         Logger.debug(`${cmdInfo.command} took ${midTime - startTime}ms, sending took ${endTime - midTime}ms, message->start took ${startTime - interaction.createdTimestamp}ms`)
@@ -105,7 +105,7 @@ export async function handleModalSubmit(cmdInfo: ParsedCommand, interaction: Mod
         const startTime = Date.now()
         const msg = cmd.runModalSubmit(interaction, command)
         const midTime = Date.now()
-        if (msg && interaction.channel?.type !== "DM")
+        if (msg)
             await msg
         const endTime = Date.now()
         Logger.debug(`${cmdInfo.command} took ${midTime - startTime}ms, sending took ${endTime - midTime}ms, message->start took ${startTime - interaction.createdTimestamp}ms`)

@@ -1,4 +1,4 @@
-import { Guild, GuildMember, User } from "discord.js"
+import { ChannelType, Guild, GuildMember, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../main"
 import { TicketableChannel, TicketType } from "./Types"
@@ -8,15 +8,16 @@ import { trim } from "./Utils"
 const Logger = getLogger("tickets")
 export async function createTicket(ticketType: TicketType, name: string, member: GuildMember, guild: Guild) {
     const parent = await guild.channels.fetch(ticketType.defaultCategory)
-    if (!parent || parent.type != "GUILD_CATEGORY")
+    if (!parent || parent.type != ChannelType.GuildCategory)
         throw Error("Invalid parent channel")
 
     Logger.info(`Creating a ticket for ${member.id} (@${member.user.tag}) in ${guild.id}: ${name}`)
 
     await client.transcriptionManager.updateServer(guild)
 
-    const channel = await guild.channels.create(trim(name), {
-        type: "GUILD_TEXT",
+    const channel = await guild.channels.create({
+        name: trim(name),
+        type: ChannelType.GuildText,
         parent
     })
 
@@ -46,16 +47,16 @@ export async function createTicket(ticketType: TicketType, name: string, member:
 
     try {
         await channel.permissionOverwrites.edit(member, {
-            VIEW_CHANNEL: true,
-            MANAGE_MESSAGES: true
+            ViewChannel: true,
+            ManageChannels: true
         })
     } catch (error) {
-        Logger.error("Couldn't give creator permission for MANAGE_MESSAGES")
+        Logger.error("Couldn't give creator permission for ManageChannels")
     }
     if (ticketType.creationChannel) {
         const creationChannel = await guild.channels.fetch(ticketType.creationChannel)
 
-        if (creationChannel?.isText())
+        if (creationChannel?.isTextBased())
             await creationChannel.send({
                 content: `<@${member.id}> created a ${ticketType.name}: ${name} over at <#${channel.id}>!`
             })

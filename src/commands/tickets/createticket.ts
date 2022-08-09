@@ -1,6 +1,6 @@
-import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, Modal, ModalSubmitInteraction, TextInputComponent, User } from "discord.js"
+import { ActionRowBuilder, ApplicationCommandOptionType, ButtonInteraction, ChatInputCommandInteraction, Message, ModalActionRowComponentBuilder, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle, User } from "discord.js"
 import Command from "../../utils/Command"
-import {  ticketTypes } from "../../utils/TicketTypes"
+import { ticketTypes } from "../../utils/TicketTypes"
 import { createTicket } from "../../utils/TicketUtils"
 import { CommandSource, SendMessage } from "../../utils/Types"
 import { sendMessage } from "../../utils/Utils"
@@ -17,19 +17,19 @@ export default class CreateTicket extends Command {
             options: [{
                 name: "type",
                 description: "Ticket type to create",
-                type: "STRING",
+                type: ApplicationCommandOptionType.String,
                 choices: Object.values(ticketTypes).map(a => ({ name: a.name, value: a.id })),
                 required: true
             }, {
                 name: "name",
                 description: "Ticket name",
-                type: "STRING",
+                type: ApplicationCommandOptionType.String,
                 required: true
             }]
         })
     }
 
-    async runInteraction(source: CommandInteraction): Promise<SendMessage | undefined> {
+    async runInteraction(source: ChatInputCommandInteraction): Promise<SendMessage | undefined> {
         await source.deferReply({ ephemeral: true })
         return this.run(source, source.user, source.options.getString("type", true), source.options.getString("name", true))
     }
@@ -51,19 +51,17 @@ export default class CreateTicket extends Command {
             return
         }
 
-        const input = new TextInputComponent()
+        const input = new TextInputBuilder()
             .setCustomId("name")
             .setLabel("Name")
-            .setStyle("SHORT")
+            .setStyle(TextInputStyle.Short)
             .setPlaceholder("Enter a name for your ticket")
             .setRequired(true)
 
-        const modal = new Modal()
+        const modal = new ModalBuilder()
             .setTitle(`Creating a ${ticketType.name}`)
             .setCustomId(source.customId)
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            .setComponents(new MessageActionRow().addComponents(input))
+            .setComponents(new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(input))
 
         await source.showModal(modal)
     }

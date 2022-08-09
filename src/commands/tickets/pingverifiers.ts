@@ -1,4 +1,4 @@
-import { ButtonInteraction, CommandInteraction, Message, User } from "discord.js"
+import { ApplicationCommandOptionType, ButtonInteraction, ChatInputCommandInteraction, Message, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
 import Command from "../../utils/Command"
@@ -18,7 +18,7 @@ export default class PingVerifiers extends Command {
             options: [{
                 name: "type",
                 description: "Type of verifiers to ping",
-                type: "STRING",
+                type: ApplicationCommandOptionType.String,
                 choices: [{
                     name: "Guide verifiers",
                     value: VerifierType.GUIDE
@@ -31,7 +31,7 @@ export default class PingVerifiers extends Command {
         })
     }
 
-    async runInteraction(source: CommandInteraction): Promise<SendMessage | string | undefined> {
+    async runInteraction(source: ChatInputCommandInteraction): Promise<SendMessage | string | undefined> {
         await source.deferReply({ ephemeral: true })
         return this.run(source, source.user, source.options.getString("type", true))
     }
