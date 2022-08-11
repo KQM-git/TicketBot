@@ -554,7 +554,7 @@ export default class TranscriptionManager {
                 url: f.iconURL ?? undefined,
             }
         }
-        function mapImage(i: EmbedAssetData | null) {
+        function mapAsset(i: EmbedAssetData | null) {
             if (!i) return undefined
             return {
                 url: i.url,
@@ -580,9 +580,9 @@ export default class TranscriptionManager {
             description: this.parseText(e.description, relevantRoles, relevantUsers, relevantChannels) ?? undefined,
             fields: e.fields.map(f => mapField(f)),
             footer: mapFooter(e.footer),
-            image: mapImage(e.image),
-            thumbnail: mapImage(e.thumbnail),
-            video: mapImage(e.video),
+            image: mapAsset(e.image),
+            thumbnail: mapAsset(e.thumbnail),
+            video: mapAsset(e.video),
             timestamp: e.timestamp ?? undefined,
         }
     }
