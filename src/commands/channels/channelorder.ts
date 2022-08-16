@@ -72,7 +72,6 @@ export default class ChannelOrder extends Command {
 
 
         const channels = [...source.guild.channels.cache.values()]
-        logger.info(channels.map(x => x.id))
         const nonThread: NonThreadGuildBasedChannel[] = channels.filter(x => !x.isThread()) as NonThreadGuildBasedChannel[]
 
         const sorted = nonThread.sort((a, b) => a.position - b.position || a.id.localeCompare(b.id))

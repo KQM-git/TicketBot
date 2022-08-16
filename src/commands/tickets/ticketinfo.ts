@@ -50,12 +50,13 @@ export default class TicketInfo extends Command {
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
 
         if (channel.type == ChannelType.GuildCategory) {
+            if (!member.permissionsIn(channel.id).has(PermissionFlagsBits.ManageChannels))
+                return await sendMessage(source, "You can't check categories", undefined, true)
+
             const children = channel.children.cache
             const converted: string[] = []
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             for (const [_id, child] of children) {
-                if (!member.permissionsIn(channel.id).has(PermissionFlagsBits.ManageChannels))
-                    return await sendMessage(source, "You can't check categories", undefined, true)
 
                 if (child.isTextBased()) {
                     const ticketInfo = await client.prisma.ticket.findUnique({
