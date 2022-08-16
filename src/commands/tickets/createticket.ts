@@ -92,7 +92,7 @@ export default class CreateTicket extends Command {
         if (!member.roles.cache.hasAny(...ticketType.creationRoles))
             return await sendMessage(source, "You don't have one of the roles required to create this type of ticket", undefined, true)
 
-        if (ticketType.blacklistNames)
+        if (ticketType.blacklistNames && !member.roles.cache.hasAny(...ticketType.manageRoles))
             for (const blacklist of ticketType.blacklistNames)
                 if ((!blacklist.until || blacklist.until.getTime() > Date.now())  && blacklist.regex.test(name))
                     return await sendMessage(source, blacklist.message, undefined, true)

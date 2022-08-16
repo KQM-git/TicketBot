@@ -212,10 +212,6 @@ export const ticketTypes: Record<string, TicketType> = {
         creationRoles: [ROLE.GUIDESUBS, ROLE.ADMIN],
         blacklistRoles: ROLE.BLACKLIST,
         blacklistNames: [{
-            regex: /Shikanoin|Heizou/i,
-            message: "Guide Submissions for new characters are banned in the first week of the characters release.",
-            until: new Date("2022-07-20T03:00:00Z")
-        }, {
             regex: /Collei|Thighnari|Dori/i,
             message: "Guide Submissions for new characters are banned in the first week of the characters release.",
             until: new Date("2022-08-31T03:00:00Z")
