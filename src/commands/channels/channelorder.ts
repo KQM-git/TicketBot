@@ -1,5 +1,5 @@
 import { APIInteractionDataResolvedChannel } from "discord-api-types/v10"
-import { ApplicationCommandOptionType, Attachment, AttachmentBuilder, ChannelPosition, ChatInputCommandInteraction, GuildBasedChannel, Message, NonThreadGuildBasedChannel, PermissionFlagsBits, ThreadChannel, User } from "discord.js"
+import { ApplicationCommandOptionType, Attachment, AttachmentBuilder, ChannelPosition, ChannelType, ChatInputCommandInteraction, GuildBasedChannel, Message, NonThreadGuildBasedChannel, PermissionFlagsBits, ThreadChannel, User } from "discord.js"
 import { getLogger } from "log4js"
 import fetch from "node-fetch"
 import client from "../../main"
@@ -87,7 +87,7 @@ export default class ChannelOrder extends Command {
         })
 
 
-        const category = [4, "GUILD_CATEGORY"], text = [0, "GUILD_TEXT", 5, "GUILD_NEWS"], voice = [2, "GUILD_VOICE", 13, "GUILD_STAGE_VOICE"]
+        const category = [ChannelType.GuildCategory], text = [ChannelType.GuildText, ChannelType.GuildNews, ChannelType.GuildForum], voice = [ChannelType.GuildVoice, ChannelType.GuildStageVoice]
 
         const misc = sorted.filter(x => !text.includes(x.type) && !voice.includes(x.type) && !category.includes(x.type))
         const unknown = misc.map(x => x.type).filter((p, i, a) => a.indexOf(p) == i)
