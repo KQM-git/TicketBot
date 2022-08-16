@@ -1,5 +1,5 @@
 import { APIInteractionDataResolvedChannel } from "discord-api-types/v10"
-import { ApplicationCommandOptionType, Attachment, AttachmentBuilder, ChannelPosition, ChannelType, ChatInputCommandInteraction, GuildBasedChannel, Message, NonThreadGuildBasedChannel, PermissionFlagsBits, ThreadChannel, User } from "discord.js"
+import { ApplicationCommandOptionType, Attachment, AttachmentBuilder, ChannelPosition, ChannelType, ChatInputCommandInteraction, GuildBasedChannel, Message, NonThreadGuildBasedChannel, PermissionFlagsBits, User } from "discord.js"
 import { getLogger } from "log4js"
 import fetch from "node-fetch"
 import client from "../../main"
@@ -72,7 +72,8 @@ export default class ChannelOrder extends Command {
 
 
         const channels = [...source.guild.channels.cache.values()]
-        const nonThread: NonThreadGuildBasedChannel[] = channels.filter(x => !(x instanceof ThreadChannel)) as NonThreadGuildBasedChannel[]
+        logger.info(channels.map(x => x.id))
+        const nonThread: NonThreadGuildBasedChannel[] = channels.filter(x => !x.isThread()) as NonThreadGuildBasedChannel[]
 
         const sorted = nonThread.sort((a, b) => a.position - b.position || a.id.localeCompare(b.id))
 
