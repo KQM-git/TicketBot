@@ -198,7 +198,7 @@ export const ticketTypes: Record<string, TicketType> = {
 - When done ping <@235719068726853632> to begin the review process.`,
             embeds: [new EmbedBuilder()
                 .setTitle("Guide Guidelines")
-                .setDescription("Here are the KQM Guide standards if you are interested. These are not enforced at the moment but it is heavily encouraged you follow them.")
+                .setDescription("Please follow the KQM Guide Standards while writing your guide.")
                 .setColor("#A758BF")
             ],
             pingUsers: ["235719068726853632"],
