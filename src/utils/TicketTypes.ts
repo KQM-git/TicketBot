@@ -23,9 +23,17 @@ export const buttons = {
         .setCustomId("rename")
         .setEmoji("✏️")
         .setStyle(ButtonStyle.Secondary),
-    GUIDE_LINK: new ButtonBuilder()
-        .setLabel("Guide Guidelines")
+    GUIDE_STANDARD: new ButtonBuilder()
+        .setLabel("Guide Standards")
         .setURL("https://docs.google.com/document/d/1hZ0bNmMy1t5R8TOF1v8mcuzQpR0BgJD5pKY2T_t6uh0/edit?usp=sharing")
+        .setStyle(ButtonStyle.Link),
+    GUIDE_SKELETON: new ButtonBuilder()
+        .setLabel("Guide Skeleton")
+        .setURL("https://docs.google.com/document/d/1i_ftnpyJfLMTKSbHqDNPk6_oX8UlDhwVOsJUN2wk0vE/edit?usp=sharing")
+        .setStyle(ButtonStyle.Link),
+    GUIDE_VER_STANDARD: new ButtonBuilder()
+        .setLabel("Verification Standards")
+        .setURL("https://docs.google.com/document/d/1i_ftnpyJfLMTKSbHqDNPk6_oX8UlDhwVOsJUN2wk0vE/edit?usp=sharing")
         .setStyle(ButtonStyle.Link)
 }
 
@@ -204,7 +212,9 @@ export const ticketTypes: Record<string, TicketType> = {
             pingUsers: ["235719068726853632"],
             components: [
                 new ActionRowBuilder<ButtonBuilder>().addComponents(
-                    buttons.GUIDE_LINK,
+                    buttons.GUIDE_STANDARD,
+                    buttons.GUIDE_SKELETON,
+                    buttons.GUIDE_VER_STANDARD,
                     buttons.CLOSE
                 )
             ]
