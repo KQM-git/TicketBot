@@ -206,7 +206,14 @@ export const ticketTypes: Record<string, TicketType> = {
 - When done ping <@235719068726853632> to begin the review process.`,
             embeds: [new EmbedBuilder()
                 .setTitle("Guide Guidelines")
-                .setDescription("Please follow the KQM Guide Standards while writing your guide.")
+                .setDescription(`**[Guide Standards](https://docs.google.com/document/d/1hZ0bNmMy1t5R8TOF1v8mcuzQpR0BgJD5pKY2T_t6uh0/edit?usp=sharing)**
+Entails what KQM looks for in terms of quality for guides hosted on our website. These standards are enforced, and it is expected that authors follow them closely.
+
+**[Guide Skeleton](https://docs.google.com/document/d/1i_ftnpyJfLMTKSbHqDNPk6_oX8UlDhwVOsJUN2wk0vE/edit?usp=sharing)**
+A general template for what a KQM-hosted guide should look like. Use this as a reference for what elements and sections should be in your guide.
+
+**[Verification Standards](https://docs.google.com/document/d/1i_ftnpyJfLMTKSbHqDNPk6_oX8UlDhwVOsJUN2wk0vE/edit?usp=sharing)**
+A reference document for Wangsheng Editors and Theorycrafters when reviewing guides before they go live on the site.`)
                 .setColor("#A758BF")
             ],
             pingUsers: ["235719068726853632"],
