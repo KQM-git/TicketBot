@@ -324,7 +324,11 @@ export default class Theoryhunt extends Command {
         Logger.info(`Creating TH ${source.fields.getTextInputValue("name")} for ${member.id} / ${member.user.tag}`)
 
         const msg = await creationChannel.send({
-            embeds: [new EmbedBuilder().setTitle("Loading...")]
+            content: "<@&855509799335493692> <:keqgrab:1011631839569518643>",
+            embeds: [new EmbedBuilder().setTitle(source.fields.getTextInputValue("name") ?? "Unknown").setDescription("Creating theoryhunt...")],
+            allowedMentions: {
+                roles: ["855509799335493692"],
+            },
         })
 
         const theoryhunt = await client.prisma.theoryhunt.create({
@@ -344,7 +348,7 @@ export default class Theoryhunt extends Command {
 
         Logger.info(`Created TH #${theoryhunt.id} for ${member.id} / ${member.user.tag}`)
 
-        await msg.edit({ embeds: [createEmbed(theoryhunt)] })
+        await updateTHMessage(theoryhunt)
 
         return sendMessage(source, `Created theoryhunt #${theoryhunt.id}!`, undefined, true)
     }
@@ -382,8 +386,7 @@ export default class Theoryhunt extends Command {
 
 
         try {
-            const msg = await channel.messages.fetch(theoryhunt.messageId)
-            await msg.edit({ embeds: [createEmbed(theoryhunt)] })
+            await updateTHMessage(theoryhunt)
         } catch (error) {
             return await sendMessage(source, "Couldn't find message?", undefined, true)
         }
@@ -456,8 +459,7 @@ export default class Theoryhunt extends Command {
         Logger.info(`Updated TH #${id} for ${source.user.id} / ${source.user.tag}`)
 
         try {
-            const msg = await channel.messages.fetch(theoryhunt.messageId)
-            await msg.edit({ embeds: [createEmbed(theoryhunt)] })
+            await updateTHMessage(theoryhunt)
         } catch (error) {
             return await sendMessage(source, "Couldn't find message?", undefined, true)
         }
@@ -474,7 +476,11 @@ export default class Theoryhunt extends Command {
             return await sendMessage(source, "Theoryhunt channel might not be configured correctly", undefined, true)
 
         const newMsg = await channel.send({
-            embeds: [createEmbed(theoryhunt)]
+            content: "<@&855509799335493692> <:keqgrab:1011631839569518643>",
+            embeds: [createEmbed(theoryhunt)],
+            allowedMentions: {
+                roles: ["855509799335493692"]
+            }
         })
 
         await client.prisma.theoryhunt.update({
@@ -605,7 +611,13 @@ export async function updateTHMessage(theoryhunt: IncludedTheoryhunt|null) {
 
     try {
         const msg = await channel.messages.fetch(theoryhunt.messageId)
-        await msg.edit({ embeds: [createEmbed(theoryhunt)] })
+        await msg.edit({
+            content: "<@&855509799335493692> <:keqgrab:1011631839569518643>",
+            embeds: [createEmbed(theoryhunt)],
+            allowedMentions: {
+                roles: ["855509799335493692"]
+            }
+        })
     } catch (error) {
         void 0
     }
