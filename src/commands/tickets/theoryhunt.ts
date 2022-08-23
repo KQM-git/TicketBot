@@ -191,6 +191,7 @@ export default class Theoryhunt extends Command {
             .setMaxLength(50)
             .setPlaceholder("Optional reason explaining difficulty")
             .setValue(theoryhunt?.difficultyReason ?? "")
+            .setRequired(false)
 
         const req = new TextInputBuilder()
             .setCustomId("req")
@@ -237,6 +238,7 @@ export default class Theoryhunt extends Command {
             .setMaxLength(1000)
             .setPlaceholder("Enter description for the theoryhunt")
             .setValue(theoryhunt.description ?? "")
+            .setRequired(false)
 
         const commissioner = new TextInputBuilder()
             .setCustomId("commissioners")
@@ -245,6 +247,7 @@ export default class Theoryhunt extends Command {
             .setMaxLength(1000)
             .setPlaceholder("Enter line separated list of Discord IDs")
             .setValue(theoryhunt.commissioner.map(c => c.discordId).join("\n"))
+            .setRequired(false)
 
         const tickets = new TextInputBuilder()
             .setCustomId("tickets")
@@ -253,6 +256,7 @@ export default class Theoryhunt extends Command {
             .setMaxLength(1000)
             .setPlaceholder("Enter line separated list of Ticket IDs")
             .setValue(theoryhunt.ticket.map(c => c.id).join("\n"))
+            .setRequired(false)
 
         const modal = new ModalBuilder()
             .setTitle(`Editing Theoryhunt #${theoryhunt.id}`)
