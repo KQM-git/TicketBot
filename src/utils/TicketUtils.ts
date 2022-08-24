@@ -48,10 +48,10 @@ export async function createTicket(ticketType: TicketType, name: string, member:
     try {
         await channel.permissionOverwrites.edit(member, {
             ViewChannel: true,
-            ManageChannels: true
+            ManageMessages: true
         })
     } catch (error) {
-        Logger.error("Couldn't give creator permission for ManageChannels")
+        Logger.error("Couldn't give creator permission for ManageMessages")
     }
     if (ticketType.creationChannel) {
         const creationChannel = await guild.channels.fetch(ticketType.creationChannel)
