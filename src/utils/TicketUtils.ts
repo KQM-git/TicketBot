@@ -24,7 +24,7 @@ export async function createTicket(ticketType: TicketType, name: string, member:
     const mgs = await channel.send({
         content: `<@${member.id}>${ticketType.opening.content}`,
         allowedMentions: {
-            users: [member.id, ...(ticketType.opening.pingUsers ?? [])]
+            users: [member.id, ...(ticketType.opening.pingUsers ?? [])].filter((x, i, a) => a.indexOf(x) == i)
         },
         embeds: ticketType.opening.embeds,
         components: ticketType.opening.components
@@ -43,7 +43,6 @@ export async function createTicket(ticketType: TicketType, name: string, member:
     })
 
     await mgs.pin("Initial create ticket message")
-
 
     try {
         await channel.permissionOverwrites.edit(member, {
