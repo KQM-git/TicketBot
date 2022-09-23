@@ -33,7 +33,7 @@ export const buttons = {
         .setStyle(ButtonStyle.Link),
     GUIDE_VER_STANDARD: new ButtonBuilder()
         .setLabel("Verification Standards")
-        .setURL("https://docs.google.com/document/d/1i_ftnpyJfLMTKSbHqDNPk6_oX8UlDhwVOsJUN2wk0vE/edit?usp=sharing")
+        .setURL("https://docs.google.com/document/d/1b9EBm0ZIYeNFuYhLwZoqFicmgRHhlMWpP8gy-qazwhU/edit?usp=sharing")
         .setStyle(ButtonStyle.Link)
 }
 
