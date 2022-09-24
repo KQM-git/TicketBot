@@ -212,7 +212,7 @@ Entails what KQM looks for in terms of quality for guides hosted on our website.
 **[Guide Skeleton](https://docs.google.com/document/d/1i_ftnpyJfLMTKSbHqDNPk6_oX8UlDhwVOsJUN2wk0vE/edit?usp=sharing)**
 A general template for what a KQM-hosted guide should look like. Use this as a reference for what elements and sections should be in your guide.
 
-**[Verification Standards](https://docs.google.com/document/d/1i_ftnpyJfLMTKSbHqDNPk6_oX8UlDhwVOsJUN2wk0vE/edit?usp=sharing)**
+**[Verification Standards](https://docs.google.com/document/d/1b9EBm0ZIYeNFuYhLwZoqFicmgRHhlMWpP8gy-qazwhU/edit?usp=sharing)**
 A reference document for Wangsheng Editors and Theorycrafters when reviewing guides before they go live on the site.`)
                 .setColor("#A758BF")
             ],
