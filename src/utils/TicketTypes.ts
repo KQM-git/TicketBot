@@ -203,7 +203,7 @@ export const ticketTypes: Record<string, TicketType> = {
 
 **Guidelines**
 - Name it appropriately with \`/rename <ticket name>\`
-- When done ping <@235719068726853632> to begin the review process.`,
+- When done ping <@&903791926162100256> to begin the review process.`,
             embeds: [new EmbedBuilder()
                 .setTitle("Guide Guidelines")
                 .setDescription(`**[Guide Standards](https://docs.google.com/document/d/1hZ0bNmMy1t5R8TOF1v8mcuzQpR0BgJD5pKY2T_t6uh0/edit?usp=sharing)**
@@ -216,7 +216,6 @@ A general template for what a KQM-hosted guide should look like. Use this as a r
 A reference document for Wangsheng Editors and Theorycrafters when reviewing guides before they go live on the site.`)
                 .setColor("#A758BF")
             ],
-            pingUsers: ["235719068726853632"],
             components: [
                 new ActionRowBuilder<ButtonBuilder>().addComponents(
                     buttons.GUIDE_STANDARD,
