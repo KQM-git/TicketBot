@@ -46,6 +46,7 @@ export const ROLE = config.production ? {
     TC_STAFF: [
         "810550138552320010", // Scholar
         "903791926162100256", // Editor
+        "1026677040054808616", // Assistant Editor
         "975990552812204032", // Monke
         "873486216782299137", // Mod
     ],
