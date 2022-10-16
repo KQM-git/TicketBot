@@ -36,7 +36,6 @@ export default class TiBotClient extends Discord.Client {
             partials: [Partials.Channel, Partials.GuildMember, Partials.Reaction, Partials.Message],
             shards: "auto",
             presence: {
-                status: "idle",
                 activities: [{
                     name: config.activity,
                     type: ActivityType.Competing
