@@ -36,7 +36,9 @@ export async function updateMessage(channelId: string, replyId: string, response
 export const verificationTypeName: Record<VerifierType, string> = {
     DEFAULT: "Ticket",
     CALCS: "Calculations",
-    GUIDE: "Guide"
+    GUIDE: "Guide",
+    GUIDE_GRAMMAR: "Guide Readability/Grammar",
+    GUIDE_TC: "Guide TC Content"
 }
 
 export async function sendMessage(source: CommandSource, response: string | EmbedBuilder, components?: (

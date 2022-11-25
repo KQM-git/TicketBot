@@ -236,7 +236,7 @@ A reference document for Wangsheng Editors and Theorycrafters when reviewing gui
         manageRoles: [...ROLE.TC_STAFF, ROLE.ADMIN],
         defaultCategory: CATEGORY.GUIDES,
         verifications: [{
-            type: VerifierType.GUIDE,
+            type: VerifierType.GUIDE_GRAMMAR,
             required: 2,
             roles: [ROLE.THEORYCRAFTER],
             dinkDonk: {
@@ -250,7 +250,16 @@ A reference document for Wangsheng Editors and Theorycrafters when reviewing gui
                 }
             },
             button: {
-                label: "Verify guide",
+                label: "Verify guide readability/grammar",
+                emoji: "✅",
+                style: ButtonStyle.Primary
+            }
+        }, {
+            type: VerifierType.GUIDE_TC,
+            required: 2,
+            roles: [ROLE.THEORYCRAFTER],
+            button: {
+                label: "Verify guide TC content",
                 emoji: "✅",
                 style: ButtonStyle.Primary
             }

@@ -25,6 +25,8 @@ export enum EndingAction {
 export enum VerifierType {
     DEFAULT = "DEFAULT",
     GUIDE = "GUIDE",
+    GUIDE_TC = "GUIDE_TC",
+    GUIDE_GRAMMAR = "GUIDE_GRAMMAR",
     CALCS = "CALCS",
 }
 
