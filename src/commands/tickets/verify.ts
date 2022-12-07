@@ -24,8 +24,11 @@ export default class VerifyTicket extends Command {
                     name: "Default",
                     value: VerifierType.DEFAULT
                 }, {
-                    name: "Guide",
-                    value: VerifierType.GUIDE
+                    name: "Guide Readability/Grammar",
+                    value: VerifierType.GUIDE_TC
+                }, {
+                    name: "Guide TC Content",
+                    value: VerifierType.GUIDE_GRAMMAR
                 }, {
                     name: "Calculations",
                     value: VerifierType.CALCS
