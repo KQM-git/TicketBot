@@ -25,15 +25,15 @@ export const buttons = {
         .setStyle(ButtonStyle.Secondary),
     GUIDE_STANDARD: new ButtonBuilder()
         .setLabel("Guide Standards")
-        .setURL("https://docs.google.com/document/d/1hZ0bNmMy1t5R8TOF1v8mcuzQpR0BgJD5pKY2T_t6uh0/edit?usp=sharing")
+        .setURL("https://docs.google.com/document/d/1MN1g59oB64_D2XjPhguBB88y7zdlkQ_rlNYVpJvFdfQ/")
         .setStyle(ButtonStyle.Link),
     GUIDE_SKELETON: new ButtonBuilder()
         .setLabel("Guide Skeleton")
-        .setURL("https://docs.google.com/document/d/1i_ftnpyJfLMTKSbHqDNPk6_oX8UlDhwVOsJUN2wk0vE/edit?usp=sharing")
+        .setURL("https://docs.google.com/document/d/1i_ftnpyJfLMTKSbHqDNPk6_oX8UlDhwVOsJUN2wk0vE/")
         .setStyle(ButtonStyle.Link),
-    GUIDE_VER_STANDARD: new ButtonBuilder()
-        .setLabel("Verification Standards")
-        .setURL("https://docs.google.com/document/d/1b9EBm0ZIYeNFuYhLwZoqFicmgRHhlMWpP8gy-qazwhU/edit?usp=sharing")
+    GUIDE_SPELLING_AND_CAPITALIZATION: new ButtonBuilder()
+        .setLabel("Spelling & Capitalization")
+        .setURL("https://docs.google.com/document/d/1Az6Oq9BAlU1primFVVEBAo-tGjeo-K5lYKxNxPHMle4/")
         .setStyle(ButtonStyle.Link)
 }
 
@@ -207,21 +207,21 @@ export const ticketTypes: Record<string, TicketType> = {
 - When done ping <@&903791926162100256> to begin the review process.`,
             embeds: [new EmbedBuilder()
                 .setTitle("Guide Guidelines")
-                .setDescription(`**[Guide Standards](https://docs.google.com/document/d/1hZ0bNmMy1t5R8TOF1v8mcuzQpR0BgJD5pKY2T_t6uh0/edit?usp=sharing)**
+                .setDescription(`**[Guide Standards](https://docs.google.com/document/d/1MN1g59oB64_D2XjPhguBB88y7zdlkQ_rlNYVpJvFdfQ/)**
 Entails what KQM looks for in terms of quality for guides hosted on our website. These standards are enforced, and it is expected that authors follow them closely.
 
-**[Guide Skeleton](https://docs.google.com/document/d/1i_ftnpyJfLMTKSbHqDNPk6_oX8UlDhwVOsJUN2wk0vE/edit?usp=sharing)**
+**[Guide Skeleton](https://docs.google.com/document/d/1i_ftnpyJfLMTKSbHqDNPk6_oX8UlDhwVOsJUN2wk0vE/)**
 A general template for what a KQM-hosted guide should look like. Use this as a reference for what elements and sections should be in your guide.
 
-**[Verification Standards](https://docs.google.com/document/d/1b9EBm0ZIYeNFuYhLwZoqFicmgRHhlMWpP8gy-qazwhU/edit?usp=sharing)**
-A reference document for Wangsheng Editors and Theorycrafters when reviewing guides before they go live on the site.`)
+**[KQM Spelling & Capitalization Standards](https://docs.google.com/document/d/1Az6Oq9BAlU1primFVVEBAo-tGjeo-K5lYKxNxPHMle4/)**
+A reference document for spelling and capitalization standards in KQM guides.`)
                 .setColor("#A758BF")
             ],
             components: [
                 new ActionRowBuilder<ButtonBuilder>().addComponents(
                     buttons.GUIDE_STANDARD,
                     buttons.GUIDE_SKELETON,
-                    buttons.GUIDE_VER_STANDARD,
+                    buttons.GUIDE_SPELLING_AND_CAPITALIZATION,
                     buttons.CLOSE
                 )
             ]
