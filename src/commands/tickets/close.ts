@@ -109,7 +109,8 @@ export default class CloseTicket extends Command {
         const updatedTicket = await client.prisma.ticket.update({
             where: { id: ticket.id },
             data: {
-                status: TicketStatus.CLOSED
+                status: TicketStatus.CLOSED,
+                statusUpdate: new Date()
             },
             include: { theoryhunt: { include: thInclude } }
         })

@@ -181,6 +181,7 @@ export default class VerifyTicket extends Command {
             where: { id: ticket.id },
             data: {
                 status: enough ? TicketStatus.VERIFIED : undefined,
+                statusUpdate: enough ? new Date() : undefined,
                 verifications: {
                     create: {
                         channelId: source.channel.id,

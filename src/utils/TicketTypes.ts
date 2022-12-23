@@ -226,6 +226,7 @@ A reference document for Wangsheng Editors and Theorycrafters when reviewing gui
                 )
             ]
         },
+        lockout: 7 * 24 * 3600 * 1000,
         creationRoles: [ROLE.GUIDESUBS, ROLE.ADMIN],
         blacklistRoles: ROLE.BLACKLIST,
         blacklistNames: [{

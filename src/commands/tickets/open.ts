@@ -96,6 +96,7 @@ export default class OpenTicket extends Command {
             where: { id: ticket.id },
             data: {
                 status: TicketStatus.OPEN,
+                statusUpdate: new Date(),
                 verifications: {
                     deleteMany: {
                         channelId: source.channel.id

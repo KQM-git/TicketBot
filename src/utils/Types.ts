@@ -70,6 +70,7 @@ export type TicketType = {
             button: ButtonStyling
         }
     }[]
+    lockout?: number
     verifiedCategory?: string
     verifiedRoles?: string[]
     verifiedChannel?: string

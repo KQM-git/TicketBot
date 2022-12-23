@@ -47,7 +47,7 @@ export default class PingVerifiers extends Command {
     }
 
     async run(source: CommandSource, user: User, type: string): Promise<SendMessage | undefined | string> {
-        if (!source.guild) return await sendMessage(source, "Can't rename transcripts here", undefined, true)
+        if (!source.guild) return await sendMessage(source, "Can't ping verifiers here", undefined, true)
 
         const member = await source.guild.members.fetch(user.id)
         if (!member) return await sendMessage(source, "Couldn't fetch your Discord profile", undefined, true)
