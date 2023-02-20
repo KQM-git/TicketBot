@@ -22,7 +22,7 @@ export default class ConvertTicket extends Command {
                 name: "channel",
                 description: "Channel / category to convert",
                 type: ApplicationCommandOptionType.Channel,
-                required: true
+                required: false
             }, {
                 name: "type",
                 description: "Ticket type to use",
@@ -50,7 +50,10 @@ export default class ConvertTicket extends Command {
 
     async runInteraction(source: ChatInputCommandInteraction): Promise<SendMessage | undefined> {
         await source.deferReply({ ephemeral: true })
-        return this.run(source, source.user, source.options.getString("type", true), source.options.getChannel("channel", true), source.options.getString("status", true))
+        const channel = source.options.getChannel("channel", false) ?? source.channel
+        if (!channel || channel.type == ChannelType.DM)
+            return await sendMessage(source, "Couldn't find channel?", undefined, true)
+        return this.run(source, source.user, source.options.getString("type", true), channel, source.options.getString("status", true))
     }
 
     async runMessage(source: Message): Promise<SendMessage | undefined> {

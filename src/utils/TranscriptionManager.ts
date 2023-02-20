@@ -620,13 +620,23 @@ export default class TranscriptionManager {
                     url: d.url ?? undefined
                 }
 
-            if (d.type == ComponentType.SelectMenu)
+            if (d.type == ComponentType.StringSelect)
                 return {
                     type: d.type,
                     disabled: d.disabled,
                     minValues: d.minValues ?? undefined,
                     maxValues: d.maxValues ?? undefined,
                     options: d.options,
+                    placeholder: d.placeholder ?? undefined,
+                }
+
+            if (d.type == ComponentType.ChannelSelect || d.type == ComponentType.MentionableSelect ||
+                d.type == ComponentType.RoleSelect || d.type == ComponentType.UserSelect)
+                return {
+                    type: d.type,
+                    disabled: d.disabled,
+                    minValues: d.minValues ?? undefined,
+                    maxValues: d.maxValues ?? undefined,
                     placeholder: d.placeholder ?? undefined,
                 }
 
