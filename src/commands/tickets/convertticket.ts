@@ -19,11 +19,6 @@ export default class ConvertTicket extends Command {
             usage: "convertticket",
             aliases: [],
             options: [{
-                name: "channel",
-                description: "Channel / category to convert",
-                type: ApplicationCommandOptionType.Channel,
-                required: false
-            }, {
                 name: "type",
                 description: "Ticket type to use",
                 type: ApplicationCommandOptionType.String,
@@ -44,6 +39,11 @@ export default class ConvertTicket extends Command {
                     value: TicketStatus.VERIFIED
                 }],
                 required: true
+            }, {
+                name: "channel",
+                description: "Channel / category to convert (defaults to current)",
+                type: ApplicationCommandOptionType.Channel,
+                required: false
             }]
         })
     }
