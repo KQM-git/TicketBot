@@ -19,6 +19,7 @@ intents.add(
     IntentsBitField.Flags.Guilds,
     // For handling commands/archiving messages in guilds
     IntentsBitField.Flags.GuildMessages,
+    IntentsBitField.Flags.MessageContent,
     // Updating members
     IntentsBitField.Flags.GuildMembers,
 )
