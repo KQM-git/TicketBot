@@ -86,8 +86,9 @@ export default class ConvertTicket extends Command {
                 const children = channel.children.cache
                 const converted: string[] = []
                 for (const child of children) {
-                    if (child[1].isTextBased())
-                        converted.push(await convertTicket(ticketType, child[1], member, status, source.guild))
+                    const channel = child[1]
+                    if (isTicketable(channel))
+                        converted.push(await convertTicket(ticketType, channel, member, status, source.guild))
                 }
                 return await sendMessage(source, converted.join("\n").substring(0, 1900), undefined)
             } else if (isTicketable(channel)) {
