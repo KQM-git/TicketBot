@@ -83,6 +83,21 @@ export type TicketType = {
     randomDefaultSlug?: true
 }
 
+export type TicketButton = {
+    name: string
+    value: string
+    content?: string
+    title: string
+    desc: string
+    ticketTypes: {
+        customId?: string
+        id?: string
+        name: string
+        emoji: string
+        style: ButtonStyle
+    }[]
+}
+
 // Database stuff
 export type MessageInput = {
     discordId: string

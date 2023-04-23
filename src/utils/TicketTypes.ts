@@ -1,6 +1,6 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from "discord.js"
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Snowflake, TextInputStyle } from "discord.js"
 import config from "../data/config.json"
-import { TicketType, VerifierType } from "./Types"
+import { TicketButton, TicketType, VerifierType } from "./Types"
 
 export const buttons = {
     CLOSE: new ButtonBuilder()
@@ -23,26 +23,46 @@ export const buttons = {
         .setCustomId("rename")
         .setEmoji("✏️")
         .setStyle(ButtonStyle.Secondary),
-    GUIDE_STANDARD: new ButtonBuilder()
+    GI_GUIDE_STANDARD: new ButtonBuilder()
         .setLabel("Guide Standards")
         .setURL("https://docs.google.com/document/d/1MN1g59oB64_D2XjPhguBB88y7zdlkQ_rlNYVpJvFdfQ/")
         .setStyle(ButtonStyle.Link),
-    GUIDE_SKELETON: new ButtonBuilder()
+    GI_GUIDE_SKELETON: new ButtonBuilder()
         .setLabel("Guide Skeleton")
         .setURL("https://docs.google.com/document/d/1i_ftnpyJfLMTKSbHqDNPk6_oX8UlDhwVOsJUN2wk0vE/")
         .setStyle(ButtonStyle.Link),
-    GUIDE_SPELLING_AND_CAPITALIZATION: new ButtonBuilder()
+    GI_GUIDE_SPELLING_AND_CAPITALIZATION: new ButtonBuilder()
         .setLabel("Spelling & Capitalization")
         .setURL("https://docs.google.com/document/d/1Az6Oq9BAlU1primFVVEBAo-tGjeo-K5lYKxNxPHMle4/")
-        .setStyle(ButtonStyle.Link)
+        .setStyle(ButtonStyle.Link),
+    HSR_GUIDE_STANDARD: new ButtonBuilder()
+        .setLabel("Guide Standards")
+        .setURL("https://docs.google.com/document/d/1-ALCQKIMRthcSxryuOphmXbZhFTzzSBy6j9y6AR1deo/")
+        .setStyle(ButtonStyle.Link),
 }
 
-export const ROLE = config.production ? {
+const GI_ROLE = config.production ? {
     LIBSUB: "953173415836147792",
     GUIDESUBS: "939413668553179147",
-    CONTRIBUTOR: "764838634280845312",
     WET: "845508406579691530",
     THEORYCRAFTER: "896043474699317259",
+    FEIYUN: "840649229021085736",
+    FEIYUN_ADMIN: "841871289894305793"
+} : {
+    LIBSUB: "980899762054254593",
+    GUIDESUBS: "980899740029956106",
+    WET: "980899325779537990",
+    THEORYCRAFTER: "980898982316351578",
+    FEIYUN: "981973618760228944", // SAME AS EDITOR,
+    FEIYUN_ADMIN: "980899219235807302" // SAME AS STAFF
+}
+
+const HSR_ROLE = {
+    SUBS: "1099762139020918924"
+}
+
+export const ROLE = config.type == "GI" ? config.production ? {
+    // Genshin Production
     TC_STAFF: [
         "810550138552320010", // Scholar
         "903791926162100256", // Editor
@@ -63,20 +83,15 @@ export const ROLE = config.production ? {
         "810410368622395392", // Keqing's Key
         "995096399983149078", // Emissary
     ],
-    GUIDE_VERIFICATION_PING: "945105638839705630",
-    CALCS_VERIFICATION_PING: "989266525280145478",
     BLACKLIST: [
         // "839680495453077534", // Coffin
         "771259671671078913", // Muted
     ],
-    FEIYUN: "840649229021085736",
-    FEIYUN_ADMIN: "841871289894305793"
+    CONTRIBUTOR: "764838634280845312",
+    GUIDE_VERIFICATION_PING: "945105638839705630",
+    CALCS_VERIFICATION_PING: "989266525280145478",
 } : {
-    LIBSUB: "980899762054254593",
-    GUIDESUBS: "980899740029956106",
-    CONTRIBUTOR: "980899054177374268",
-    WET: "980899325779537990",
-    THEORYCRAFTER: "980898982316351578",
+    // Test server
     TC_STAFF: [
         "980899103049383936", // Scholar
         "981973618760228944", // Editor
@@ -84,16 +99,34 @@ export const ROLE = config.production ? {
     STAFF: ["980899219235807302"],
     ADMIN: "980899219235807302",
     ADMIN_LIKE: ["980899219235807302"],
-    GUIDE_VERIFICATION_PING: "984490976817066046",
-    CALCS_VERIFICATION_PING: "984490976817066046",
     BLACKLIST: [
         "987118008910610444", // Coffin
     ],
-    FEIYUN: "981973618760228944", // SAME AS EDITOR,
-    FEIYUN_ADMIN: "980899219235807302" // SAME AS STAFF
+    CONTRIBUTOR: "980899054177374268",
+    GUIDE_VERIFICATION_PING: "984490976817066046",
+    CALCS_VERIFICATION_PING: "984490976817066046",
+} : {
+    // HSR Production
+    TC_STAFF: [
+        "1094788736715341944", // TC Mod
+        "1090846911101145138", // TC
+    ],
+    STAFF: ["1089341501764542484"], // Staff
+    ADMIN: "1089339955509215273",
+    ADMIN_LIKE: [
+        "1089339955509215273", // Aeon
+        "1089368868306288691", // Key
+    ],
+    BLACKLIST: [
+        "1090818029639717005", // Muted
+    ],
+    CONTRIBUTOR: "1099763950352093224", // TC Contributor
+    GUIDE_VERIFICATION_PING: "1090846911101145138",
+    CALCS_VERIFICATION_PING: "1090846911101145138",
 }
 
-export const CATEGORY = config.production ? {
+const CATEGORY = config.type == "GI" ? config.production ? {
+    // GI KQM
     GUIDES: "953147741415018526",
     TC_PROJECT: "953342753557868604",
     OPEN_SUBS: "953155656125411419",
@@ -104,6 +137,7 @@ export const CATEGORY = config.production ? {
     FEIYUN_PROJECTS: "946636283667681331",
     FEIYUN_DONE: "999767676924735568"
 } : {
+    // TESTING
     GUIDES: "980838140099039272",
     TC_PROJECT: "980837799076958310",
     OPEN_SUBS: "980837799076958310",
@@ -113,9 +147,21 @@ export const CATEGORY = config.production ? {
     STAFF_CLOSED: "982768252033835058",
     FEIYUN_PROJECTS: "980926469737963530",
     FEIYUN_DONE: "980838078300164096"
+} : {
+    // HSR
+    GUIDES: "1099761128122359959",
+    TC_PROJECT: "1099761981336080454",
+    OPEN_SUBS: "1099761028348264488",
+    FOR_REVIEW: "1099762096448749580",
+    PUBLISHING: "1099762543578316940",
+    STAFF_TICKETS: "1099762656853901402",
+    STAFF_CLOSED: "1099762824005292114",
+    FEIYUN_PROJECTS: "0",
+    FEIYUN_DONE: "0"
 }
 
-export const CHANNEL = config.production ? {
+const CHANNEL = config.type == "GI" ? config.production ? {
+    // GI KQM
     NEW_TICKETS: "988565627943931934",
     TC_TRANSCRIPTS: "945097851195777054",
     THEORYHUNT: "782067573276672061",
@@ -124,6 +170,7 @@ export const CHANNEL = config.production ? {
     FEIYUN_FEED: "999763136984924211",
     CALC_REQUEST: "1001597332716003548"
 } : {
+    // TESTING
     NEW_TICKETS: "981316199185014806",
     TC_TRANSCRIPTS: "980924167648079892",
     THEORYHUNT: "994320734308552775",
@@ -131,6 +178,15 @@ export const CHANNEL = config.production ? {
     FEIYUN_TRANSCRIPTS: "986748960041467954",
     FEIYUN_FEED: "981316199185014806",
     CALC_REQUEST: "994320734308552775"
+} : {
+    // HSR
+    NEW_TICKETS: "1099763077492244491",
+    TC_TRANSCRIPTS: "1099763396045451324",
+    THEORYHUNT: "1099763353741693080",
+    STAFF_TRANSCRIPTS: "1099763282975400037",
+    FEIYUN_TRANSCRIPTS: "0",
+    FEIYUN_FEED: "0",
+    CALC_REQUEST: "0"
 }
 
 export const TheoryhuntSettings = {
@@ -149,7 +205,7 @@ export const ticketTypes: Record<string, TicketType> = {
 
 **Guidelines**
 - You can rename your ticket with \`/rename <ticket name>\` or with the button below
-- If this ticket was created by accident or it can be deleted, you can use \`/delete\` within the first 5 minutes, otherwise ask a Scholar.
+- If this ticket was created by accident or it can be deleted, you can use \`/delete\` within the first 5 minutes, otherwise ask ${config.type == "GI" ? "a Scholar" : "an Astral Navigator"}.
 - When you are ready to submit the ticket, compile everything into one message following the format below and pin it. Then type \`/close\` or click the button below; the ticket will automatically be moved to be reviewed.
 - To add contributors to your ticket you can use \`/contributor add <user>\`.
 - The ticket will be scrapped if: no activity >1 week or open for >1 month.`,
@@ -169,7 +225,7 @@ export const ticketTypes: Record<string, TicketType> = {
                 )
             ]
         },
-        creationRoles: [ROLE.LIBSUB, ROLE.ADMIN],
+        creationRoles: [GI_ROLE.LIBSUB, HSR_ROLE.SUBS, ROLE.ADMIN],
         blacklistRoles: ROLE.BLACKLIST,
         manageRoles: [...ROLE.TC_STAFF, ROLE.ADMIN],
         defaultCategory: CATEGORY.OPEN_SUBS,
@@ -178,7 +234,7 @@ export const ticketTypes: Record<string, TicketType> = {
         verifications: [{
             type: VerifierType.DEFAULT,
             required: 2,
-            roles: [ROLE.THEORYCRAFTER],
+            roles: [GI_ROLE.THEORYCRAFTER],
             button: {
                 label: "Verify",
                 emoji: "✅",
@@ -203,31 +259,39 @@ export const ticketTypes: Record<string, TicketType> = {
             content: ` - As an author, it is your responsibility to complete the ticket
 
 **Guidelines**
-- Name it appropriately with \`/rename <ticket name>\`
-- When done ping <@&903791926162100256> to begin the review process.`,
+- Name it appropriately with \`/rename <ticket name>\`${config.type == "GI" ? `
+- When done ping <@&903791926162100256> to begin the review process.` : ""}`,
             embeds: [new EmbedBuilder()
                 .setTitle("Guide Guidelines")
-                .setDescription(`**[Guide Standards](https://docs.google.com/document/d/1MN1g59oB64_D2XjPhguBB88y7zdlkQ_rlNYVpJvFdfQ/)**
+                .setDescription(config.type == "GI" ?
+                // GI
+                    `**[Guide Standards](https://docs.google.com/document/d/1MN1g59oB64_D2XjPhguBB88y7zdlkQ_rlNYVpJvFdfQ/)**
 Entails what KQM looks for in terms of quality for guides hosted on our website. These standards are enforced, and it is expected that authors follow them closely.
 
 **[Guide Skeleton](https://docs.google.com/document/d/1i_ftnpyJfLMTKSbHqDNPk6_oX8UlDhwVOsJUN2wk0vE/)**
 A general template for what a KQM-hosted guide should look like. Use this as a reference for what elements and sections should be in your guide.
 
 **[KQM Spelling & Capitalization Standards](https://docs.google.com/document/d/1Az6Oq9BAlU1primFVVEBAo-tGjeo-K5lYKxNxPHMle4/)**
-A reference document for spelling and capitalization standards in KQM guides.`)
+A reference document for spelling and capitalization standards in KQM guides.` :
+                // HSR
+                    `**[Guide Standards](https://docs.google.com/document/d/1-ALCQKIMRthcSxryuOphmXbZhFTzzSBy6j9y6AR1deo/)**
+Entails what KQM looks for in terms of quality for guides hosted on our website. These standards are enforced, and it is expected that authors follow them closely.`)
                 .setColor("#A758BF")
             ],
             components: [
-                new ActionRowBuilder<ButtonBuilder>().addComponents(
-                    buttons.GUIDE_STANDARD,
-                    buttons.GUIDE_SKELETON,
-                    buttons.GUIDE_SPELLING_AND_CAPITALIZATION,
+                config.type == "GI" ? new ActionRowBuilder<ButtonBuilder>().addComponents(
+                    buttons.GI_GUIDE_STANDARD,
+                    buttons.GI_GUIDE_SKELETON,
+                    buttons.GI_GUIDE_SPELLING_AND_CAPITALIZATION,
+                    buttons.CLOSE
+                ) : new ActionRowBuilder<ButtonBuilder>().addComponents(
+                    buttons.HSR_GUIDE_STANDARD,
                     buttons.CLOSE
                 )
             ]
         },
         lockout: 7 * 24 * 3600 * 1000,
-        creationRoles: [ROLE.GUIDESUBS, ROLE.ADMIN],
+        creationRoles: [GI_ROLE.GUIDESUBS, HSR_ROLE.SUBS, ROLE.ADMIN],
         blacklistRoles: ROLE.BLACKLIST,
         blacklistNames: [{
             regex: /Collei|Thighnari|Dori/i,
@@ -238,8 +302,8 @@ A reference document for spelling and capitalization standards in KQM guides.`)
         defaultCategory: CATEGORY.GUIDES,
         verifications: [{
             type: VerifierType.GUIDE_GRAMMAR,
-            required: 2,
-            roles: [ROLE.THEORYCRAFTER],
+            required: config.type == "GI" ? 2 : 1,
+            roles: [GI_ROLE.THEORYCRAFTER],
             dinkDonk: {
                 time: 24 * 3600 * 1000,
                 message: `<@&${ROLE.GUIDE_VERIFICATION_PING}> - This guide is ready for guide verification`,
@@ -257,8 +321,8 @@ A reference document for spelling and capitalization standards in KQM guides.`)
             }
         }, {
             type: VerifierType.GUIDE_TC,
-            required: 2,
-            roles: [ROLE.THEORYCRAFTER],
+            required: config.type == "GI" ? 2 : 1,
+            roles: [GI_ROLE.THEORYCRAFTER],
             button: {
                 label: "Verify guide TC content",
                 emoji: "✅",
@@ -267,7 +331,7 @@ A reference document for spelling and capitalization standards in KQM guides.`)
         }, {
             type: VerifierType.CALCS,
             required: 1,
-            roles: [ROLE.THEORYCRAFTER],
+            roles: [GI_ROLE.THEORYCRAFTER],
             dinkDonk: {
                 time: 24 * 3600 * 1000,
                 message: `<@&${ROLE.CALCS_VERIFICATION_PING}> - This guide is ready for calc verification`,
@@ -301,7 +365,7 @@ A reference document for spelling and capitalization standards in KQM guides.`)
 
 **Guidelines**
 - You can rename your ticket with \`/rename <ticket name>\` or with the button below
-- If this ticket was created by accident or it can be deleted, you can use \`/delete\` within the first 5 minutes, otherwise ask a Scholar.
+- If this ticket was created by accident or it can be deleted, you can use \`/delete\` within the first 5 minutes, otherwise ask ${config.type == "GI" ? "a Scholar" : "an Astral Navigator"}.
 - When you are ready to submit the ticket, compile everything into one message following the format below and pin it. Then type \`/close\` or click the button below; the ticket will automatically be moved to be reviewed.
 - To add contributors to your ticket you can use \`/contributor add <user>\`.`,
             embeds: [new EmbedBuilder()
@@ -327,7 +391,7 @@ A reference document for spelling and capitalization standards in KQM guides.`)
         verifications: [{
             type: VerifierType.DEFAULT,
             required: 2,
-            roles: [ROLE.THEORYCRAFTER],
+            roles: [GI_ROLE.THEORYCRAFTER],
             button: {
                 label: "Verify",
                 emoji: "✅",
@@ -349,7 +413,7 @@ A reference document for spelling and capitalization standards in KQM guides.`)
 
 **Guidelines**
 - You can rename your ticket with \`/rename <ticket name>\` or with the button below
-- If this ticket was created by accident or it can be deleted, you can use \`/delete\` within the first 5 minutes, otherwise ask a Scholar.
+- If this ticket was created by accident or it can be deleted, you can use \`/delete\` within the first 5 minutes, otherwise ask a ${config.type == "GI" ? "a Scholar" : "an Astral Navigator"}.
 - When you are ready to submit the ticket, compile everything into one message following the format below and pin it. Then type \`/close\` or click the button below; the ticket will automatically be moved to be reviewed.
 - To add contributors to your ticket you can use \`/contributor add <user>\`.
 - The ticket will be scrapped if: no activity >1 week or open for >1 month.`,
@@ -378,7 +442,7 @@ A reference document for spelling and capitalization standards in KQM guides.`)
         verifications: [{
             type: VerifierType.DEFAULT,
             required: 2,
-            roles: [ROLE.THEORYCRAFTER],
+            roles: [GI_ROLE.THEORYCRAFTER],
             button: {
                 label: "Verify",
                 emoji: "✅",
@@ -386,7 +450,7 @@ A reference document for spelling and capitalization standards in KQM guides.`)
             }
         }],
         verifiedCategory: CATEGORY.PUBLISHING,
-        verifiedRoles: [ROLE.WET],
+        verifiedRoles: config.type == "GI" ? [GI_ROLE.WET] : [ROLE.CONTRIBUTOR],
         dumpChannel: CHANNEL.TC_TRANSCRIPTS,
         creationChannel: CHANNEL.NEW_TICKETS,
         dinkDonk: {
@@ -419,18 +483,20 @@ A reference document for spelling and capitalization standards in KQM guides.`)
         dumpChannel: CHANNEL.STAFF_TRANSCRIPTS,
         randomDefaultSlug: true
     },
-    feiyun: {
+}
+if (config.type == "GI")
+    ticketTypes.feiyun = {
         id: "feiyun",
         name: "Feiyun Ticket",
         emoji: "📹",
         style: ButtonStyle.Primary,
-        creationRoles: [ROLE.FEIYUN],
-        manageRoles: [ROLE.FEIYUN_ADMIN],
+        creationRoles: [GI_ROLE.FEIYUN],
+        manageRoles: [GI_ROLE.FEIYUN_ADMIN],
         defaultCategory: CATEGORY.FEIYUN_PROJECTS,
         verifications: [{
             type: VerifierType.DEFAULT,
             required: 1,
-            roles: [ROLE.FEIYUN_ADMIN],
+            roles: [GI_ROLE.FEIYUN_ADMIN],
             button: {
                 label: "Verify",
                 emoji: "✅",
@@ -450,22 +516,8 @@ A reference document for spelling and capitalization standards in KQM guides.`)
         creationChannel: CHANNEL.FEIYUN_FEED,
         randomDefaultSlug: true
     }
-}
 
-export const menus: {
-    name: string
-    value: string
-    content?: string
-    title: string
-    desc: string
-    ticketTypes: {
-        customId?: string
-        id?: string
-        name: string
-        emoji: string
-        style: ButtonStyle
-    }[]
-}[] = [{
+export const menus: TicketButton[] = [{
     name: "Theorycrafting Tickets",
     value: "TC",
     title: "Theorycrafting Ticket",
@@ -492,12 +544,6 @@ For anyone else you want to add in, you can use \`/add <person or role>\` in the
     desc: "Click below to create a task",
     ticketTypes: [ticketTypes.staff]
 }, {
-    name: "Feiyun Tickets",
-    value: "FY",
-    title: "Projects",
-    desc: "Click below to create a new project",
-    ticketTypes: [ticketTypes.feiyun]
-}, {
     name: "Calculation Requests",
     value: "CR",
     title: "Calculation Requests",
@@ -509,3 +555,97 @@ For anyone else you want to add in, you can use \`/add <person or role>\` in the
         customId: "template-reqcalc",
     }]
 }]
+
+export const templates: Record<string, {
+    name: string
+    embedTitle: string
+    createThreads?: Snowflake[]
+    fields: {
+        id: string
+        inline?: true
+        modalTitle: string
+        embedTitle: string
+        modalPlaceholder?: string
+        modalDefault?: string
+        type: TextInputStyle
+    }[]
+    threadPing?: string[]
+}> = config.type == "GI" ? {
+    proposal: {
+        name: "Proposal",
+        embedTitle: "Theorycrafting Proposal",
+        fields: [{
+            id: "proposal",
+            modalTitle: "Proposal",
+            embedTitle: "Proposal",
+            modalPlaceholder: "What is the idea that you want to explore?",
+            type: TextInputStyle.Short
+        }, {
+            id: "motivation",
+            modalTitle: "Motivation",
+            embedTitle: "Why are you TC'ing this?",
+            modalPlaceholder: "<I like X unit> <Meta/Value Analysis>",
+            type: TextInputStyle.Short
+        }, {
+            id: "idea",
+            modalTitle: "Reasoning",
+            embedTitle: "Why would this idea work? What is it competing against? What are some substitutes and alternatives that we already use?",
+            modalPlaceholder: "The shield from Xinyan provides small defense but has Pyro application.",
+            type: TextInputStyle.Paragraph
+        }, {
+            id: "what",
+            modalTitle: "What do you need",
+            embedTitle: "Did you want to try to calc this? What is the end goal?",
+            modalPlaceholder: "<TheoryHunt> <Calc Guide> <GCsim>",
+            type: TextInputStyle.Paragraph
+        }]
+    },
+    reqcalc: {
+        name: "Calculation Request",
+        embedTitle: "Calculation Request",
+        createThreads: [CHANNEL.CALC_REQUEST],
+        threadPing: ["975990552812204032"],
+        fields: [{
+            id: "type",
+            embedTitle: "Type of Calculation",
+            modalTitle: "Calculation Type",
+            modalPlaceholder: "Weapon / Team / etc.",
+            type: TextInputStyle.Short
+        }, {
+            id: "composition",
+            modalTitle: "Team / Character(s)",
+            embedTitle: "Composition",
+            modalPlaceholder: "List the team members and rotation video",
+            modalDefault: `- Team member 1 + Weapon + Artifact Set/Stats 
+(repeat for all team members)
+(if anything is not included, up to calcer's discretion)`,
+            type: TextInputStyle.Paragraph
+        }, {
+            id: "misc",
+            modalTitle: "Misc",
+            embedTitle: "Other details",
+            modalPlaceholder: "At least purpose is required",
+            modalDefault: `- Purpose of calc (for guide, compendium, etc.)
+- Rotation (required if team calc)
+- Rotation video (required if team calc), links can be formatted like [this](https://youtu.be/dQw4w9WgXcQ)
+- Additional details (if necessary)`,
+            type: TextInputStyle.Paragraph
+        }, {
+            id: "status",
+            inline: true,
+            modalTitle: "Status",
+            embedTitle: "Status",
+            modalPlaceholder: "Open / Under verification / etc.",
+            modalDefault: "Open",
+            type: TextInputStyle.Short
+        }, {
+            id: "participants",
+            inline: true,
+            modalTitle: "Participants",
+            embedTitle: "Participants",
+            modalPlaceholder: "Participants",
+            modalDefault: "This can be you!",
+            type: TextInputStyle.Paragraph
+        }]
+    }
+} : {}
