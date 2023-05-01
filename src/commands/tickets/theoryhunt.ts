@@ -328,10 +328,10 @@ export default class Theoryhunt extends Command {
         Logger.info(`Creating TH ${source.fields.getTextInputValue("name")} for ${member.id} / ${member.user.tag}`)
 
         const msg = await creationChannel.send({
-            content: "<@&855509799335493692> <:keqgrab:1011631839569518643>",
+            content: TheoryhuntSettings.message,
             embeds: [new EmbedBuilder().setTitle(source.fields.getTextInputValue("name") ?? "Unknown").setDescription("Creating theoryhunt...")],
             allowedMentions: {
-                roles: ["855509799335493692"],
+                roles: TheoryhuntSettings.pingable,
             },
         })
 
@@ -480,10 +480,10 @@ export default class Theoryhunt extends Command {
             return await sendMessage(source, "Theoryhunt channel might not be configured correctly", undefined, true)
 
         const newMsg = await channel.send({
-            content: "<@&855509799335493692> <:keqgrab:1011631839569518643>",
+            content: TheoryhuntSettings.message,
             embeds: [createEmbed(theoryhunt)],
             allowedMentions: {
-                roles: ["855509799335493692"]
+                roles: TheoryhuntSettings.pingable
             }
         })
 
@@ -616,10 +616,10 @@ export async function updateTHMessage(theoryhunt: IncludedTheoryhunt|null) {
     try {
         const msg = await channel.messages.fetch(theoryhunt.messageId)
         await msg.edit({
-            content: "<@&855509799335493692> <:keqgrab:1011631839569518643>",
+            content: TheoryhuntSettings.message,
             embeds: [createEmbed(theoryhunt)],
             allowedMentions: {
-                roles: ["855509799335493692"]
+                roles: TheoryhuntSettings.pingable
             }
         })
     } catch (error) {
