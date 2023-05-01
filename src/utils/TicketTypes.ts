@@ -193,7 +193,7 @@ export const TheoryhuntSettings = {
     channel: CHANNEL.THEORYHUNT,
     manageRoles: [...ROLE.TC_STAFF, ROLE.ADMIN],
     message: config.type == "GI" ? "<@&855509799335493692> <:keqgrab:1011631839569518643>" : "",
-    pingable: config.type == "GI" ? ["855509799335493692"] : [""],
+    pingable: config.type == "GI" ? ["855509799335493692"] : [],
 }
 
 export const ticketTypes: Record<string, TicketType> = {
