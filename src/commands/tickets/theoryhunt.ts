@@ -597,7 +597,7 @@ function createEmbed(theoryhunt: IncludedTheoryhunt) {
             inline: true
         }, {
             name: "Ticket",
-            value:  theoryhunt.ticket.length == 0 ? "Ask a Scholar to create a ticket for you if you want to work on this." : theoryhunt.ticket.map(t => `<#${t.channelId}> [${t.status}]`).sort().join("\n"),
+            value:  theoryhunt.ticket.length == 0 ? "Ask a TC Staff to create a ticket for you if you want to work on this." : theoryhunt.ticket.map(t => `<#${t.channelId}> [${t.status}]`).sort().join("\n"),
             inline: true
         }, {
             name: "Participants",
