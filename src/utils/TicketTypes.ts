@@ -60,7 +60,7 @@ const GI_ROLE = config.production ? {
 const HSR_ROLE = {
     SUBS: "1099762139020918924",
     QC_VERIF_PING: "1103837646117163008",
-    TC_VERIF_PING: "1103834692605706280"
+    TC_VERIF_PING: "1103834692605706280",
 }
 
 export const ROLE = config.type == "GI" ? config.production ? {
@@ -124,7 +124,7 @@ export const ROLE = config.type == "GI" ? config.production ? {
     ],
     CONTRIBUTOR: "1099763950352093224", // TC Contributor
     GUIDE_VERIFICATION_PING: HSR_ROLE.QC_VERIF_PING,
-    CALCS_VERIFICATION_PING: "1090846911101145138",
+    CALCS_VERIFICATION_PING: "1103841029746073670",
 }
 
 const CATEGORY = config.type == "GI" ? config.production ? {
@@ -346,7 +346,7 @@ Entails what KQM looks for in terms of quality for guides hosted on our website.
             type: VerifierType.CALCS,
             required: 1,
             roles: [GI_ROLE.THEORYCRAFTER],
-            dinkDonk: config.type == "GI" ? {
+            dinkDonk: {
                 time: 24 * 3600 * 1000,
                 message: `<@&${ROLE.CALCS_VERIFICATION_PING}> - This guide is ready for calc verification`,
                 roles: [ROLE.CALCS_VERIFICATION_PING],
@@ -355,7 +355,7 @@ Entails what KQM looks for in terms of quality for guides hosted on our website.
                     label: "Ping calc verifiers",
                     style: ButtonStyle.Danger
                 }
-            } : undefined,
+            },
             button: {
                 label: "Verify calcs",
                 emoji: "✅",
