@@ -306,7 +306,7 @@ Entails what KQM looks for in terms of quality for guides hosted on our website.
             type: VerifierType.GUIDE_GRAMMAR,
             required: config.type == "GI" ? 2 : 1,
             roles: [GI_ROLE.THEORYCRAFTER],
-            dinkDonk: {
+            dinkDonk: config.type == "GI" ? {
                 time: 24 * 3600 * 1000,
                 message: `<@&${ROLE.GUIDE_VERIFICATION_PING}> - This guide is ready for guide verification`,
                 roles: [ROLE.GUIDE_VERIFICATION_PING],
@@ -315,7 +315,7 @@ Entails what KQM looks for in terms of quality for guides hosted on our website.
                     label: "Ping guide verifiers",
                     style: ButtonStyle.Danger
                 }
-            },
+            } : undefined,
             button: {
                 label: "Verify guide readability/grammar",
                 emoji: "✅",
@@ -334,7 +334,7 @@ Entails what KQM looks for in terms of quality for guides hosted on our website.
             type: VerifierType.CALCS,
             required: 1,
             roles: [GI_ROLE.THEORYCRAFTER],
-            dinkDonk: {
+            dinkDonk: config.type == "GI" ? {
                 time: 24 * 3600 * 1000,
                 message: `<@&${ROLE.CALCS_VERIFICATION_PING}> - This guide is ready for calc verification`,
                 roles: [ROLE.CALCS_VERIFICATION_PING],
@@ -343,7 +343,7 @@ Entails what KQM looks for in terms of quality for guides hosted on our website.
                     label: "Ping calc verifiers",
                     style: ButtonStyle.Danger
                 }
-            },
+            } : undefined,
             button: {
                 label: "Verify calcs",
                 emoji: "✅",
