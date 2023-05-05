@@ -58,7 +58,9 @@ const GI_ROLE = config.production ? {
 }
 
 const HSR_ROLE = {
-    SUBS: "1099762139020918924"
+    SUBS: "1099762139020918924",
+    QC_VERIF_PING: "1103837646117163008",
+    TC_VERIF_PING: "1103834692605706280"
 }
 
 export const ROLE = config.type == "GI" ? config.production ? {
@@ -121,7 +123,7 @@ export const ROLE = config.type == "GI" ? config.production ? {
         "1090818029639717005", // Muted
     ],
     CONTRIBUTOR: "1099763950352093224", // TC Contributor
-    GUIDE_VERIFICATION_PING: "1103834692605706280",
+    GUIDE_VERIFICATION_PING: HSR_ROLE.QC_VERIF_PING,
     CALCS_VERIFICATION_PING: "1090846911101145138",
 }
 
@@ -312,7 +314,7 @@ Entails what KQM looks for in terms of quality for guides hosted on our website.
                 roles: [ROLE.GUIDE_VERIFICATION_PING],
                 button: {
                     emoji: "<a:dinkdonk:981687794000879696>",
-                    label: "Ping guide verifiers",
+                    label: config.type == "GI" ? "Ping guide verifiers" : "Ping QC verifiers",
                     style: ButtonStyle.Danger
                 }
             },
@@ -325,6 +327,16 @@ Entails what KQM looks for in terms of quality for guides hosted on our website.
             type: VerifierType.GUIDE_TC,
             required: config.type == "GI" ? 2 : 1,
             roles: [GI_ROLE.THEORYCRAFTER],
+            dinkDonk: config.type == "HSR" ? {
+                time: 24 * 3600 * 1000,
+                message: `<@&${HSR_ROLE.TC_VERIF_PING}> - This guide is ready for TC content verification`,
+                roles: [HSR_ROLE.TC_VERIF_PING],
+                button: {
+                    emoji: "<a:dinkdonk:981687794000879696>",
+                    label: "Ping TC content verifiers",
+                    style: ButtonStyle.Danger
+                }
+            } : undefined,
             button: {
                 label: "Verify guide TC content",
                 emoji: "✅",
