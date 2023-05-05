@@ -121,7 +121,7 @@ export const ROLE = config.type == "GI" ? config.production ? {
         "1090818029639717005", // Muted
     ],
     CONTRIBUTOR: "1099763950352093224", // TC Contributor
-    GUIDE_VERIFICATION_PING: "1090846911101145138",
+    GUIDE_VERIFICATION_PING: "1103834692605706280",
     CALCS_VERIFICATION_PING: "1090846911101145138",
 }
 
@@ -306,7 +306,7 @@ Entails what KQM looks for in terms of quality for guides hosted on our website.
             type: VerifierType.GUIDE_GRAMMAR,
             required: config.type == "GI" ? 2 : 1,
             roles: [GI_ROLE.THEORYCRAFTER],
-            dinkDonk: config.type == "GI" ? {
+            dinkDonk: {
                 time: 24 * 3600 * 1000,
                 message: `<@&${ROLE.GUIDE_VERIFICATION_PING}> - This guide is ready for guide verification`,
                 roles: [ROLE.GUIDE_VERIFICATION_PING],
@@ -315,7 +315,7 @@ Entails what KQM looks for in terms of quality for guides hosted on our website.
                     label: "Ping guide verifiers",
                     style: ButtonStyle.Danger
                 }
-            } : undefined,
+            },
             button: {
                 label: "Verify guide readability/grammar",
                 emoji: "✅",
