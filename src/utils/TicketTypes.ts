@@ -306,7 +306,7 @@ Entails what KQM looks for in terms of quality for guides hosted on our website.
         defaultCategory: CATEGORY.GUIDES,
         verifications: [{
             type: VerifierType.GUIDE_GRAMMAR,
-            required: config.type == "GI" ? 2 : 1,
+            required: 2,
             roles: [GI_ROLE.THEORYCRAFTER],
             dinkDonk: {
                 time: 24 * 3600 * 1000,
@@ -325,7 +325,7 @@ Entails what KQM looks for in terms of quality for guides hosted on our website.
             }
         }, {
             type: VerifierType.GUIDE_TC,
-            required: config.type == "GI" ? 2 : 1,
+            required: 2,
             roles: [GI_ROLE.THEORYCRAFTER],
             dinkDonk: config.type == "HSR" ? {
                 time: 24 * 3600 * 1000,

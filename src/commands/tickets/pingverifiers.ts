@@ -21,7 +21,10 @@ export default class PingVerifiers extends Command {
                 type: ApplicationCommandOptionType.String,
                 choices: [{
                     name: "Guide verifiers",
-                    value: VerifierType.GUIDE
+                    value: VerifierType.GUIDE_GRAMMAR
+                }, {
+                    name: "TC verifiers",
+                    value: VerifierType.GUIDE_TC
                 }, {
                     name: "Calculation verifiers",
                     value: VerifierType.CALCS
