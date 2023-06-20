@@ -16,7 +16,9 @@ export function getCommand(command: string): ParsedCommand | false {
 
     // If that command doesn't exist, try to find an alias
     if (!cmd) {
-        cmd = client.commands.find((cmd: Command) => cmd.aliases.includes(command) || (cmd.onMessage?.includes(command) ?? false))
+        for (const newCmd of client.commands.values())
+            if (newCmd.aliases.includes(command) || (newCmd.onMessage?.includes(command)))
+                cmd = newCmd
 
         // If that command doesn't exist, silently exit and do nothing
         if (!cmd)

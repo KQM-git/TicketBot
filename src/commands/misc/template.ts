@@ -162,11 +162,12 @@ export default class Template extends Command {
         const msg = await sendMessage(source, embed)
         if (msg && source.channel?.type == ChannelType.GuildText && template.createThreads?.includes(source.channel.id)) {
             const thread = await source.channel.threads.create({
+                type: template.threadType,
                 name: source.fields.getTextInputValue(template.fields[0].id).substring(0, 100),
                 startMessage: msg.id,
             })
             await thread.send({
-                content: `Feel free to further discuss the topic in this thread ${[`<@${source.user.id}>`, ...(template.threadPing??[]).map(x => `<@&${x}>`)].join(", ")}`,
+                content: `Feel free to further discuss the topic in this thread ${[...(template.addUser??true ? [`<@${source.user.id}>`] : []), ...(template.threadPing??[]).map(x => `<@&${x}>`)].join(", ")}`,
                 allowedMentions: {
                     users: [source.user.id],
                     roles: template.threadPing

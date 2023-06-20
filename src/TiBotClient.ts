@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client"
 import Discord, { ActivityType, ClientEvents, IntentsBitField, Partials } from "discord.js"
-import Enmap from "enmap"
 import fs from "fs"
 import log4js from "log4js"
 import { join } from "path"
@@ -25,7 +24,7 @@ intents.add(
 )
 
 export default class TiBotClient extends Discord.Client {
-    commands: Enmap<string, Command> = new Enmap()
+    commands: Map<string, Command> = new Map()
     prisma: PrismaClient = new PrismaClient()
 
     transcriptionManager: TranscriptionManager = new TranscriptionManager(this)
@@ -106,6 +105,8 @@ export default class TiBotClient extends Discord.Client {
         }
         readDir("./commands/")
 
+        Logger.info("Logging in")
         await this.login(config.token)
+        Logger.info("Logged in!")
     }
 }

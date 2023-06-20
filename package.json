@@ -23,7 +23,6 @@
         "adm-zip": "^0.5.10",
         "discord-api-types": "0.37.37",
         "discord.js": "^14.9.0",
-        "enmap": "^5.9.5",
         "fs-extra": "^10.1.0",
         "log4js": "^6.9.1",
         "node-fetch": "^2.6.9"

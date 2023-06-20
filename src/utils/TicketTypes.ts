@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Snowflake, TextInputStyle } from "discord.js"
+import { ActionRowBuilder, AllowedThreadTypeForTextChannel, ButtonBuilder, ButtonStyle, ChannelType, EmbedBuilder, Snowflake, TextInputStyle } from "discord.js"
 import config from "../data/config.json"
 import { TicketButton, TicketType, VerifierType } from "./Types"
 
@@ -574,6 +574,8 @@ export const templates: Record<string, {
     name: string
     embedTitle: string
     createThreads?: Snowflake[]
+    threadType?: AllowedThreadTypeForTextChannel
+    addUser?: false
     fields: {
         id: string
         inline?: true
@@ -614,52 +616,72 @@ export const templates: Record<string, {
             type: TextInputStyle.Paragraph
         }]
     },
-    reqcalc: {
-        name: "Calculation Request",
-        embedTitle: "Calculation Request",
-        createThreads: [CHANNEL.CALC_REQUEST],
-        threadPing: ["975990552812204032"],
+    tlr: {
+        name: "TLR Topic Proposal",
+        embedTitle: "TLR Topic Proposal",
+        threadType: ChannelType.PrivateThread,
+        createThreads: ["1076777919403282502", "982680753777299526"],
+        addUser: false,
         fields: [{
-            id: "type",
-            embedTitle: "Type of Calculation",
-            modalTitle: "Calculation Type",
-            modalPlaceholder: "Weapon / Team / etc.",
+            id: "topic",
+            modalTitle: "Topic Title",
+            embedTitle: "Topic",
+            modalPlaceholder: "A short WIP title",
             type: TextInputStyle.Short
         }, {
-            id: "composition",
-            modalTitle: "Team / Character(s)",
-            embedTitle: "Composition",
-            modalPlaceholder: "List the team members and rotation video",
-            modalDefault: `- Team member 1 + Weapon + Artifact Set/Stats 
-(repeat for all team members)
-(if anything is not included, up to calcer's discretion)`,
-            type: TextInputStyle.Paragraph
-        }, {
-            id: "misc",
-            modalTitle: "Misc",
-            embedTitle: "Other details",
-            modalPlaceholder: "At least purpose is required",
-            modalDefault: `- Purpose of calc (for guide, compendium, etc.)
-- Rotation (required if team calc)
-- Rotation video (required if team calc), links can be formatted like [this](https://youtu.be/dQw4w9WgXcQ)
-- Additional details (if necessary)`,
-            type: TextInputStyle.Paragraph
-        }, {
-            id: "status",
-            inline: true,
-            modalTitle: "Status",
-            embedTitle: "Status",
-            modalPlaceholder: "Open / Under verification / etc.",
-            modalDefault: "Open",
-            type: TextInputStyle.Short
-        }, {
-            id: "participants",
-            inline: true,
-            modalTitle: "Participants",
-            embedTitle: "Participants",
-            modalPlaceholder: "Participants",
-            modalDefault: "This can be you!",
+            id: "info",
+            modalTitle: "About",
+            embedTitle: "Information",
+            modalPlaceholder: "Information/description about the topic",
             type: TextInputStyle.Paragraph
         }]
-    }
+    },
+//     reqcalc: {
+//         name: "Calculation Request",
+//         embedTitle: "Calculation Request",
+//         createThreads: [CHANNEL.CALC_REQUEST],
+//         threadPing: ["975990552812204032"],
+//         fields: [{
+//             id: "type",
+//             embedTitle: "Type of Calculation",
+//             modalTitle: "Calculation Type",
+//             modalPlaceholder: "Weapon / Team / etc.",
+//             type: TextInputStyle.Short
+//         }, {
+//             id: "composition",
+//             modalTitle: "Team / Character(s)",
+//             embedTitle: "Composition",
+//             modalPlaceholder: "List the team members and rotation video",
+//             modalDefault: `- Team member 1 + Weapon + Artifact Set/Stats
+// (repeat for all team members)
+// (if anything is not included, up to calcer's discretion)`,
+//             type: TextInputStyle.Paragraph
+//         }, {
+//             id: "misc",
+//             modalTitle: "Misc",
+//             embedTitle: "Other details",
+//             modalPlaceholder: "At least purpose is required",
+//             modalDefault: `- Purpose of calc (for guide, compendium, etc.)
+// - Rotation (required if team calc)
+// - Rotation video (required if team calc), links can be formatted like [this](https://youtu.be/dQw4w9WgXcQ)
+// - Additional details (if necessary)`,
+//             type: TextInputStyle.Paragraph
+//         }, {
+//             id: "status",
+//             inline: true,
+//             modalTitle: "Status",
+//             embedTitle: "Status",
+//             modalPlaceholder: "Open / Under verification / etc.",
+//             modalDefault: "Open",
+//             type: TextInputStyle.Short
+//         }, {
+//             id: "participants",
+//             inline: true,
+//             modalTitle: "Participants",
+//             embedTitle: "Participants",
+//             modalPlaceholder: "Participants",
+//             modalDefault: "This can be you!",
+//             type: TextInputStyle.Paragraph
+//         }]
+//     }
 } : {}

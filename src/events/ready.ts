@@ -1,7 +1,7 @@
-import client from "../main"
-import log4js from "log4js"
 import { ApplicationCommandData, ApplicationCommandType } from "discord.js"
+import log4js from "log4js"
 import config from "../data/config.json"
+import client from "../main"
 
 const Logger = log4js.getLogger("ready")
 
@@ -18,8 +18,7 @@ export async function handle(): Promise<void> {
     await client.user?.setStatus("online")
 
     if (!client.application?.owner) await client.application?.fetch()
-    const cmds: ApplicationCommandData[] = client.commands
-        .array()
+    const cmds: ApplicationCommandData[] = [...client.commands.values()]
         .filter(cmd => cmd.category !== "Admin")
         .flatMap(cmd => {
             const help = (cmd.shortHelp ?? cmd.help).split("\n")[0]
