@@ -117,6 +117,9 @@ export default class CloseTicket extends Command {
 
         await updateTHMessage(updatedTicket.theoryhunt)
 
+        if (ticketType?.tags?.[TicketStatus.CLOSED] && source.channel.isThread())
+            await source.channel.setAppliedTags(ticketType.tags[TicketStatus.CLOSED])
+
         return await sendMessage(source, "Closed ticket!")
     }
 }

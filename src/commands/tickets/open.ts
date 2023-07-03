@@ -109,6 +109,9 @@ export default class OpenTicket extends Command {
         await updateTHMessage(updatedTicket.theoryhunt)
         Logger.info(`Opened ticket ${source.channel.id} / ${source.channel.id} -> ${ticket.id} by ${user.id} (${user.tag})`)
 
+        if (ticketType?.tags?.[TicketStatus.OPEN] && source.channel.isThread())
+            await source.channel.setAppliedTags(ticketType.tags[TicketStatus.OPEN])
+
         return await sendMessage(source, "Opened ticket!")
     }
 }

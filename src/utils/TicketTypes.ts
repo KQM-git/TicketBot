@@ -469,6 +469,11 @@ Entails what KQM looks for in terms of quality for guides hosted on our website.
         dinkDonk: {
             time: 7 * 24 * 3600 * 1000,
             message: "<a:dinkdonk:981687794000879696> This channel hasn't been active in the past week!"
+        },
+        tags: { // TODO config is for GI
+            OPEN: ["1034603107126104246"],
+            CLOSED: ["1036274863444336650"],
+            VERIFIED: ["1034603193239359508"],
         }
     },
     tcproject: {

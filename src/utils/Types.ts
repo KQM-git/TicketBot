@@ -80,6 +80,7 @@ export type TicketType = {
         time: number
         message: string
     }
+    tags?: Record<string, string[] | undefined>
     randomDefaultSlug?: true
 }
 

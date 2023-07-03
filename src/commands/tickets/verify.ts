@@ -123,7 +123,12 @@ export default class VerifyTicket extends Command {
             Logger.info(`Enough verifications for ticket ${ticket.id}: ${ticket.name} by ${user.id} (${user.tag}), doing some extra actions...`)
             if (ticketType?.verifiedCategory && source.channel instanceof BaseGuildTextChannel)
                 await source.channel.setParent(ticketType?.verifiedCategory, { lockPermissions: false })
-
+            if (ticketType?.tags?.[TicketStatus.VERIFIED] && source.channel.isThread())
+                try {
+                    await source.channel.setAppliedTags(ticketType.tags[TicketStatus.VERIFIED])
+                } catch (error) {
+                    Logger.error("Unable to update tags for ticket")
+                }
 
             if (ticketType.verifiedRoles) {
                 let givenUser: string[] = []

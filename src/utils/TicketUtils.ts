@@ -47,9 +47,10 @@ export async function createTicket(ticketType: TicketType, name: string, member:
         channelId = channel.id
     } else if (parent.type === ChannelType.GuildForum) {
         const thread = await parent.threads.create({
-            name: trim(name),
+            name: name,
             message: msgPayload,
-            reason: "Triggered from createTicket"
+            reason: "Triggered from createTicket",
+            appliedTags: ticketType.tags?.OPEN
         })
         channelId = thread.id
     } else
