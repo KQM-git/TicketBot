@@ -35,6 +35,14 @@ export const buttons = {
         .setLabel("Spelling & Capitalization")
         .setURL("https://docs.google.com/document/d/1Az6Oq9BAlU1primFVVEBAo-tGjeo-K5lYKxNxPHMle4/")
         .setStyle(ButtonStyle.Link),
+    GI_QUICK_GUIDE_STANDARD: new ButtonBuilder()
+        .setLabel("Quick Guide Standards")
+        .setURL("https://docs.google.com/document/d/e/2PACX-1vSWwwAcfLm80kUQzePM07kXUXTy2Z6u9Luf_K8_9NdCwGlaXqySuQPWm2xZwLvQ-C4L6mtapu0p3DH1/pub")
+        .setStyle(ButtonStyle.Link),
+    GI_QUICK_GUIDE_SKELETON: new ButtonBuilder()
+        .setLabel("Quick Guide Template")
+        .setURL("https://docs.google.com/document/d/14uatnD-WeTA_gXgul3chPb6U--o0EJWUfLbK7elm7vE/")
+        .setStyle(ButtonStyle.Link),
     HSR_GUIDE_STANDARD: new ButtonBuilder()
         .setLabel("Guide Standards")
         .setURL("https://docs.google.com/document/d/1-ALCQKIMRthcSxryuOphmXbZhFTzzSBy6j9y6AR1deo/")
@@ -130,6 +138,7 @@ export const ROLE = config.type == "GI" ? config.production ? {
 const CATEGORY = config.type == "GI" ? config.production ? {
     // GI KQM
     GUIDES: "953147741415018526",
+    QUICK_GUIDES: "1034590774555328603",
     TC_PROJECT: "953342753557868604",
     OPEN_SUBS: "953155656125411419",
     FOR_REVIEW: "953148307771883530",
@@ -141,6 +150,7 @@ const CATEGORY = config.type == "GI" ? config.production ? {
 } : {
     // TESTING
     GUIDES: "980838140099039272",
+    QUICK_GUIDES: "980838140099039272",
     TC_PROJECT: "980837799076958310",
     OPEN_SUBS: "980837799076958310",
     FOR_REVIEW: "980837820929294367",
@@ -152,6 +162,7 @@ const CATEGORY = config.type == "GI" ? config.production ? {
 } : {
     // HSR
     GUIDES: "1099761128122359959",
+    QUICK_GUIDES: "1099761128122359959",
     TC_PROJECT: "1099761981336080454",
     OPEN_SUBS: "1099761028348264488",
     FOR_REVIEW: "1099762096448749580",
@@ -358,6 +369,97 @@ Entails what KQM looks for in terms of quality for guides hosted on our website.
             },
             button: {
                 label: "Verify calcs",
+                emoji: "✅",
+                style: ButtonStyle.Primary
+            }
+        }],
+        dumpChannel: CHANNEL.TC_TRANSCRIPTS,
+        creationChannel: CHANNEL.NEW_TICKETS,
+        dinkDonk: {
+            time: 7 * 24 * 3600 * 1000,
+            message: "<a:dinkdonk:981687794000879696> This channel hasn't been active in the past week!"
+        }
+    },
+    quick_guide: {
+        id: "quick_guide",
+        name: "Quick Guide Submission",
+        emoji: "📔",
+        style: ButtonStyle.Success,
+        opening: {
+            content: ` - As an author, it is your responsibility to complete the ticket
+
+**Guidelines**
+- Name it appropriately with \`/rename <ticket name>\`${config.type == "GI" ? `
+- When done ping <@&903791926162100256> to begin the review process.` : ""}`,
+            embeds: [new EmbedBuilder()
+                .setTitle("Quick Guide Guidelines")
+                .setDescription(config.type == "GI" ?
+                // GI
+                    `**[Quick Guide Standards](https://docs.google.com/document/d/e/2PACX-1vSWwwAcfLm80kUQzePM07kXUXTy2Z6u9Luf_K8_9NdCwGlaXqySuQPWm2xZwLvQ-C4L6mtapu0p3DH1/pub)**
+What KQM looks for in terms of quality for Quick Guides. These standards are enforced.
+
+**[Quick Guide Template](https://docs.google.com/document/d/14uatnD-WeTA_gXgul3chPb6U--o0EJWUfLbK7elm7vE/)**
+A template for Quick Guide structure, which should be followed closely.
+
+**[KQM Spelling & Capitalization Standards](https://docs.google.com/document/d/1Az6Oq9BAlU1primFVVEBAo-tGjeo-K5lYKxNxPHMle4/)**
+A reference document for spelling and capitalization standards in KQM guides.` :
+                // HSR
+                    `**[Guide Standards](https://docs.google.com/document/d/1-ALCQKIMRthcSxryuOphmXbZhFTzzSBy6j9y6AR1deo/)**
+Entails what KQM looks for in terms of quality for guides hosted on our website. These standards are enforced, and it is expected that authors follow them closely.`)
+                .setColor("#A758BF")
+            ],
+            components: [
+                config.type == "GI" ? new ActionRowBuilder<ButtonBuilder>().addComponents(
+                    buttons.GI_QUICK_GUIDE_STANDARD,
+                    buttons.GI_QUICK_GUIDE_SKELETON,
+                    buttons.GI_GUIDE_SPELLING_AND_CAPITALIZATION,
+                    buttons.CLOSE
+                ) : new ActionRowBuilder<ButtonBuilder>().addComponents(
+                    // buttons.HSR_GUIDE_STANDARD,
+                    buttons.CLOSE
+                )
+            ]
+        },
+        lockout: 1 * 24 * 3600 * 1000,
+        creationRoles: [GI_ROLE.GUIDESUBS, HSR_ROLE.SUBS, ROLE.ADMIN],
+        blacklistRoles: ROLE.BLACKLIST,
+        manageRoles: [...ROLE.TC_STAFF, ROLE.ADMIN],
+        defaultCategory: CATEGORY.QUICK_GUIDES,
+        verifications: [{
+            type: VerifierType.GUIDE_GRAMMAR,
+            required: 1,
+            roles: [GI_ROLE.THEORYCRAFTER],
+            dinkDonk: {
+                time: 24 * 3600 * 1000,
+                message: `<@&${ROLE.GUIDE_VERIFICATION_PING}> - This guide is ready for guide verification`,
+                roles: [ROLE.GUIDE_VERIFICATION_PING],
+                button: {
+                    emoji: "<a:dinkdonk:981687794000879696>",
+                    label: config.type == "GI" ? "Ping guide verifiers" : "Ping QC verifiers",
+                    style: ButtonStyle.Danger
+                }
+            },
+            button: {
+                label: "Verify guide readability/grammar",
+                emoji: "✅",
+                style: ButtonStyle.Primary
+            }
+        }, {
+            type: VerifierType.GUIDE_TC,
+            required: 1,
+            roles: [GI_ROLE.THEORYCRAFTER],
+            dinkDonk: config.type == "HSR" ? {
+                time: 24 * 3600 * 1000,
+                message: `<@&${HSR_ROLE.TC_VERIF_PING}> - This guide is ready for TC content verification`,
+                roles: [HSR_ROLE.TC_VERIF_PING],
+                button: {
+                    emoji: "<a:dinkdonk:981687794000879696>",
+                    label: "Ping TC content verifiers",
+                    style: ButtonStyle.Danger
+                }
+            } : undefined,
+            button: {
+                label: "Verify guide TC content",
                 emoji: "✅",
                 style: ButtonStyle.Primary
             }

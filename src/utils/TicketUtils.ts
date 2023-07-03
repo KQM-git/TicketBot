@@ -8,31 +8,56 @@ import { trim } from "./Utils"
 const Logger = getLogger("tickets")
 export async function createTicket(ticketType: TicketType, name: string, member: GuildMember, guild: Guild) {
     const parent = await guild.channels.fetch(ticketType.defaultCategory)
-    if (!parent || parent.type != ChannelType.GuildCategory)
+    if (!parent)
         throw Error("Invalid parent channel")
 
     Logger.info(`Creating a ticket for ${member.id} (@${member.user.tag}) in ${guild.id}: ${name}`)
 
     await client.transcriptionManager.updateServer(guild)
 
-    const channel = await guild.channels.create({
-        name: trim(name),
-        type: ChannelType.GuildText,
-        parent
-    })
-
-    const mgs = await channel.send({
+    const msgPayload = {
         content: `<@${member.id}>${ticketType.opening.content}`,
         allowedMentions: {
             users: [member.id, ...(ticketType.opening.pingUsers ?? [])].filter((x, i, a) => a.indexOf(x) == i)
         },
         embeds: ticketType.opening.embeds,
         components: ticketType.opening.components
-    })
+    }
+
+    let channelId: string |null = null
+    if (parent.type === ChannelType.GuildCategory) {
+        const channel = await guild.channels.create({
+            name: trim(name),
+            type: ChannelType.GuildText,
+            parent
+        })
+
+        const msg = await channel.send(msgPayload)
+        await msg.pin("Initial create ticket message")
+
+        try {
+            await channel.permissionOverwrites.edit(member, {
+                ViewChannel: true,
+                ManageMessages: true
+            })
+        } catch (error) {
+            Logger.error("Couldn't give creator permission for ManageMessages")
+        }
+
+        channelId = channel.id
+    } else if (parent.type === ChannelType.GuildForum) {
+        const thread = await parent.threads.create({
+            name: trim(name),
+            message: msgPayload,
+            reason: "Triggered from createTicket"
+        })
+        channelId = thread.id
+    } else
+        throw Error("Invalid parent channel")
 
     await client.prisma.ticket.create({
         data: {
-            channelId: channel.id,
+            channelId: channelId,
             name,
             type: ticketType.id,
             server: client.transcriptionManager.getServer(guild),
@@ -42,28 +67,18 @@ export async function createTicket(ticketType: TicketType, name: string, member:
         select: { id: true }
     })
 
-    await mgs.pin("Initial create ticket message")
-
-    try {
-        await channel.permissionOverwrites.edit(member, {
-            ViewChannel: true,
-            ManageMessages: true
-        })
-    } catch (error) {
-        Logger.error("Couldn't give creator permission for ManageMessages")
-    }
     if (ticketType.creationChannel) {
         const creationChannel = await guild.channels.fetch(ticketType.creationChannel)
 
         if (creationChannel?.isTextBased())
             await creationChannel.send({
-                content: `<@${member.id}> created a ${ticketType.name}: ${name} over at <#${channel.id}>!`
+                content: `<@${member.id}> created a ${ticketType.name}: ${name} over at <#${channelId}>!`
             })
     }
 
-    Logger.info(`Created ticket for ${channel.id} / ${channel.name}`)
+    Logger.info(`Created ticket for ${channelId}`)
 
-    return channel.id
+    return channelId
 }
 
 export async function convertTicket(ticketType: TicketType, channel: TicketableChannel, member: GuildMember | User, status: string, guild: Guild) {
