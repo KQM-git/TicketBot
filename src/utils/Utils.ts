@@ -1,4 +1,4 @@
-import { ActionRow, APIActionRowComponent, APIMessageActionRowComponent, Attachment, Channel, ColorResolvable, EmbedBuilder, GuildChannel, JSONEncodable, Message, MessageActionRowComponent } from "discord.js"
+import { ActionRow, APIActionRowComponent, APIMessageActionRowComponent, Attachment, Channel, ColorResolvable, EmbedBuilder, GuildChannel, JSONEncodable, Message, MessageActionRowComponent, ThreadChannel } from "discord.js"
 import log4js from "log4js"
 import client from "../main"
 import { CommandSource, SendMessage, TicketableChannel, TicketStatus, VerifierType } from "./Types"
@@ -148,7 +148,7 @@ export function findFuzzyBestCandidates(target: string[], search: string, amount
         .map(e => e.t)
 }
 
-export function isTicketable(channel: Channel | GuildChannel | null): channel is TicketableChannel {
+export function isTicketable(channel: Channel | GuildChannel | ThreadChannel | null): channel is TicketableChannel {
     if (!channel) return false
     return channel.isTextBased() && !channel.isDMBased()
 }
