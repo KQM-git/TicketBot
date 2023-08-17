@@ -1,4 +1,4 @@
-import { ActionRow, APIActionRowComponent, APIMessageActionRowComponent, Attachment, Channel, ColorResolvable, EmbedBuilder, GuildChannel, JSONEncodable, Message, MessageActionRowComponent, ThreadChannel } from "discord.js"
+import { ActionRow, APIActionRowComponent, APIMessageActionRowComponent, AttachmentBuilder, Channel, ColorResolvable, EmbedBuilder, GuildChannel, JSONEncodable, Message, MessageActionRowComponent, ThreadChannel } from "discord.js"
 import log4js from "log4js"
 import client from "../main"
 import { CommandSource, SendMessage, TicketableChannel, TicketStatus, VerifierType } from "./Types"
@@ -12,7 +12,7 @@ export function displayTimestamp(time: Date, display = "R"): string {
 export function isMessage(msg: SendMessage | CommandSource | undefined): msg is Message {
     return msg instanceof Message
 }
-export async function updateMessage(channelId: string, replyId: string, response: string | EmbedBuilder, components?: ActionRow<MessageActionRowComponent>[]): Promise<SendMessage | undefined> {
+export async function updateMessage(channelId: string, replyId: string, response: string | EmbedBuilder, components?: ActionRow<MessageActionRowComponent>[], files?: AttachmentBuilder[]): Promise<SendMessage | undefined> {
     let embeds: EmbedBuilder[] | undefined
     let content: string | undefined
 
@@ -25,7 +25,7 @@ export async function updateMessage(channelId: string, replyId: string, response
         const channel = await client.channels.fetch(channelId)
         if (channel && isTicketable(channel)) {
             const msg = await channel.messages.fetch(replyId)
-            await msg.edit({ content, embeds, components })
+            await msg.edit({ content, embeds, components, files })
             return msg
         }
     } catch (error) {
@@ -43,7 +43,7 @@ export const verificationTypeName: Record<VerifierType, string> = {
 
 export async function sendMessage(source: CommandSource, response: string | EmbedBuilder, components?: (
     | JSONEncodable<APIActionRowComponent<APIMessageActionRowComponent>>
-)[], ephemeral?: boolean, files?: Attachment[]): Promise<SendMessage | undefined> {
+)[], ephemeral?: boolean, files?: AttachmentBuilder[]): Promise<SendMessage | undefined> {
     let embeds: EmbedBuilder[] | undefined
     let content: string | undefined
 
