@@ -607,7 +607,7 @@ Entails what KQM looks for in terms of quality for guides hosted on our website.
         randomDefaultSlug: true
     },
 }
-if (config.type == "GI")
+if (config.type == "GI") {
     ticketTypes.feiyun = {
         id: "feiyun",
         name: "Feiyun Ticket",
@@ -639,6 +639,71 @@ if (config.type == "GI")
         creationChannel: CHANNEL.FEIYUN_FEED,
         randomDefaultSlug: true
     }
+    ticketTypes.kqmb = {
+        id: "kqmb",
+        name: "KQMB Submission",
+        emoji: "📔",
+        style: ButtonStyle.Success,
+        opening: {
+            content: ` - As an author, it is your responsibility to complete the ticket
+
+**Guidelines**
+- Name it appropriately with \`/rename <ticket name>\`
+- When you are ready to submit the ticket, type \`/close\` or click the button below; the ticket will automatically be tagged correctly.`,
+            components: [
+                new ActionRowBuilder<ButtonBuilder>().addComponents(
+                    buttons.GI_GUIDE_SPELLING_AND_CAPITALIZATION,
+                    buttons.CLOSE
+                )
+            ]
+        },
+        lockout: 1 * 24 * 3600 * 1000,
+        creationRoles: [...ROLE.TC_STAFF, ROLE.ADMIN],
+        blacklistRoles: ROLE.BLACKLIST,
+        manageRoles: [...ROLE.TC_STAFF, ROLE.ADMIN],
+        defaultCategory: "1077342382451859486",
+        verifications: [{
+            type: VerifierType.GUIDE_GRAMMAR,
+            required: 1,
+            roles: [GI_ROLE.THEORYCRAFTER],
+            dinkDonk: {
+                time: 24 * 3600 * 1000,
+                message: `<@&${ROLE.GUIDE_VERIFICATION_PING}> - This guide is ready for guide verification`,
+                roles: [ROLE.GUIDE_VERIFICATION_PING],
+                button: {
+                    emoji: "<a:dinkdonk:981687794000879696>",
+                    label: config.type == "GI" ? "Ping guide verifiers" : "Ping QC verifiers",
+                    style: ButtonStyle.Danger
+                }
+            },
+            button: {
+                label: "Verify guide readability/grammar",
+                emoji: "✅",
+                style: ButtonStyle.Primary
+            }
+        }, {
+            type: VerifierType.GUIDE_TC,
+            required: 1,
+            roles: [GI_ROLE.THEORYCRAFTER],
+            button: {
+                label: "Verify guide TC content",
+                emoji: "✅",
+                style: ButtonStyle.Primary
+            }
+        }],
+        dumpChannel: CHANNEL.STAFF_TRANSCRIPTS,
+        dinkDonk: {
+            time: 7 * 24 * 3600 * 1000,
+            message: "<a:dinkdonk:981687794000879696> This channel hasn't been active in the past week!"
+        },
+        tags: { // TODO config is for GI
+            OPEN: ["1077342625746649098"],
+            CLOSED: ["1077345123349839924"],
+            VERIFIED: ["1077342696479412294"],
+        },
+        randomDefaultSlug: true
+    }
+}
 
 export const menus: TicketButton[] = [{
     name: "Theorycrafting Tickets",
