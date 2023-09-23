@@ -33,7 +33,7 @@ export const buttons = {
         .setStyle(ButtonStyle.Link),
     GI_GUIDE_SPELLING_AND_CAPITALIZATION: new ButtonBuilder()
         .setLabel("Spelling & Capitalization")
-        .setURL("https://docs.google.com/document/d/1Az6Oq9BAlU1primFVVEBAo-tGjeo-K5lYKxNxPHMle4/")
+        .setURL("https://docs.google.com/document/d/1bZQYdfh7HMIUzCb0m11RTFHF62sL7VFKH235hm8oZwU/")
         .setStyle(ButtonStyle.Link),
     GI_QUICK_GUIDE_STANDARD: new ButtonBuilder()
         .setLabel("Quick Guide Standards")
@@ -42,6 +42,14 @@ export const buttons = {
     GI_QUICK_GUIDE_SKELETON: new ButtonBuilder()
         .setLabel("Quick Guide Template")
         .setURL("https://docs.google.com/document/d/14uatnD-WeTA_gXgul3chPb6U--o0EJWUfLbK7elm7vE/")
+        .setStyle(ButtonStyle.Link),
+    GI_BULLETIN_STANDARD: new ButtonBuilder()
+        .setLabel("Bulletin Standards")
+        .setURL("https://docs.google.com/document/d/1HhCu-ysKLun75QpxY4WaC5Iadi412yOWBbk5H5vMs3k/")
+        .setStyle(ButtonStyle.Link),
+    GI_BULLETIN_SKELETON: new ButtonBuilder()
+        .setLabel("Bulletin Template")
+        .setURL("https://docs.google.com/document/d/16ke82bZ8Cr-DBvuD7RkO6-2jgLWbKJzp4gDyGuDdGTY/")
         .setStyle(ButtonStyle.Link),
     HSR_GUIDE_STANDARD: new ButtonBuilder()
         .setLabel("Guide Standards")
@@ -288,7 +296,7 @@ Entails what KQM looks for in terms of quality for guides hosted on our website.
 **[Guide Skeleton](https://docs.google.com/document/d/1i_ftnpyJfLMTKSbHqDNPk6_oX8UlDhwVOsJUN2wk0vE/)**
 A general template for what a KQM-hosted guide should look like. Use this as a reference for what elements and sections should be in your guide.
 
-**[KQM Spelling & Capitalization Standards](https://docs.google.com/document/d/1Az6Oq9BAlU1primFVVEBAo-tGjeo-K5lYKxNxPHMle4/)**
+**[KQM Spelling & Capitalization Standards](https://docs.google.com/document/d/1bZQYdfh7HMIUzCb0m11RTFHF62sL7VFKH235hm8oZwU/)**
 A reference document for spelling and capitalization standards in KQM guides.` :
                 // HSR
                     `**[Guide Standards](https://docs.google.com/document/d/1-ALCQKIMRthcSxryuOphmXbZhFTzzSBy6j9y6AR1deo/)**
@@ -403,7 +411,7 @@ What KQM looks for in terms of quality for Quick Guides. These standards are enf
 **[Quick Guide Template](https://docs.google.com/document/d/14uatnD-WeTA_gXgul3chPb6U--o0EJWUfLbK7elm7vE/)**
 A template for Quick Guide structure, which should be followed closely.
 
-**[KQM Spelling & Capitalization Standards](https://docs.google.com/document/d/1Az6Oq9BAlU1primFVVEBAo-tGjeo-K5lYKxNxPHMle4/)**
+**[KQM Spelling & Capitalization Standards](https://docs.google.com/document/d/1bZQYdfh7HMIUzCb0m11RTFHF62sL7VFKH235hm8oZwU/)**
 A reference document for spelling and capitalization standards in KQM guides.` :
                 // HSR
                     `**[Guide Standards](https://docs.google.com/document/d/1-ALCQKIMRthcSxryuOphmXbZhFTzzSBy6j9y6AR1deo/)**
@@ -650,8 +658,23 @@ if (config.type == "GI") {
 **Guidelines**
 - Name it appropriately with \`/rename <ticket name>\`
 - When you are ready to submit the ticket, type \`/close\` or click the button below; the ticket will automatically be tagged correctly.`,
+            embeds: [new EmbedBuilder()
+                .setTitle("Quick Guide Guidelines")
+                .setDescription(
+                    `**[KQM Bulletin Standards](https://docs.google.com/document/d/1HhCu-ysKLun75QpxY4WaC5Iadi412yOWBbk5H5vMs3k/)**
+What KQM looks for in terms of quality for Bulletin articles. These standards are enforced.
+
+**[KQM Bulletin Article Formatting Template](https://docs.google.com/document/d/16ke82bZ8Cr-DBvuD7RkO6-2jgLWbKJzp4gDyGuDdGTY/)**
+A template for formatting the submitted Google Docs, which should be followed closely.
+
+**[KQM Spelling & Capitalization Standards](https://docs.google.com/document/d/1bZQYdfh7HMIUzCb0m11RTFHF62sL7VFKH235hm8oZwU/)**
+A reference document for spelling and capitalization standards in KQM guides.`
+                ).setColor("#A758BF")
+            ],
             components: [
                 new ActionRowBuilder<ButtonBuilder>().addComponents(
+                    buttons.GI_BULLETIN_STANDARD,
+                    buttons.GI_BULLETIN_SKELETON,
                     buttons.GI_GUIDE_SPELLING_AND_CAPITALIZATION,
                     buttons.CLOSE
                 )
