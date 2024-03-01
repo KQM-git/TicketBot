@@ -82,13 +82,7 @@ const HSR_ROLE = {
 export const ROLE = config.type == "GI" ? config.production ? {
     // Genshin Production
     TC_STAFF: [
-        "810550138552320010", // Scholar
-        "903791926162100256", // Editor
-        "1026677040054808616", // Assistant Editor
-        "975990552812204032", // Monke
-        "1120443712821002250", // Consultant
-        "1125540537802440794", // Assistant Consultant
-        "873486216782299137", // Mod
+        "1011040674247889026", // TC Staff
     ],
     STAFF: [
         "953164120952283206", // Pillar Staff
