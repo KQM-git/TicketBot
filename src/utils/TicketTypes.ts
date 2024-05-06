@@ -77,6 +77,8 @@ const HSR_ROLE = {
     SUBS: "1099762139020918924",
     QC_VERIF_PING: "1103837646117163008",
     TC_VERIF_PING: "1103834692605706280",
+    EDATING: "1100933761648033862", // Test server
+    EDATING_ADMIN: "1095455723506380831",
 }
 
 export const ROLE = config.type == "GI" ? config.production ? {
@@ -173,8 +175,8 @@ const CATEGORY = config.type == "GI" ? config.production ? {
     PUBLISHING: "1099762543578316940",
     STAFF_TICKETS: "1099762656853901402",
     STAFF_CLOSED: "1099762824005292114",
-    FEIYUN_PROJECTS: "0",
-    FEIYUN_DONE: "0"
+    FEIYUN_PROJECTS: "1108623583976095835", // HSR test server
+    FEIYUN_DONE: "1126362861736820746"
 }
 
 const CHANNEL = config.type == "GI" ? config.production ? {
@@ -201,7 +203,7 @@ const CHANNEL = config.type == "GI" ? config.production ? {
     TC_TRANSCRIPTS: "1099763396045451324",
     THEORYHUNT: "1099763353741693080",
     STAFF_TRANSCRIPTS: "1099763282975400037",
-    FEIYUN_TRANSCRIPTS: "0",
+    FEIYUN_TRANSCRIPTS: "1237093253627772990",
     FEIYUN_FEED: "0",
     CALC_REQUEST: "0"
 }
@@ -720,6 +722,28 @@ A reference document for spelling and capitalization standards in KQM guides.`
         },
         randomDefaultSlug: true
     }
+} else {
+    ticketTypes.edating = {
+        id: "edating",
+        name: "Edating",
+        emoji: "�",
+        style: ButtonStyle.Secondary,
+        creationRoles: [HSR_ROLE.EDATING],
+        manageRoles: [HSR_ROLE.EDATING_ADMIN],
+        defaultCategory: CATEGORY.FEIYUN_PROJECTS,
+        closeCategory: CATEGORY.FEIYUN_DONE,
+        verifiedCategory: CATEGORY.FEIYUN_DONE,
+        opening: {
+            content: "<:edating:1100144601865650267>",
+            components: [
+                new ActionRowBuilder<ButtonBuilder>().addComponents(
+                    buttons.RENAME
+                )
+            ]
+        },
+        dumpChannel: CHANNEL.FEIYUN_TRANSCRIPTS,
+        randomDefaultSlug: true
+    }
 }
 
 export const menus: TicketButton[] = [{
@@ -760,6 +784,16 @@ For anyone else you want to add in, you can use \`/add <person or role>\` in the
         customId: "template-reqcalc",
     }]
 }]
+
+if (config.type == "HSR") {
+    menus.push({
+        name: "Edating",
+        value: "ED",
+        title: "Edating",
+        desc: "Click below to create a new ticket",
+        ticketTypes: [ticketTypes.edating]
+    })
+}
 
 export const templates: Record<string, {
     name: string
