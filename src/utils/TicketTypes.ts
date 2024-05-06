@@ -726,7 +726,7 @@ A reference document for spelling and capitalization standards in KQM guides.`
     ticketTypes.edating = {
         id: "edating",
         name: "Edating",
-        emoji: "�",
+        emoji: "🤡",
         style: ButtonStyle.Secondary,
         creationRoles: [HSR_ROLE.EDATING],
         manageRoles: [HSR_ROLE.EDATING_ADMIN],
