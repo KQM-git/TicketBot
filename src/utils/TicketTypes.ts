@@ -176,7 +176,7 @@ const CATEGORY = config.type == "GI" ? config.production ? {
     STAFF_TICKETS: "1099762656853901402",
     STAFF_CLOSED: "1099762824005292114",
     FEIYUN_PROJECTS: "1108623583976095835", // HSR test server
-    FEIYUN_DONE: "1126362861736820746"
+    FEIYUN_DONE: "1299395573803388949"
 }
 
 const CHANNEL = config.type == "GI" ? config.production ? {
