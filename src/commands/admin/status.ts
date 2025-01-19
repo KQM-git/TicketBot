@@ -46,7 +46,7 @@ export default class Status extends Command {
             return `${d}d${p(h)}h${p(m)}m${p(s)}s`
         }
 
-        const getVersion = (): string => `https://github.com/Tibowl/TiBot/commit/${child_process.execSync("git rev-parse HEAD").toString().trim()}`
+        const getVersion = (): string => `https://github.com/KQM-git/TicketBot/commit/${child_process.execSync("git rev-parse HEAD").toString().trim()}`
         const getMemoryUsage = (): string => {
             const mem = (bytes: number): string => `${(bytes/10e6).toFixed(2)} MB`
             const { heapTotal, heapUsed } = process.memoryUsage()
