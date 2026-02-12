@@ -105,7 +105,8 @@ export const ROLE = config.type == "GI" ? config.production ? {
         "771259671671078913", // Muted
     ],
     CONTRIBUTOR: "764838634280845312",
-    GUIDE_VERIFICATION_PING: "945105638839705630",
+    QC_VERIFICATION_PING: "1471237740535218288",
+    TC_VERIFICATION_PING: "945105638839705630",
     CALCS_VERIFICATION_PING: "989266525280145478",
 } : {
     // Test server
@@ -120,7 +121,8 @@ export const ROLE = config.type == "GI" ? config.production ? {
         "987118008910610444", // Coffin
     ],
     CONTRIBUTOR: "980899054177374268",
-    GUIDE_VERIFICATION_PING: "984490976817066046",
+    QC_VERIFICATION_PING: "984490976817066046",
+    TC_VERIFICATION_PING: "984490976817066046",
     CALCS_VERIFICATION_PING: "984490976817066046",
 } : {
     // HSR Production
@@ -138,7 +140,8 @@ export const ROLE = config.type == "GI" ? config.production ? {
         "1090818029639717005", // Muted
     ],
     CONTRIBUTOR: "1099763950352093224", // TC Contributor
-    GUIDE_VERIFICATION_PING: HSR_ROLE.QC_VERIF_PING,
+    QC_VERIFICATION_PING: HSR_ROLE.QC_VERIF_PING,
+    TC_VERIFICATION_PING: HSR_ROLE.TC_VERIF_PING,
     CALCS_VERIFICATION_PING: HSR_ROLE.CALC_VERIF_PING,
 }
 
@@ -328,11 +331,11 @@ Entails what KQM looks for in terms of quality for guides hosted on our website.
             roles: [GI_ROLE.THEORYCRAFTER],
             dinkDonk: {
                 time: 24 * 3600 * 1000,
-                message: `<@&${ROLE.GUIDE_VERIFICATION_PING}> - This guide is ready for guide verification`,
-                roles: [ROLE.GUIDE_VERIFICATION_PING],
+                message: `<@&${ROLE.QC_VERIFICATION_PING}> - This guide is ready for guide verification`,
+                roles: [ROLE.QC_VERIFICATION_PING],
                 button: {
                     emoji: "<a:dinkdonk:981687794000879696>",
-                    label: config.type == "GI" ? "Ping guide verifiers" : "Ping QC verifiers",
+                    label: "Ping QC verifiers",
                     style: ButtonStyle.Danger
                 }
             },
@@ -345,16 +348,16 @@ Entails what KQM looks for in terms of quality for guides hosted on our website.
             type: VerifierType.GUIDE_TC,
             required: 2,
             roles: [GI_ROLE.THEORYCRAFTER],
-            dinkDonk: config.type == "HSR" ? {
+            dinkDonk:  {
                 time: 24 * 3600 * 1000,
-                message: `<@&${HSR_ROLE.TC_VERIF_PING}> - This guide is ready for TC content verification`,
-                roles: [HSR_ROLE.TC_VERIF_PING],
+                message: `<@&${ROLE.TC_VERIFICATION_PING}> - This guide is ready for TC content verification`,
+                roles: [ROLE.TC_VERIFICATION_PING],
                 button: {
                     emoji: "<a:dinkdonk:981687794000879696>",
                     label: "Ping TC content verifiers",
                     style: ButtonStyle.Danger
                 }
-            } : undefined,
+            },
             button: {
                 label: "Verify guide TC content",
                 emoji: "✅",
@@ -438,11 +441,11 @@ Entails what KQM looks for in terms of quality for guides hosted on our website.
             roles: [GI_ROLE.THEORYCRAFTER],
             dinkDonk: {
                 time: 24 * 3600 * 1000,
-                message: `<@&${ROLE.GUIDE_VERIFICATION_PING}> - This guide is ready for guide verification`,
-                roles: [ROLE.GUIDE_VERIFICATION_PING],
+                message: `<@&${ROLE.QC_VERIFICATION_PING}> - This guide is ready for guide verification`,
+                roles: [ROLE.QC_VERIFICATION_PING],
                 button: {
                     emoji: "<a:dinkdonk:981687794000879696>",
-                    label: config.type == "GI" ? "Ping guide verifiers" : "Ping QC verifiers",
+                    label: "Ping QC verifiers",
                     style: ButtonStyle.Danger
                 }
             },
@@ -455,16 +458,16 @@ Entails what KQM looks for in terms of quality for guides hosted on our website.
             type: VerifierType.GUIDE_TC,
             required: 1,
             roles: [GI_ROLE.THEORYCRAFTER],
-            dinkDonk: config.type == "HSR" ? {
+            dinkDonk: {
                 time: 24 * 3600 * 1000,
-                message: `<@&${HSR_ROLE.TC_VERIF_PING}> - This guide is ready for TC content verification`,
-                roles: [HSR_ROLE.TC_VERIF_PING],
+                message: `<@&${ROLE.TC_VERIFICATION_PING}> - This guide is ready for TC content verification`,
+                roles: [ROLE.TC_VERIFICATION_PING],
                 button: {
                     emoji: "<a:dinkdonk:981687794000879696>",
                     label: "Ping TC content verifiers",
                     style: ButtonStyle.Danger
                 }
-            } : undefined,
+            },
             button: {
                 label: "Verify guide TC content",
                 emoji: "✅",
