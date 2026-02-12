@@ -29,7 +29,7 @@ export default class TimerManager {
             let lastTime = ticket.lastMessage.getTime()
             if (lastTime > minTime) continue
 
-            const channel = await this.client.channels.fetch(ticket.channelId)
+            const channel = await this.getChannel(ticket.channelId)
             if (!channel || !channel.isTextBased()) {
                 Logger.error(`Unable to check time for ticket #${ticket.id}: Channel ${ticket.channelId} in ${ticket.serverId} isn't available - ${ticket.type}: ${ticket.name}`)
                 continue
@@ -68,6 +68,17 @@ export default class TimerManager {
             })
         }
     }
+
+    private async getChannel(channelId: string) {
+        try {
+            const channel = await this.client.channels.fetch(channelId)
+            return channel
+        } catch (error) {
+            Logger.error(`Unable to fetch channel ${channelId}`, error)
+            return null
+        }
+    }
+
 
     private async ticketDir(allTickets: Ticket[]) {
         const tds = await this.prisma.ticketDirectory.findMany()
