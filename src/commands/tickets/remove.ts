@@ -1,4 +1,4 @@
-import { APIInteractionDataResolvedGuildMember, APIRole } from "discord-api-types/v9"
+import { APIInteractionDataResolvedGuildMember, APIRole } from "discord-api-types/v10"
 import { ApplicationCommandOptionType, BaseGuildTextChannel, ChatInputCommandInteraction, EmbedBuilder, GuildMember, Message, Role, User } from "discord.js"
 import { getLogger } from "log4js"
 import client from "../../main"
@@ -27,7 +27,7 @@ export default class RemoveUserTicket extends Command {
 
     async runInteraction(source: ChatInputCommandInteraction): Promise<SendMessage | undefined> {
         await source.deferReply({ ephemeral: true })
-        return this.run(source, source.user, source.options.getMentionable("target", true))
+        return this.run(source, source.user, source.options.getMentionable("target", true) as User | GuildMember | Role | APIInteractionDataResolvedGuildMember | APIRole)
     }
 
     async runMessage(source: Message): Promise<SendMessage | undefined> {

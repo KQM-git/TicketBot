@@ -30,7 +30,7 @@ export default class TimerManager {
             if (lastTime > minTime) continue
 
             const channel = await this.getChannel(ticket.channelId)
-            if (!channel || !channel.isTextBased()) {
+            if (!channel || !channel.isTextBased() || !("send" in channel)) {
                 Logger.error(`Unable to check time for ticket #${ticket.id}: Channel ${ticket.channelId} in ${ticket.serverId} isn't available - ${ticket.type}: ${ticket.name}`)
                 continue
             }

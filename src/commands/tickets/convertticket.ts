@@ -53,7 +53,7 @@ export default class ConvertTicket extends Command {
         const channel = source.options.getChannel("channel", false) ?? source.channel
         if (!channel || channel.type == ChannelType.DM)
             return await sendMessage(source, "Couldn't find channel?", undefined, true)
-        return this.run(source, source.user, source.options.getString("type", true), channel, source.options.getString("status", true))
+        return this.run(source, source.user, source.options.getString("type", true), channel as APIInteractionDataResolvedChannel | GuildBasedChannel, source.options.getString("status", true))
     }
 
     async runMessage(source: Message): Promise<SendMessage | undefined> {

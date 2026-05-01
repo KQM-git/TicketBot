@@ -476,7 +476,7 @@ export default class Theoryhunt extends Command {
             return
 
         const channel = await client.channels.fetch(TheoryhuntSettings.channel)
-        if (!channel || !channel.isTextBased())
+        if (!channel || !channel.isTextBased() || !("send" in channel))
             return await sendMessage(source, "Theoryhunt channel might not be configured correctly", undefined, true)
 
         const newMsg = await channel.send({

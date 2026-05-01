@@ -98,13 +98,14 @@ export default class CloseTicket extends Command {
                 .setStyle(v.dinkDonk?.button.style ?? ButtonStyle.Danger)
             )))
 
-        await source.channel.send({
-            embeds: [
-                new EmbedBuilder()
-                    .setDescription(`Ticket closed by <@${member.id}>. If there are any issues with it - it can be reopened by the owner or staff by using the buttons below or \`/open\`.`)
-            ],
-            components
-        })
+        if ("send" in source.channel)
+            await source.channel.send({
+                embeds: [
+                    new EmbedBuilder()
+                        .setDescription(`Ticket closed by <@${member.id}>. If there are any issues with it - it can be reopened by the owner or staff by using the buttons below or \`/open\`.`)
+                ],
+                components
+            })
 
         const updatedTicket = await client.prisma.ticket.update({
             where: { id: ticket.id },

@@ -27,7 +27,7 @@ export default class AddUserTicket extends Command {
 
     async runInteraction(source: ChatInputCommandInteraction): Promise<SendMessage | undefined> {
         await source.deferReply({ ephemeral: true })
-        return this.run(source, source.user, source.options.getMentionable("target", true))
+        return this.run(source, source.user, source.options.getMentionable("target", true) as User | GuildMember | Role | APIInteractionDataResolvedGuildMember | APIRole)
     }
 
     async runMessage(source: Message): Promise<SendMessage | undefined> {

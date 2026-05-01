@@ -149,7 +149,7 @@ export default class TranscriptionManager {
                 reactions: msg.reactions.cache.map(r => this.mapReactions(r)),
                 embeds: msg.embeds.map(e => this.mapEmbeds(e, relevantRoles, relevantUsers, relevantChannels)),
                 content: this.parseText(msg.content, relevantRoles, relevantUsers, relevantChannels) ?? "",
-                components: msg.components.map(c => this.mapRow(c)),
+                components: msg.components.filter((c): c is ActionRow<MessageActionRowComponent> => c.type === ComponentType.ActionRow).map(c => this.mapRow(c)),
                 stickers: msg.stickers.toJSON() as unknown as Enumerable<InputJsonValue>,
                 reply: msg.reference?.messageId,
                 userId: msg.author.id,
@@ -249,7 +249,7 @@ export default class TranscriptionManager {
                     })
 
                     if (!fullTranscript)
-                        if (channel && channel.isTextBased())
+                        if (channel && channel.isTextBased() && "send" in channel)
                             await channel.send(`Couldn't fetch full transcript data/too big? Stored stuff is over at ${baseUrl}/transcripts/${transcript?.slug}`)
                         else Logger.error(`Couldn't send to transcript channel - couldn't fetch full transcript data? Stored stuff over at ${baseUrl}/transcripts/${transcript?.slug}`)
                     else {
@@ -324,7 +324,7 @@ export default class TranscriptionManager {
                                 const id = ticketTypes[ticket.type].verifiedChannel
                                 if (id) {
                                     const verifiedChannel = await this.client.channels.fetch(id)
-                                    if (verifiedChannel && verifiedChannel.isTextBased())
+                                    if (verifiedChannel && verifiedChannel.isTextBased() && "send" in verifiedChannel)
                                         await verifiedChannel.send({
                                             embeds: [embed]
                                         })
@@ -337,7 +337,7 @@ export default class TranscriptionManager {
                         }
 
                         try {
-                            if (channel && channel.isTextBased())
+                            if (channel && channel.isTextBased() && "send" in channel)
                                 await channel.send({
                                     content: `Transcript for ${fullTranscript.channel.name}: <${baseUrl}/transcripts/${transcript?.slug}>`,
                                     embeds: [embed],
@@ -348,7 +348,7 @@ export default class TranscriptionManager {
                         } catch (error) {
                             Logger.error("Error while sending transcription message", error)
 
-                            if (channel && channel.isTextBased())
+                            if (channel && channel.isTextBased() && "send" in channel)
                                 await channel.send(`Error occurred while sending transcript details for ${baseUrl}/transcripts/${transcript?.slug}`)
                         }
 

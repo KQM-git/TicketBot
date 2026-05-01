@@ -37,7 +37,7 @@ export default class TicketInfo extends Command {
         return this.run(source, source.author)
     }
 
-    async run(source: CommandSource, user: User, chan?: APIInteractionDataResolvedChannel | GuildBasedChannel | null): Promise<SendMessage | undefined> {
+    async run(source: CommandSource, user: User, chan?: { id: string } | null): Promise<SendMessage | undefined> {
         if (!source.guild) return await sendMessage(source, "Couldn't get guild data", undefined, true)
 
         const channelId = chan?.id || source.channelId

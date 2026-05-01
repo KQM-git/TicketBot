@@ -691,11 +691,11 @@ A reference document for spelling and capitalization standards in KQM guides.`
             roles: [GI_ROLE.THEORYCRAFTER],
             dinkDonk: {
                 time: 24 * 3600 * 1000,
-                message: `<@&${ROLE.GUIDE_VERIFICATION_PING}> - This guide is ready for guide verification`,
-                roles: [ROLE.GUIDE_VERIFICATION_PING],
+                message: `<@&${ROLE.QC_VERIFICATION_PING}> - This guide is ready for guide verification`,
+                roles: [ROLE.QC_VERIFICATION_PING],
                 button: {
                     emoji: "<a:dinkdonk:981687794000879696>",
-                    label: config.type == "GI" ? "Ping guide verifiers" : "Ping QC verifiers",
+                    label: "Ping QC verifiers",
                     style: ButtonStyle.Danger
                 }
             },

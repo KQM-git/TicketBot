@@ -1,4 +1,5 @@
-import { ActionRow, APIActionRowComponent, APIMessageActionRowComponent, AttachmentBuilder, Channel, ColorResolvable, EmbedBuilder, GuildChannel, JSONEncodable, Message, MessageActionRowComponent, ThreadChannel } from "discord.js"
+import { ActionRow, APIActionRowComponent, AttachmentBuilder, Channel, ColorResolvable, EmbedBuilder, GuildChannel, JSONEncodable, Message, MessageActionRowComponent, ThreadChannel } from "discord.js"
+import { APIMessageActionRowComponent } from "discord-api-types/v10"
 import log4js from "log4js"
 import client from "../main"
 import { CommandSource, SendMessage, TicketableChannel, TicketStatus, VerifierType } from "./Types"

@@ -31,7 +31,7 @@ export default class CreateTicketMenu extends Command {
     }
 
     async runInteraction(source: ChatInputCommandInteraction): Promise<SendMessage | undefined> {
-        return this.run(source, source.user, source.options.getString("preset", true), source.options.getChannel("channel", false) ?? source.channel)
+        return this.run(source, source.user, source.options.getString("preset", true), (source.options.getChannel("channel", false) ?? source.channel) as TextBasedChannel | GuildBasedChannel | APIInteractionDataResolvedChannel | null)
     }
 
     async runMessage(source: Message): Promise<SendMessage | undefined> {

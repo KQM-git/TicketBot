@@ -27,7 +27,7 @@ export async function handle(message: Message): Promise<void> {
 
     if (cmdInfo && cmdInfo.cmd) {
         if (message.channel.isDMBased())
-            Logger.info(`${message.author.id} (${message.author.tag}) executes command in ${message.channel.recipient?.tag}: ${message.content}`)
+            Logger.info(`${message.author.id} (${message.author.tag}) executes command in DM: ${message.content}`)
         else
             Logger.info(`${message.author.id} (${message.author.tag}) executes command in ${isTicketable(message.channel) ? message.channel.name : message.channelId} (guild ${message.guild ? message.guild.id : "NaN"}): ${message.content}`)
 

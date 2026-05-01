@@ -1,5 +1,4 @@
-import { APIInteractionDataResolvedChannel } from "discord-api-types/v10"
-import { ApplicationCommandOptionType, Attachment, AttachmentBuilder, ChannelPosition, ChannelType, ChatInputCommandInteraction, GuildBasedChannel, Message, NonThreadGuildBasedChannel, PermissionFlagsBits, User } from "discord.js"
+import { ApplicationCommandOptionType, Attachment, AttachmentBuilder, ChannelPosition, ChannelType, ChatInputCommandInteraction, Message, NonThreadGuildBasedChannel, PermissionFlagsBits, User } from "discord.js"
 import { getLogger } from "log4js"
 import fetch from "node-fetch"
 import client from "../../main"
@@ -61,7 +60,7 @@ export default class ChannelOrder extends Command {
         return this.run(source, source.author, args[0].toLowerCase())
     }
 
-    async run(source: CommandSource, user: User, command: string, attachment?: Attachment | null, onlyMove?: APIInteractionDataResolvedChannel | GuildBasedChannel | null): Promise<SendMessage | undefined> {
+    async run(source: CommandSource, user: User, command: string, attachment?: Attachment | null, onlyMove?: { id: string } | null): Promise<SendMessage | undefined> {
         if (!source.guild) return await sendMessage(source, "Couldn't get guild data", undefined, true)
 
         const member = await source.guild.members.fetch(user.id)

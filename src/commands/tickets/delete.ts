@@ -53,7 +53,7 @@ export default class DeleteTicket extends Command {
                     .setLabel("YES")
                     .setEmoji("✖️")
                     .setCustomId("delete-yes")
-            )
+            ) as any
         ], true)
     }
 

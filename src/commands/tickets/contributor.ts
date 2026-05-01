@@ -101,13 +101,14 @@ export default class ContributorTicket extends Command {
 
             await updateTHMessage(updatedTicket.theoryhunt)
 
-            await source.channel.send({
-                embeds: [
-                    new EmbedBuilder()
-                        .setDescription(`<@${member.id}> added <@${target.id}> as contributor`)
-                        .setColor(Colors.GREEN)
-                ]
-            })
+            if ("send" in source.channel)
+                await source.channel.send({
+                    embeds: [
+                        new EmbedBuilder()
+                            .setDescription(`<@${member.id}> added <@${target.id}> as contributor`)
+                            .setColor(Colors.GREEN)
+                    ]
+                })
             return await sendMessage(source, "Added user!")
         } else if (type == "remove") {
             if (!contributor)
@@ -130,13 +131,14 @@ export default class ContributorTicket extends Command {
 
             await updateTHMessage(updatedTicket.theoryhunt)
 
-            await source.channel.send({
-                embeds: [
-                    new EmbedBuilder()
-                        .setDescription(`<@${member.id}> removed <@${target.id}> as contributor`)
-                        .setColor(Colors.RED)
-                ]
-            })
+            if ("send" in source.channel)
+                await source.channel.send({
+                    embeds: [
+                        new EmbedBuilder()
+                            .setDescription(`<@${member.id}> removed <@${target.id}> as contributor`)
+                            .setColor(Colors.RED)
+                    ]
+                })
             return await sendMessage(source, "Removed user!")
         }
 
