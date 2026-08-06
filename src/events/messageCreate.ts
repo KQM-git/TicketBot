@@ -3,11 +3,18 @@ import log4js from "log4js"
 import config from "../data/config.json"
 import client from "../main"
 import { getCommand, handleLegacyCommand } from "../utils/CommandHandler"
+import { updateMember, updateUser } from "../utils/UserUpdater"
 import { isTicketable } from "../utils/Utils"
 
 const Logger = log4js.getLogger("message")
 
 export async function handle(message: Message): Promise<void> {
+    // Messages carry member data, which is how member updates are tracked without the GuildMembers intent
+    if (message.member)
+        await updateMember(message.member)
+    else
+        await updateUser(message.author)
+
     if (message.author.bot) {
         if (message.type == MessageType.ChannelPinnedMessage && message.author.id == client.user?.id)
             try {

@@ -23,20 +23,15 @@ export default class Role extends Command {
         })
     }
 
-    lastFetched: Map<string, number> = new Map()
-
     async runInteraction(source: ChatInputCommandInteraction): Promise<SendMessage | undefined> {
         if (!source.guild) return await sendMessage(source, "Can't add to transcripts here", undefined, true)
         if (!source.memberPermissions?.has(PermissionFlagsBits.ManageRoles)) return await sendMessage(source, "You don't have manage role perms", undefined, true)
 
         await source.deferReply({ ephemeral: true })
 
-        if ((this.lastFetched.get(source.guild.id) ?? 0) + 5 * 60 * 1000 < Date.now()) {
-            Logger.log(`Member cache before: ${source.guild.members.cache.size}`)
-            await source.guild.members.fetch()
-            Logger.log(`Member cache after: ${source.guild.members.cache.size}`)
-            this.lastFetched.set(source.guild.id, Date.now())
-        }
+        // Fetching the full member list requires the privileged GuildMembers intent, which isn't
+        // requested, so this can only report on the members that happen to be cached.
+        Logger.log(`Member cache: ${source.guild.members.cache.size}`)
 
         const role = source.options.getRole("role", true)
         const fetched = await source.guild?.roles.fetch(role.id)
@@ -45,7 +40,7 @@ export default class Role extends Command {
         const memberNames = members.map(g => g.user.tag)
         const memberIDs = members.map(g => g.user.id)
 
-        await sendMessage(source, `Found ${members.length} members in role ${role.name} (${role.id})`, undefined, undefined, [
+        await sendMessage(source, `Found ${members.length} cached members in role ${role.name} (${role.id}) - note that this is limited to cached members, since the bot doesn't have the privileged GuildMembers intent`, undefined, undefined, [
             new AttachmentBuilder(Buffer.from(memberNames.join("\n")), { name: "names.txt" }),
             new AttachmentBuilder(Buffer.from(memberIDs.join("\n")), { name: "ids.txt" }),
         ])

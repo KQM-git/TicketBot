@@ -1,11 +1,18 @@
-import { Interaction } from "discord.js"
+import { GuildMember, Interaction } from "discord.js"
 import log4js from "log4js"
 import { getCommand, handleAutoComplete, handleButton, handleCommand, handleMessageContext, handleModalSubmit } from "../utils/CommandHandler"
+import { updateMember, updateUser } from "../utils/UserUpdater"
 import { isTicketable } from "../utils/Utils"
 
 const Logger = log4js.getLogger("interactionCreate")
 
 export async function handle(interaction: Interaction): Promise<void> {
+    // Interactions carry member data, which is how member updates are tracked without the GuildMembers intent
+    if (interaction.member instanceof GuildMember)
+        await updateMember(interaction.member)
+    else
+        await updateUser(interaction.user)
+
     if (interaction.isButton() || interaction.isModalSubmit()) {
         const commandName = interaction.customId.split("-")[0]
         const cmdInfo = getCommand(commandName)

@@ -104,12 +104,13 @@ export type MessageInput = {
     discordId: string
     createdAt: Date | string
     editedAt?: Date | string | null
-    attachments?: Enumerable<InputJsonValue>
-    reactions?: Enumerable<InputJsonValue>
-    embeds?: Enumerable<InputJsonValue>
+    // These map onto Json[] columns, Prisma requires an actual array for those
+    attachments?: InputJsonValue[]
+    reactions?: InputJsonValue[]
+    embeds?: InputJsonValue[]
     content: string
-    components?: Enumerable<InputJsonValue>
-    stickers?: Enumerable<InputJsonValue>
+    components?: InputJsonValue[]
+    stickers?: InputJsonValue[]
     reply?: string | null
     userId: string
     serverId: string

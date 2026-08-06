@@ -6,7 +6,7 @@ import { getLogger } from "log4js"
 import { baseUrl } from "../data/config.json"
 import TiBotClient from "../TiBotClient"
 import { ticketTypes } from "./TicketTypes"
-import { ChannelInput, EndingAction, Enumerable, InputJsonValue, MessageInput, RoleInput, SendMessage, TicketableChannel, UserConnection, UserInput, VerifierType } from "./Types"
+import { ChannelInput, EndingAction, InputJsonValue, MessageInput, RoleInput, SendMessage, TicketableChannel, UserConnection, UserInput, VerifierType } from "./Types"
 import { Colors, displayTimestamp, isTicketable, trim, updateMessage, verificationTypeName } from "./Utils"
 
 const Logger = getLogger("transcriber")
@@ -150,7 +150,7 @@ export default class TranscriptionManager {
                 embeds: msg.embeds.map(e => this.mapEmbeds(e, relevantRoles, relevantUsers, relevantChannels)),
                 content: this.parseText(msg.content, relevantRoles, relevantUsers, relevantChannels) ?? "",
                 components: msg.components.filter((c): c is ActionRow<MessageActionRowComponent> => c.type === ComponentType.ActionRow).map(c => this.mapRow(c)),
-                stickers: msg.stickers.toJSON() as unknown as Enumerable<InputJsonValue>,
+                stickers: msg.stickers.toJSON() as unknown as InputJsonValue[],
                 reply: msg.reference?.messageId,
                 userId: msg.author.id,
                 transcriptId: queued.transcriptId,

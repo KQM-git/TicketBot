@@ -19,8 +19,8 @@ intents.add(
     // For handling commands/archiving messages in guilds
     IntentsBitField.Flags.GuildMessages,
     IntentsBitField.Flags.MessageContent,
-    // Updating members
-    IntentsBitField.Flags.GuildMembers,
+    // NOTE: GuildMembers is a privileged intent and thus not requested. Member updates are instead
+    // picked up from the member data attached to messages/interactions, see utils/UserUpdater.
 )
 
 export default class TiBotClient extends Discord.Client {
@@ -58,7 +58,7 @@ export default class TiBotClient extends Discord.Client {
         Logger.info("Disconnecting DB...")
         await this.prisma.$disconnect()
         Logger.info("Done!")
-        this.destroy()
+        await this.destroy()
         process.exit(type)
     }
 
@@ -66,7 +66,7 @@ export default class TiBotClient extends Discord.Client {
         fs.readdir(join(__dirname, "./events/"), (err, files) => {
             if (err) return Logger.error(err)
             files.forEach(file => {
-                // eslint-disable-next-line @typescript-eslint/no-var-requires
+                // eslint-disable-next-line @typescript-eslint/no-require-imports
                 const event = require(`./events/${file}`)
                 const eventName = file.split(".")[0] as keyof ClientEvents
                 Logger.info(`Loading event ${eventName}`)
@@ -80,7 +80,7 @@ export default class TiBotClient extends Discord.Client {
                 if (err) return Logger.error(err)
                 files.forEach(file => {
                     if (!(file.endsWith(".js") || file.endsWith(".ts"))) return readDir(dir + file + "/")
-                    // eslint-disable-next-line @typescript-eslint/no-var-requires
+                    // eslint-disable-next-line @typescript-eslint/no-require-imports
                     const props = require(`${dir}${file}`)
                     const commandName = file.split(".")[0]
                     Logger.info(`Loading command ${commandName}`)

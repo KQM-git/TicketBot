@@ -1,5 +1,4 @@
-import { ActionRow, APIActionRowComponent, AttachmentBuilder, Channel, ColorResolvable, EmbedBuilder, GuildChannel, JSONEncodable, Message, MessageActionRowComponent, ThreadChannel } from "discord.js"
-import { APIMessageActionRowComponent } from "discord-api-types/v10"
+import { ActionRow, APIActionRowComponent, APIComponentInMessageActionRow, AttachmentBuilder, Channel, ColorResolvable, EmbedBuilder, GuildChannel, JSONEncodable, Message, MessageActionRowComponent, ThreadChannel } from "discord.js"
 import log4js from "log4js"
 import client from "../main"
 import { CommandSource, SendMessage, TicketableChannel, TicketStatus, VerifierType } from "./Types"
@@ -43,7 +42,7 @@ export const verificationTypeName: Record<VerifierType, string> = {
 }
 
 export async function sendMessage(source: CommandSource, response: string | EmbedBuilder, components?: (
-    | JSONEncodable<APIActionRowComponent<APIMessageActionRowComponent>>
+    | JSONEncodable<APIActionRowComponent<APIComponentInMessageActionRow>>
 )[], ephemeral?: boolean, files?: AttachmentBuilder[]): Promise<SendMessage | undefined> {
     let embeds: EmbedBuilder[] | undefined
     let content: string | undefined
